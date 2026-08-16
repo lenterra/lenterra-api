@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // goja is ES5.1 plus part of ES6. Rollup + babel does the downlevelling;
+    // this config is what stops the *source* from assuming anything newer.
+    "target": "ES5",
+    "lib": ["ES5", "ES2015.Core", "ES2015.Collection"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    // nakama-runtime supplies the `nkruntime` namespace. No DOM, no Node —
+    // neither exists inside the embedded VM.
+    "types": ["nakama-runtime"],
+    "paths": {
+      "@lenterra/core": ["../packages/core/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

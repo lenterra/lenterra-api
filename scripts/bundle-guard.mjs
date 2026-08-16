@@ -19,7 +19,63 @@ if (!existsSync(bundle)) {
 }
 
 const source = readFileSync(bundle, 'utf8');
-const lines = source.split('\n');
+
+/**
+ * Blank out comments and string literals, preserving line structure.
+ *
+ * The bundle keeps source comments, and those comments discuss the very things
+ * this guard bans — "no Buffer in goja", "the 200ms setTimeout recursion".
+ * Matching on raw text would flag the documentation explaining why the code is
+ * safe. String literals are blanked for the same reason: an error message
+ * naming `require` is not a call to it.
+ */
+function stripNonCode(input) {
+  let out = '';
+  let i = 0;
+  const n = input.length;
+
+  while (i < n) {
+    const ch = input[i];
+    const next = input[i + 1];
+
+    if (ch === '/' && next === '/') {
+      while (i < n && input[i] !== '\n') { out += ' '; i++; }
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      out += '  ';
+      i += 2;
+      while (i < n && !(input[i] === '*' && input[i + 1] === '/')) {
+        out += input[i] === '\n' ? '\n' : ' ';
+        i++;
+      }
+      out += '  ';
+      i += 2;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      const quote = ch;
+      out += ' ';
+      i++;
+      while (i < n && input[i] !== quote) {
+        if (input[i] === '\\') { out += '  '; i += 2; continue; }
+        out += input[i] === '\n' ? '\n' : ' ';
+        i++;
+      }
+      out += ' ';
+      i++;
+      continue;
+    }
+
+    out += ch;
+    i++;
+  }
+  return out;
+}
+
+const code = stripNonCode(source);
+const lines = code.split('\n');
+const rawLines = source.split('\n');
 
 const BANNED = [
   { name: 'require(', why: 'no module loader in goja' },
@@ -37,13 +93,15 @@ const BANNED = [
 const hits = [];
 for (let i = 0; i < lines.length; i++) {
   for (const { name, why } of BANNED) {
-    if (lines[i].includes(name)) hits.push({ line: i + 1, name, why, text: lines[i].trim().slice(0, 120) });
+    if (lines[i].includes(name)) {
+      hits.push({ line: i + 1, name, why, text: (rawLines[i] ?? '').trim().slice(0, 120) });
+    }
   }
 }
 
 // InitModule must be reachable as a global, or Nakama loads the file and finds
 // nothing to register.
-if (!/InitModule/.test(source)) {
+if (!/InitModule/.test(code)) {
   console.error('✖ the bundle does not define InitModule; Nakama would load it and register nothing');
   process.exit(1);
 }
