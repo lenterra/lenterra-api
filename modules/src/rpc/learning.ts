@@ -1,0 +1,254 @@
+/**
+ * Recommendations, progress, and course checks.
+ */
+
+import type { GameId, SkillNodeId } from '@lenterra/core';
+import { bandOf, isGameId } from '@lenterra/core';
+
+import { invalidArgument, notFound } from '../lib/errors';
+import { optionalString, requireArray, requireInt, requireString, type Ctx } from '../lib/ctx';
+import { Q } from '../db/queries';
+import { currentCatalog } from '../domain/catalog';
+import { applyAndPersist, readMastery } from '../domain/mastery';
+import { award, POINTS } from '../domain/ledger';
+import { recommend } from '../domain/selection';
+
+// ---------------------------------------------------------------------------
+// v1.mission.recommend
+// ---------------------------------------------------------------------------
+
+export interface RecommendReq {
+  limit?: number;
+  gameId?: string;
+}
+
+export function missionRecommend(c: Ctx, req: RecommendReq) {
+  const limit = req.limit === undefined ? 4 : requireInt(req.limit, 'limit', 1, 20);
+  const gameId = optionalString(req.gameId, 'gameId', 32);
+  if (gameId !== null && !isGameId(gameId)) throw invalidArgument('Unknown gameId');
+
+  const catalog = currentCatalog(c);
+  const result = recommend(
+    c,
+    c.userId,
+    catalog.version,
+    limit,
+    gameId === null ? undefined : (gameId as GameId),
+  );
+
+  return {
+    primary: result.recommendations.length > 0 ? result.recommendations[0] : null,
+    alternatives: result.recommendations.slice(1),
+    assignment: result.assignment,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// v1.progress.get
+// ---------------------------------------------------------------------------
+
+export interface ProgressReq {
+  include?: string[];
+}
+
+/**
+ * Bands, never raw numbers.
+ *
+ * The student app must be structurally incapable of showing a mastery value
+ * (PRD-ADPT-005) — a number invites comparison and gaming, and the number is a
+ * probability estimate that no 14-year-old should be asked to interpret. The
+ * teacher RPCs return raw values; this one does not.
+ */
+export function progressGet(c: Ctx, _req: ProgressReq) {
+  const snapshot = readMastery(c, c.userId);
+
+  const trendRows = c.nk.sqlQuery(Q.masteryTrend, [c.userId]) as {
+    skill_node_id: SkillNodeId;
+    direction: number;
+  }[];
+  const trends: Partial<Record<SkillNodeId, 'up' | 'flat' | 'down'>> = {};
+  for (let i = 0; i < trendRows.length; i++) {
+    const row = trendRows[i] as { skill_node_id: SkillNodeId; direction: number };
+    const direction = Number(row.direction);
+    trends[row.skill_node_id] = direction > 0 ? 'up' : direction < 0 ? 'down' : 'flat';
+  }
+
+  const mastery: { skillNodeId: string; band: string; evidenceCount: number; trend: string }[] = [];
+  const nodes = Object.keys(snapshot.state).sort() as SkillNodeId[];
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i] as SkillNodeId;
+    const state = snapshot.state[node];
+    if (!state) continue;
+    mastery.push({
+      skillNodeId: node,
+      band: bandOf(state.value, state.evidenceCount),
+      evidenceCount: state.evidenceCount,
+      trend: trends[node] ?? 'flat',
+    });
+  }
+
+  const courseRows = c.nk.sqlQuery(Q.courseProgress, [c.userId]) as {
+    course_id: string;
+    lessons_completed: number;
+  }[];
+  const courses: { courseId: string; lessonsCompleted: number }[] = [];
+  for (let i = 0; i < courseRows.length; i++) {
+    const row = courseRows[i] as { course_id: string; lessons_completed: number };
+    courses.push({ courseId: row.course_id, lessonsCompleted: Number(row.lessons_completed) });
+  }
+
+  const certRows = c.nk.sqlQuery(Q.certificatesForUser, [c.userId]) as {
+    id: string;
+    definition_id: string;
+    issued_ms: number;
+  }[];
+  const certificates: { id: string; definitionId: string; issuedAt: string }[] = [];
+  for (let i = 0; i < certRows.length; i++) {
+    const row = certRows[i] as { id: string; definition_id: string; issued_ms: number };
+    certificates.push({
+      id: row.id,
+      definitionId: row.definition_id,
+      issuedAt: new Date(Number(row.issued_ms)).toISOString(),
+    });
+  }
+
+  return { mastery, games: [], courses, certificates, weeklyActivity: [] };
+}
+
+// ---------------------------------------------------------------------------
+// v1.check.submit
+// ---------------------------------------------------------------------------
+
+export interface CheckSubmitReq {
+  idempotencyKey: string;
+  checkId: string;
+  courseId: string;
+  lessonId: string;
+  catalogVersion: string;
+  answers: { itemId: string; answer: unknown }[];
+  playedOffline?: boolean;
+}
+
+export interface CheckDefinition {
+  items: { itemId: string; correct: unknown; explainKey: string }[];
+  passMark: number;
+  skillWeights: Partial<Record<SkillNodeId, number>>;
+}
+
+/**
+ * Grade a course check server-side.
+ *
+ * The client's provisional grade is never persisted (PRD-CRS-004): the answer
+ * key is not shipped to the device, so a student cannot read it out of the
+ * bundle, and the recorded score is the one the server computed.
+ */
+export function checkSubmit(c: Ctx, req: CheckSubmitReq) {
+  const idempotencyKey = requireString(req.idempotencyKey, 'idempotencyKey', 128);
+  const checkId = requireString(req.checkId, 'checkId', 128);
+  const courseId = requireString(req.courseId, 'courseId', 128);
+  const lessonId = requireString(req.lessonId, 'lessonId', 128);
+  const catalogVersion = requireString(req.catalogVersion, 'catalogVersion', 128);
+  const answers = requireArray<{ itemId: string; answer: unknown }>(req.answers, 'answers', 100);
+
+  const existing = c.nk.sqlQuery(Q.checkByKey, [idempotencyKey]);
+  if (existing.length > 0) {
+    const row = existing[0] as { score: number; passed: boolean; attempt_number: number };
+    return {
+      score: Number(row.score),
+      passed: row.passed,
+      attemptNumber: Number(row.attempt_number),
+      itemResults: [],
+      masteryChanges: [],
+      pointsAwarded: [],
+    };
+  }
+
+  const definition = loadCheck(c, catalogVersion, checkId);
+
+  let correctCount = 0;
+  const itemResults: { itemId: string; correct: boolean; explainKey: string }[] = [];
+
+  for (let i = 0; i < definition.items.length; i++) {
+    const item = definition.items[i] as CheckDefinition['items'][number];
+    let given: unknown = undefined;
+    for (let j = 0; j < answers.length; j++) {
+      const answer = answers[j] as { itemId: string; answer: unknown };
+      if (answer.itemId === item.itemId) given = answer.answer;
+    }
+    const correct = JSON.stringify(given) === JSON.stringify(item.correct);
+    if (correct) correctCount++;
+    itemResults.push({ itemId: item.itemId, correct, explainKey: item.explainKey });
+  }
+
+  const score = definition.items.length === 0 ? 0 : correctCount / definition.items.length;
+  const passed = score >= definition.passMark;
+
+  const numberRows = c.nk.sqlQuery(Q.checkAttemptNumber, [c.userId, checkId]);
+  const attemptNumber = numberRows.length > 0 ? Number((numberRows[0] as { n: number }).n) : 1;
+
+  const checkResultId = c.nk.uuidv4();
+  c.nk.sqlExec(Q.checkInsert, [
+    checkResultId,
+    c.userId,
+    checkId,
+    courseId,
+    lessonId,
+    catalogVersion,
+    JSON.stringify(answers),
+    score,
+    passed,
+    attemptNumber,
+    req.playedOffline === true,
+    idempotencyKey,
+  ]);
+
+  const snapshot = readMastery(c, c.userId);
+  const masteryChanges = applyAndPersist(c, snapshot, {
+    userId: c.userId,
+    skillWeights: definition.skillWeights,
+    outcome: passed ? 'success' : 'failure',
+    hintShown: false,
+    hintUsed: false,
+    // A course check is independent evidence and counts toward the
+    // multi-source requirement — the transfer signal M-L05 looks for.
+    source: 'check',
+    sourceKey: checkId,
+    sourceType: 'check',
+    sourceId: checkResultId,
+  });
+
+  const pointsAwarded = [];
+  if (passed) {
+    const granted = award(
+      c,
+      c.userId,
+      POINTS.checkPassed,
+      'check.passed',
+      'check',
+      checkResultId,
+      `check.passed:${checkResultId}`,
+    );
+    if (granted) pointsAwarded.push(granted);
+    c.nk.sqlExec(Q.lessonComplete, [c.userId, courseId, lessonId]);
+  }
+
+  return { score, passed, attemptNumber, itemResults, masteryChanges, pointsAwarded };
+}
+
+/**
+ * Load a check's answer key from the catalog.
+ *
+ * Checks live in the `checks.*` catalog parts, which the client is never served
+ * — the manifest lists them but `v1.catalog.pull` refuses them.
+ */
+function loadCheck(c: Ctx, catalogVersion: string, checkId: string): CheckDefinition {
+  const rows = c.nk.sqlQuery(Q.catalogPull, [catalogVersion, ['checks.answers']]) as {
+    body: Record<string, CheckDefinition>;
+  }[];
+  if (rows.length === 0) throw notFound('Check definitions are not published');
+
+  const body = (rows[0] as { body: Record<string, CheckDefinition> }).body ?? {};
+  const definition = body[checkId];
+  if (!definition) throw notFound('Unknown check');
+  return definition;
+}
