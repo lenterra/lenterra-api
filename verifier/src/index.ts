@@ -13,7 +13,7 @@
 
 import express, { type Request, type Response } from 'express';
 import { createThirdwebClient } from 'thirdweb';
-import { createAuth } from 'thirdweb/auth';
+import { createAuth, type LoginPayload } from 'thirdweb/auth';
 
 import {
   ASSERTION_TTL_SECONDS,
@@ -61,36 +61,79 @@ function logAttempt(outcome: string, detail?: string): void {
 const nowSeconds = (): number => Math.floor(Date.now() / 1000);
 
 /**
- * Exchange a thirdweb RS256 JWT for a short-lived HS256 assertion.
+ * Step 1: issue a login payload for an address to sign.
+ *
+ * A nonce the client cannot choose is what makes the signature in step 2
+ * un-replayable. thirdweb tracks it internally and rejects a reused one.
  */
-app.post('/session', async (req: Request, res: Response) => {
-  const twJwt = (req.body as { twJwt?: unknown })?.twJwt;
+app.post('/session/challenge', async (req: Request, res: Response) => {
+  const address = (req.body as { address?: unknown })?.address;
 
-  if (typeof twJwt !== 'string' || twJwt.length === 0) {
-    logAttempt('rejected', 'missing_token');
-    return res.status(400).json({ error: 'missing_token' });
+  if (typeof address !== 'string' || !address.startsWith('0x')) {
+    logAttempt('rejected', 'missing_address');
+    return res.status(400).json({ error: 'missing_address' });
   }
-
   if (!auth) {
     logAttempt('unavailable', 'thirdweb_not_configured');
     return res.status(503).json({ error: 'verifier_not_configured' });
   }
 
   try {
-    const result = await auth.verifyJWT({ jwt: twJwt });
-    if (!result.valid) {
-      logAttempt('rejected', 'invalid_token');
-      return res.status(401).json({ error: 'invalid_token' });
+    const payload = await auth.generatePayload({ address });
+    logAttempt('challenged');
+    return res.json({ payload });
+  } catch (err) {
+    logAttempt('error', err instanceof Error ? err.name : 'unknown');
+    return res.status(500).json({ error: 'challenge_failed' });
+  }
+});
+
+/**
+ * Step 2: exchange a signed login payload for a short-lived HS256 assertion.
+ *
+ * **Corrected from the original design (ADR-004).** That assumed the wallet
+ * could hand over an RS256 JWT via `getAuthToken()`. thirdweb v5 exposes no such
+ * method; its supported flow is sign-in-with-Ethereum, where the wallet signs a
+ * server-issued payload.
+ *
+ * This is the better primitive anyway. A bearer token proves only that the
+ * holder was given one; a signature over a server-chosen nonce proves the caller
+ * controls the private key for that address *right now* — which is exactly the
+ * claim the whole chain exists to establish.
+ */
+app.post('/session', async (req: Request, res: Response) => {
+  const body = req.body as { payload?: LoginPayload; signature?: unknown; strategy?: unknown };
+
+  if (!body?.payload || typeof body.signature !== 'string') {
+    logAttempt('rejected', 'missing_signature');
+    return res.status(400).json({ error: 'missing_signature' });
+  }
+  if (!auth) {
+    logAttempt('unavailable', 'thirdweb_not_configured');
+    return res.status(503).json({ error: 'verifier_not_configured' });
+  }
+
+  try {
+    const verified = await auth.verifyPayload({
+      payload: body.payload,
+      signature: body.signature as `0x${string}`,
+    });
+
+    if (!verified.valid) {
+      logAttempt('rejected', 'invalid_signature');
+      return res.status(401).json({ error: 'invalid_signature' });
     }
 
-    const parsed = result.parsedJWT as { sub?: string; ctx?: { strategy?: string } };
-    const address = (parsed.sub ?? '').toLowerCase();
+    // The address comes from the *verified* payload, never from the request
+    // body. Reading it from anywhere else would reintroduce the hole this
+    // whole service exists to close.
+    const address = verified.payload.address.toLowerCase();
     if (!address.startsWith('0x')) {
       logAttempt('rejected', 'unexpected_subject');
-      return res.status(401).json({ error: 'invalid_token' });
+      return res.status(401).json({ error: 'invalid_signature' });
     }
 
-    const strategy = normaliseStrategy(parsed.ctx?.strategy);
+    const strategy = normaliseStrategy(body.strategy);
     const claims = buildClaims(address, strategy, nowSeconds());
 
     logAttempt('issued', strategy);
@@ -101,7 +144,7 @@ app.post('/session', async (req: Request, res: Response) => {
     });
   } catch (err) {
     logAttempt('error', err instanceof Error ? err.name : 'unknown');
-    return res.status(401).json({ error: 'invalid_token' });
+    return res.status(401).json({ error: 'invalid_signature' });
   }
 });
 
