@@ -1,0 +1,23 @@
+# English trails Indonesian by design (ADR-010).
+mission:
+  congklak:
+    m01: { title: "First Sowing", brief: "Pick a pit and sow its seeds until one reaches your store.", hint1: "Count the seeds before you choose.", fail: { ranOut: "Your seeds ran out before reaching the store." } }
+    m02: { title: "Two Seeds", brief: "Collect 2 seeds in your store.", hint1: "A seed stopping exactly in your store earns another turn.", fail: { notEnough: "Not enough seeds in your store yet." } }
+    m03: { title: "Another Turn", brief: "End a sow exactly in your store to earn another turn.", hint1: "Which pit is exactly the right distance from the store?", fail: { noExtra: "Your last seed did not stop in the store." } }
+    m04: { title: "Around the Board", brief: "Sow far enough that the seeds wrap past the end of the board.", hint1: "Sometimes the fuller pit is the one that reaches.", fail: { ranOut: "Your sowing stopped before wrapping around." } }
+    m05: { title: "Guess the End", brief: "Say where your last seed will land, then sow.", hint1: "Count step by step, and remember the opponent's store is skipped.", fail: { wrongGuess: "Your guess was off. Count the steps again." } }
+    m06: { title: "Chain of Two", brief: "Trigger a sowing chain of at least 2 links.", hint1: "If the last seed lands in a pit that already has seeds, sowing continues.", fail: { noChain: "Your chain stopped before linking twice." } }
+    m07: { title: "Long Chain", brief: "Trigger a sowing chain of at least 4 links.", hint1: "Start from the pit that makes the next link long.", fail: { noChain: "Your chain broke too early." } }
+    m08: { title: "Two Turns", brief: "Earn two extra turns in a row.", hint1: "After an extra turn, look for another pit that lands in the store.", fail: { broken: "Your run of extra turns was broken." } }
+    m09: { title: "Six Seeds", brief: "Collect 6 seeds in your store within 3 moves.", hint1: "A long chain can pass the store more than once.", fail: { outOfMoves: "You ran out of moves before collecting 6." } }
+    m10: { title: "First Capture", brief: "Make one capture by ending in an empty pit of your own.", hint1: "A last seed landing in your empty pit captures the pit opposite.", fail: { noCapture: "You have not captured anything yet." } }
+    m11: { title: "Prepare the Pit", brief: "Empty a pit this turn, capture into it next turn.", hint1: "A capture needs a move of preparation first.", fail: { noCapture: "Your pit was not ready when the moment came." } }
+    m12: { title: "Big Capture", brief: "Capture 8 or more seeds in a single move.", hint1: "Look for the fullest pit on the opposite side.", fail: { tooSmall: "Your capture was too small." } }
+    m13: { title: "Stay Covered", brief: "Reach the goal without ever leaving a pit your opponent could capture.", hint1: "A full pit facing an empty one is an easy target.", fail: { exposed: "You left a pit your opponent could capture." } }
+    m14: { title: "Capture Back", brief: "Your opponent threatens a capture. Defend, then capture back.", hint1: "Sometimes moving seeds beats adding to them.", fail: { noCapture: "You defended, but did not capture back." } }
+    m15: { title: "Do Not Be Greedy", brief: "Win from a position where the fullest pit is a trap.", hint1: "The fullest pit is not always the best pit.", fail: { greedy: "You took the fullest pit, and your opponent captured back." } }
+    m16: { title: "Bigger Board", brief: "The same lesson on a seven-pit board.", hint1: "A bigger board means the store is further away.", fail: { greedy: "The fullest pit was the wrong answer again." } }
+    m17: { title: "Two Options", brief: "Two moves look the same. Only one wins.", hint1: "Picture the board after two moves, not one.", fail: { wrongBranch: "Your choice looked good, and lost in three moves." } }
+    m18: { title: "The Best Move", brief: "Find the single best move among all the options.", hint1: "Compare the end results, not the immediate ones.", fail: { notOptimal: "There was a better move than the one you chose." } }
+    m19: { title: "Beat the Machine", brief: "Beat the machine opponent at medium strength.", hint1: "Keep your store filling and do not open pits carelessly.", fail: { outscored: "Your opponent collected more seeds." } }
+    m20: { title: "Board Champion", brief: "Beat the strongest machine opponent on a seven-pit board.", hint1: "Plan two moves ahead, not one.", fail: { outscored: "Your opponent looked further ahead than you did." } }

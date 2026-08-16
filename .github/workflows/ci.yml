@@ -56,6 +56,11 @@ jobs:
       - name: bundle guard
         run: npm run guard:bundle
 
+      # Content is where a mission that teaches nothing, or one nobody can win,
+      # would otherwise reach a student.
+      - name: content validation
+        run: npm run content:validate
+
       - name: unit tests
         run: npm test
 

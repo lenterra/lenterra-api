@@ -1,0 +1,51 @@
+# Congklak mission 06 — Rantai Dua
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m06
+game: congklak
+rank: 6
+contentVersion: 1
+eloDifficulty: 900
+seed: 1006
+
+skillWeights:
+  algo.iteration: 0.65
+  algo.sequencing: 0.35
+
+rationale: >-
+  A continuation chain is a loop whose output feeds the next iteration, executed by hand one pit at a time.
+
+goal:
+  kind: chain
+  count: 2
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 2, 2, 2, 2, 2, 0, 1, 2, 0, 0, 1]
+
+constraints:
+  maxMoves: 8
+  parMoves: 1
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: true
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m06.title
+briefKey: mission.congklak.m06.brief
+hintKeys:
+  - mission.congklak.m06.hint1
+failureKeys:
+  noChain: mission.congklak.m06.fail.noChain

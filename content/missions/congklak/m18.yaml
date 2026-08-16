@@ -1,0 +1,58 @@
+# Congklak mission 18 — Langkah Terbaik
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m18
+game: congklak
+rank: 18
+contentVersion: 1
+eloDifficulty: 1550
+# Verified by the solver: the fullest pit loses, another opening wins.
+greedyTrap: true
+seed: 1018
+
+skillWeights:
+  algo.optimization: 0.6
+  algo.state-eval: 0.2
+  algo.lookahead: 0.2
+
+rationale: >-
+  Every sow is legal and only the highest ranked one keeps the lumbung filling, so the student compares resulting positions across all pits.
+
+goal:
+  kind: all
+  goals:
+    - kind: collect
+      count: 2
+    - kind: best_move
+      maxRank: 0
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 2, 2, 2, 2, 2, 0, 3, 11, 5, 7, 6]
+
+constraints:
+  maxMoves: 6
+  parMoves: 2
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m18.title
+briefKey: mission.congklak.m18.brief
+hintKeys:
+  - mission.congklak.m18.hint1
+failureKeys:
+  notOptimal: mission.congklak.m18.fail.notOptimal

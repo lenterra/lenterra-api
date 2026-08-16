@@ -1,0 +1,57 @@
+# Congklak mission 16 — Papan Besar
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m16
+game: congklak
+rank: 16
+contentVersion: 1
+eloDifficulty: 1250
+seed: 1016
+# Verified by the solver: the fullest pit loses, another opening wins.
+greedyTrap: true
+
+skillWeights:
+  algo.greedy: 0.5
+  comp.modular: 0.3
+  algo.iteration: 0.2
+
+rationale: >-
+  On a seven pit board the distance to the lumbung is longer, so the fullest pit overshoots further and the student must recompute rather than reuse the smaller board habit.
+
+goal:
+  kind: within
+  moves: 2
+  goal:
+    kind: collect
+    count: 2
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 2, 2, 2, 2, 2, 2, 2, 0, 11, 0, 0, 0, 0, 9, 8]
+
+constraints:
+  maxMoves: 10
+  parMoves: 2
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m16.title
+briefKey: mission.congklak.m16.brief
+hintKeys:
+  - mission.congklak.m16.hint1
+failureKeys:
+  greedy: mission.congklak.m16.fail.greedy

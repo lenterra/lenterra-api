@@ -1,0 +1,55 @@
+# Congklak mission 14 — Balas Tembakan
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m14
+game: congklak
+rank: 14
+contentVersion: 1
+eloDifficulty: 1300
+seed: 1014
+
+skillWeights:
+  algo.state-eval: 0.5
+  algo.lookahead: 0.3
+  sec.risk: 0.2
+
+rationale: >-
+  The opponent threatens a capture on the board as set up, so the student must compare positions rather than take the first capture offered.
+
+goal:
+  kind: within
+  moves: 2
+  goal:
+    kind: capture
+    count: 12
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 2, 4, 2, 6, 2, 0, 1, 0, 1, 0, 3]
+
+constraints:
+  maxMoves: 10
+  parMoves: 3
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: true
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m14.title
+briefKey: mission.congklak.m14.brief
+hintKeys:
+  - mission.congklak.m14.hint1
+failureKeys:
+  noCapture: mission.congklak.m14.fail.noCapture

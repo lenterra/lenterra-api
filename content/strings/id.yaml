@@ -1,0 +1,23 @@
+# Indonesian is the source locale (ADR-010). English may lag; Indonesian may not.
+mission:
+  congklak:
+    m01: { title: "Sebar Pertama", brief: "Pilih satu lubang dan sebar bijinya sampai ada yang masuk lumbungmu.", hint1: "Hitung dulu bijinya sebelum memilih.", fail: { ranOut: "Bijimu habis sebelum mencapai lumbung." } }
+    m02: { title: "Dua Biji", brief: "Kumpulkan 2 biji di lumbungmu.", hint1: "Biji yang berhenti tepat di lumbung memberimu giliran lagi.", fail: { notEnough: "Belum cukup biji di lumbungmu." } }
+    m03: { title: "Giliran Lagi", brief: "Akhiri sebaranmu tepat di lumbung untuk mendapat giliran lagi.", hint1: "Lubang mana yang jaraknya pas ke lumbung?", fail: { noExtra: "Biji terakhirmu tidak berhenti di lumbung." } }
+    m04: { title: "Putar Papan", brief: "Sebar biji sampai melewati ujung papan dan kembali berputar.", hint1: "Kadang lubang dengan biji lebih banyak justru yang sampai.", fail: { ranOut: "Sebaranmu berhenti sebelum melewati ujung papan." } }
+    m05: { title: "Tebak Akhir", brief: "Tebak dulu di lubang mana biji terakhirmu berhenti, baru sebar.", hint1: "Hitung langkahnya satu per satu, ingat lumbung lawan dilewati.", fail: { wrongGuess: "Tebakanmu meleset. Hitung ulang langkahnya." } }
+    m06: { title: "Rantai Dua", brief: "Buat rantai sebaran minimal 2 sambungan.", hint1: "Kalau biji terakhir jatuh di lubang berisi, sebarannya lanjut.", fail: { noChain: "Sebaranmu berhenti sebelum menyambung dua kali." } }
+    m07: { title: "Rantai Panjang", brief: "Buat rantai sebaran minimal 4 sambungan.", hint1: "Mulai dari lubang yang membuat sambungan berikutnya panjang.", fail: { noChain: "Rantaimu putus terlalu cepat." } }
+    m08: { title: "Dua Giliran", brief: "Dapatkan dua giliran tambahan berturut-turut.", hint1: "Setelah giliran tambahan, cari lubang yang pas ke lumbung lagi.", fail: { broken: "Giliran tambahanmu terputus." } }
+    m09: { title: "Enam Biji", brief: "Kumpulkan 6 biji di lumbungmu dalam 3 langkah.", hint1: "Rantai panjang bisa melewati lumbung lebih dari sekali.", fail: { outOfMoves: "Langkahmu habis sebelum terkumpul 6 biji." } }
+    m10: { title: "Tembakan Pertama", brief: "Lakukan satu tembakan: berhenti di lubang kosong milikmu.", hint1: "Biji terakhir yang jatuh di lubang kosongmu menembak lubang seberang.", fail: { noCapture: "Kamu belum menembak satu pun." } }
+    m11: { title: "Siapkan Lubang", brief: "Kosongkan sebuah lubang sekarang, tembak ke lubang itu giliran berikutnya.", hint1: "Tembakan butuh persiapan satu langkah sebelumnya.", fail: { noCapture: "Lubangmu belum siap saat waktunya menembak." } }
+    m12: { title: "Tembakan Besar", brief: "Tembak 8 biji atau lebih dalam satu langkah.", hint1: "Cari lubang seberang yang paling penuh.", fail: { tooSmall: "Tembakanmu terlalu kecil." } }
+    m13: { title: "Jangan Tertembak", brief: "Capai tujuan tanpa pernah membuka lubang yang bisa ditembak lawan.", hint1: "Lubang berisi yang seberangnya kosong adalah sasaran empuk.", fail: { exposed: "Kamu membuka lubang yang bisa ditembak lawan." } }
+    m14: { title: "Balas Tembakan", brief: "Lawan mengancam menembak. Bertahan, lalu balas menembak.", hint1: "Kadang memindahkan biji lebih baik daripada menambahnya.", fail: { noCapture: "Kamu bertahan, tapi belum membalas." } }
+    m15: { title: "Jangan Serakah", brief: "Menang dari posisi yang lubang terbanyaknya adalah jebakan.", hint1: "Lubang terbanyak belum tentu terbaik.", fail: { greedy: "Kamu mengambil lubang terbanyak, dan lawan menembak balik." } }
+    m16: { title: "Papan Besar", brief: "Pelajaran yang sama di papan tujuh lubang.", hint1: "Papan lebih besar berarti jarak ke lumbung lebih jauh.", fail: { greedy: "Lubang terbanyak lagi-lagi bukan jawabannya." } }
+    m17: { title: "Dua Pilihan", brief: "Dua langkah terlihat sama. Hanya satu yang menang.", hint1: "Bayangkan papan setelah dua langkah, bukan satu.", fail: { wrongBranch: "Pilihanmu terlihat bagus, tapi kalah dalam tiga langkah." } }
+    m18: { title: "Langkah Terbaik", brief: "Temukan satu langkah terbaik dari semua pilihan yang ada.", hint1: "Bandingkan hasil akhirnya, bukan hasil langsungnya.", fail: { notOptimal: "Ada langkah yang lebih baik dari pilihanmu." } }
+    m19: { title: "Lawan Mesin", brief: "Kalahkan lawan mesin pada tingkat sedang.", hint1: "Jaga lumbungmu tetap terisi dan jangan buka lubang sembarangan.", fail: { outscored: "Lawan mengumpulkan lebih banyak biji." } }
+    m20: { title: "Juara Papan", brief: "Kalahkan lawan mesin terkuat di papan tujuh lubang.", hint1: "Rencanakan dua langkah ke depan, bukan satu.", fail: { outscored: "Lawan bermain lebih jauh ke depan darimu." } }

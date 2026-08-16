@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+// Runs every content check and fails the build on an error.
+//
+// Two reviewers still have to approve a mission (PRD-CNT-005) — this cannot
+// judge whether a mission teaches anything. What it can do is refuse the ways
+// content breaks silently: weights that do not sum, a skill claimed with no
+// mechanic behind it, a ladder with a gap, a mission nobody can win, and a
+// greedy-trap quota that has quietly eroded as content was added.
+
+import { checkAll, report } from './content-lib.mjs';
+import { checkGreedyTrapQuota } from '../packages/core/dist/index.js';
+
+const games = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+const skipSolver = process.argv.includes('--fast');
+const targets = games.length > 0 ? games : ['congklak', 'benteng'];
+
+let totalErrors = 0;
+let totalWarnings = 0;
+
+for (const game of targets) {
+  const { missions, issues, solved, traps } = checkAll(game, { skipSolver });
+
+  if (missions.length === 0) {
+    console.log(`${game}: no missions authored yet`);
+    continue;
+  }
+
+  const all = issues.slice();
+  if (game === 'congklak' && !skipSolver) {
+    for (const issue of checkGreedyTrapQuota(missions, traps)) all.push(issue);
+  }
+
+  console.log(`\n${game}: ${missions.length} missions`);
+  const counts = report(all);
+  totalErrors += counts.errors;
+  totalWarnings += counts.warnings;
+
+  if (!skipSolver) {
+    const lines = missions
+      .map((m) => {
+        const s = solved.get(m.id);
+        const line = s?.solvable ? `${s.line.length} move(s)` : 'UNSOLVED';
+        const trap = traps.has(m.id) ? ' · greedy trap' : '';
+        return `  rank ${String(m.rank).padStart(2)}  ${m.id.padEnd(16)} elo ${String(m.eloDifficulty).padStart(4)}  ${line}${trap}`;
+      })
+      .join('\n');
+    console.log(lines);
+    if (game === 'congklak') {
+      console.log(`  greedy traps: ${traps.size}/${missions.length} (need ${Math.ceil(missions.length / 3)})`);
+    }
+  }
+
+  if (counts.errors === 0) console.log(`  ✓ ${game} content is valid`);
+}
+
+console.log(`\n${totalErrors} error(s), ${totalWarnings} warning(s)`);
+process.exit(totalErrors > 0 ? 1 : 0);

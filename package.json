@@ -16,6 +16,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:schema": "node --test test/schema.test.mjs",
+    "content:validate": "node scripts/content-validate.mjs",
+    "content:publish": "node scripts/content-publish.mjs",
     "test:integration": "node --test \"test/integration/*.test.mjs\"",
     "build": "npm run build -w @lenterra/core && npm run build -w @lenterra/modules",
     "build:core": "npm run build -w @lenterra/core",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
+    "js-yaml": "^5.3.0",
     "pg": "^8.13.1",
     "typescript": "^5.6.3"
   }

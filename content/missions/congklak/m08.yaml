@@ -1,0 +1,58 @@
+# Congklak mission 08 — Dua Giliran
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m08
+game: congklak
+rank: 8
+contentVersion: 1
+eloDifficulty: 1150
+# Verified by the solver: the fullest pit loses, another opening wins.
+greedyTrap: true
+seed: 1008
+
+skillWeights:
+  algo.branching: 0.5
+  algo.lookahead: 0.3
+  comp.modular: 0.2
+
+rationale: >-
+  Two extra turns in a row requires seeing that after the first store landing another pit still has the exact distance.
+
+goal:
+  kind: within
+  moves: 2
+  goal:
+    kind: extra_turns
+    count: 2
+    consecutive: true
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 2, 2, 2, 2, 2, 0, 9, 0, 8, 7, 6]
+
+constraints:
+  maxMoves: 8
+  parMoves: 2
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m08.title
+briefKey: mission.congklak.m08.brief
+hintKeys:
+  - mission.congklak.m08.hint1
+failureKeys:
+  broken: mission.congklak.m08.fail.broken

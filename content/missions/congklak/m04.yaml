@@ -1,0 +1,51 @@
+# Congklak mission 04 — Putar Papan
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m04
+game: congklak
+rank: 4
+contentVersion: 1
+eloDifficulty: 950
+seed: 1004
+
+skillWeights:
+  comp.modular: 0.7
+  comp.counting: 0.3
+
+rationale: >-
+  Only the pit whose sowing wraps past the end of the board reaches the lumbung, which is modular arithmetic made physical.
+
+goal:
+  kind: collect
+  count: 1
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 1, 1, 1, 1, 1, 0, 2, 0, 0, 7, 1]
+
+constraints:
+  maxMoves: 6
+  parMoves: 1
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m04.title
+briefKey: mission.congklak.m04.brief
+hintKeys:
+  - mission.congklak.m04.hint1
+failureKeys:
+  ranOut: mission.congklak.m04.fail.ranOut

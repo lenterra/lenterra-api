@@ -1,0 +1,52 @@
+# Congklak mission 19 — Lawan Mesin
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m19
+game: congklak
+rank: 19
+contentVersion: 1
+eloDifficulty: 1450
+seed: 1019
+
+skillWeights:
+  algo.state-eval: 0.4
+  algo.lookahead: 0.3
+  algo.greedy: 0.2
+  algo.optimization: 0.1
+
+rationale: >-
+  A full game against a deterministic opponent forces the student to judge which of several positions is better and say why, across many sows.
+
+goal:
+  kind: outscore
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7]
+
+constraints:
+  maxMoves: 60
+  aiTier: sedang
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: true
+  continuationEnabled: true
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m19.title
+briefKey: mission.congklak.m19.brief
+hintKeys:
+  - mission.congklak.m19.hint1
+failureKeys:
+  outscored: mission.congklak.m19.fail.outscored

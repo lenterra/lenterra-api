@@ -1,0 +1,56 @@
+# Congklak mission 15 — Jangan Serakah
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m15
+game: congklak
+rank: 15
+contentVersion: 1
+eloDifficulty: 1150
+seed: 1015
+# Verified by the solver: the fullest pit loses, another opening wins.
+greedyTrap: true
+
+skillWeights:
+  algo.greedy: 0.65
+  algo.state-eval: 0.35
+
+rationale: >-
+  The fullest pit overshoots the lumbung and feeds the opponent row, while a smaller pit lands exactly, so taking the most seeds loses.
+
+goal:
+  kind: within
+  moves: 1
+  goal:
+    kind: collect
+    count: 1
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 2, 2, 2, 2, 2, 0, 9, 0, 0, 0, 6]
+
+constraints:
+  maxMoves: 8
+  parMoves: 2
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m15.title
+briefKey: mission.congklak.m15.brief
+hintKeys:
+  - mission.congklak.m15.hint1
+failureKeys:
+  greedy: mission.congklak.m15.fail.greedy

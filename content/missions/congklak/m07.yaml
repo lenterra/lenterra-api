@@ -1,0 +1,51 @@
+# Congklak mission 07 — Rantai Panjang
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m07
+game: congklak
+rank: 7
+contentVersion: 1
+eloDifficulty: 950
+seed: 1007
+
+skillWeights:
+  algo.iteration: 0.7
+  algo.lookahead: 0.3
+
+rationale: >-
+  Reaching four links means choosing the starting pit whose chain keeps finding non-empty pits, which is reasoning about a loop terminating.
+
+goal:
+  kind: chain
+  count: 4
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 3, 3, 3, 3, 3, 0, 1, 2, 3, 4, 5]
+
+constraints:
+  maxMoves: 10
+  parMoves: 2
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: true
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m07.title
+briefKey: mission.congklak.m07.brief
+hintKeys:
+  - mission.congklak.m07.hint1
+failureKeys:
+  noChain: mission.congklak.m07.fail.noChain

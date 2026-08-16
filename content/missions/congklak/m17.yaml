@@ -1,0 +1,57 @@
+# Congklak mission 17 — Dua Pilihan
+#
+# Board indices (5 pits per side, 12 cells):
+#   0        player 2's store (lumbung)
+#   1-5      player 2's row
+#   6        player 1's store  ← the student
+#   7-11     player 1's row
+#
+# Distance to the student's store: pit 11 is 6 steps, 10 is 7, 9 is 8, 8 is 9,
+# 7 is 10 — the opponent's store at index 0 is skipped.
+
+id: congklak.m17
+game: congklak
+rank: 17
+contentVersion: 1
+eloDifficulty: 1350
+# Verified by the solver: the fullest pit loses, another opening wins.
+greedyTrap: true
+seed: 1017
+
+skillWeights:
+  algo.state-eval: 0.65
+  algo.lookahead: 0.35
+
+rationale: >-
+  Two openings each drop a seed in the lumbung on the way past, and only one of them stops there to earn the turn again, so the student must compare the resulting positions rather than the immediate gain.
+
+goal:
+  kind: within
+  moves: 2
+  goal:
+    kind: extra_turns
+    count: 2
+    consecutive: true
+
+setup:
+  game: congklak
+  playerSide: 1
+  toMove: 1
+  pits: [0, 1, 1, 1, 1, 1, 0, 0, 10, 8, 3, 6]
+
+constraints:
+  maxMoves: 4
+  parMoves: 2
+
+config:
+  extraTurnOnStore: true
+  captureEnabled: false
+  continuationEnabled: false
+  sweepOnEnd: true
+
+titleKey: mission.congklak.m17.title
+briefKey: mission.congklak.m17.brief
+hintKeys:
+  - mission.congklak.m17.hint1
+failureKeys:
+  wrongBranch: mission.congklak.m17.fail.wrongBranch
