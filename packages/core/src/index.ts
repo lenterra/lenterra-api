@@ -63,3 +63,4 @@ export {
 
 // --- content ---------------------------------------------------------------
 export * from './content/validate';
+export * from './content/solver';

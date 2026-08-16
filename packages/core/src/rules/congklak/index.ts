@@ -45,6 +45,7 @@ function initState(setup: MissionSetup, config: GameConfig): CongklakState {
     pendingPrediction: null,
     finished: false,
     extraTurnOnStore: config.extraTurnOnStore ?? DEFAULT_GAME_CONFIG.extraTurnOnStore,
+    requirePrediction: config.requirePrediction === true,
     captureEnabled: config.captureEnabled ?? DEFAULT_GAME_CONFIG.captureEnabled,
     continuationEnabled: config.continuationEnabled ?? DEFAULT_GAME_CONFIG.continuationEnabled,
     sweepOnEnd: config.sweepOnEnd ?? DEFAULT_GAME_CONFIG.sweepOnEnd,
@@ -62,6 +63,7 @@ function hashState(state: CongklakState): string {
   return sha256(
     canonicalJson({
       pits: state.pits,
+      pendingPrediction: state.pendingPrediction,
       toMove: state.toMove,
       playerSide: state.playerSide,
       turn: state.turn,

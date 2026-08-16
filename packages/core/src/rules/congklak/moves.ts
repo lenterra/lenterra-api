@@ -35,10 +35,33 @@ export type CongklakMove =
 /** Guard against a pathological mission definition looping forever. */
 export const MAX_CHAIN_LINKS = 200;
 
+/**
+ * Legal moves in the current position.
+ *
+ * When a mission requires predictions, the two phases are separated: with no
+ * prediction pending only predictions are legal, and once one is pending only
+ * sows are. That keeps the branching factor small enough for the solver and,
+ * more importantly, makes "predict before you sow" a rule the server can verify
+ * from a replay rather than a claim the client makes about itself.
+ *
+ * Predictions are only offered for the mover's own side and the opponent's row
+ * — the opponent's store is unreachable, and predicting your own store is
+ * covered by the extra-turn rule.
+ */
 export function legalMoves(state: CongklakState): CongklakMove[] {
   if (state.finished) return [];
 
   const moves: CongklakMove[] = [];
+
+  if (state.requirePrediction && state.pendingPrediction === null) {
+    const opponentStore = storeOf(state, otherSide(state.toMove));
+    for (let i = 0; i < state.pits.length; i++) {
+      if (i === opponentStore) continue;
+      moves.push({ kind: 'predict', pit: i });
+    }
+    return moves;
+  }
+
   const { from, to } = rowOf(state, state.toMove);
   for (let i = from; i <= to; i++) {
     if ((state.pits[i] as number) > 0) moves.push({ kind: 'sow', pit: i });
@@ -50,15 +73,16 @@ export function isLegal(state: CongklakState, move: CongklakMove): boolean {
   if (state.finished) return false;
 
   if (move.kind === 'predict') {
-    // A prediction is legal only when none is pending and the named cell is a
-    // real board position.
-    return (
-      state.pendingPrediction === null &&
-      Number.isInteger(move.pit) &&
-      move.pit >= 0 &&
-      move.pit < state.pits.length
-    );
+    if (!Number.isInteger(move.pit)) return false;
+    if (move.pit < 0 || move.pit >= state.pits.length) return false;
+    if (move.pit === storeOf(state, otherSide(state.toMove))) return false;
+    return state.pendingPrediction === null;
   }
+
+  // Sowing before predicting is illegal when the mission asks for a prediction.
+  // Without this the student could sow first and "predict" afterwards, which
+  // is not the skill being evidenced.
+  if (state.requirePrediction && state.pendingPrediction === null) return false;
 
   if (!Number.isInteger(move.pit)) return false;
   if (!ownsPit(state, state.toMove, move.pit)) return false;

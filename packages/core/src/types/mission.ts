@@ -137,6 +137,13 @@ export interface GameConfig {
   sweepOnEnd?: boolean;
   /** Benteng: turns after leaving base before a unit becomes capturable by anyone. */
   freshnessWindow?: number;
+  /**
+   * Congklak: the student must declare where the last seed will land before
+   * they may sow. Turns "predict the landing pit" from a UI affordance into a
+   * rule — which is what makes it searchable by the solver and verifiable in a
+   * replay, rather than a claim the client makes about itself.
+   */
+  requirePrediction?: boolean;
 }
 
 export const DEFAULT_GAME_CONFIG: Required<

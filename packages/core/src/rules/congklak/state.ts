@@ -53,6 +53,7 @@ export interface CongklakState {
 
   // --- config, resolved at init ------------------------------------------
   extraTurnOnStore: boolean;
+  requirePrediction: boolean;
   captureEnabled: boolean;
   continuationEnabled: boolean;
   sweepOnEnd: boolean;
@@ -133,6 +134,7 @@ export function cloneState(state: CongklakState): CongklakState {
     pendingPrediction: state.pendingPrediction,
     finished: state.finished,
     extraTurnOnStore: state.extraTurnOnStore,
+    requirePrediction: state.requirePrediction,
     captureEnabled: state.captureEnabled,
     continuationEnabled: state.continuationEnabled,
     sweepOnEnd: state.sweepOnEnd,
