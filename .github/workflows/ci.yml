@@ -1,0 +1,120 @@
+# CI for the backend.
+#
+# The integration job exists because Nakama has no arm64 image and the primary
+# development machine is aarch64 — hook and handler behaviour cannot be
+# exercised locally, so this is the only place it runs (docs/local-development.md).
+
+name: ci
+
+on:
+  push:
+    branches: [master, main, staging]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: unit and schema
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: nakama
+          POSTGRES_PASSWORD: localdev
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: typecheck
+        run: npm run typecheck
+
+      # The core must stay dependency-free and clock-free, or one build cannot
+      # run in both Hermes and goja.
+      - name: core purity guard
+        run: npm run guard:deps
+
+      - name: build
+        run: npm run build
+
+      # A Node built-in in the bundle breaks Nakama at server start rather than
+      # at compile time. Catch it here instead.
+      - name: bundle guard
+        run: npm run guard:bundle
+
+      - name: unit tests
+        run: npm test
+
+      - name: schema tests
+        run: npm run test:schema
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: localdev
+
+  integration:
+    name: integration (real nakama)
+    runs-on: ubuntu-latest
+    needs: unit
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: start the stack
+        run: |
+          docker compose -f docker/docker-compose.yml up -d postgres nakama
+          timeout 180 bash -c '
+            until docker compose -f docker/docker-compose.yml logs nakama 2>&1 | grep -q "Startup done"; do
+              sleep 3
+            done'
+        env:
+          ASSERTION_HMAC_SECRET: ci-assertion-secret-at-least-32-characters
+          JOIN_GRANT_HMAC_SECRET: ci-join-grant-secret-at-least-32-chars
+          NAKAMA_SERVER_KEY: ci-server-key
+
+      # Confirms the bundle not only builds but loads: if InitModule threw or a
+      # goja incompatibility slipped past the static guard, this line is absent.
+      - name: modules loaded
+        run: |
+          docker compose -f docker/docker-compose.yml logs nakama \
+            | grep -q "Lenterra modules initialised"
+
+      - name: migrations
+        run: npm run migrate
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: localdev
+
+      - name: integration tests
+        run: npm run test:integration
+        env:
+          NAKAMA_HOST: localhost
+          NAKAMA_PORT: '7350'
+          NAKAMA_SERVER_KEY: ci-server-key
+          ASSERTION_HMAC_SECRET: ci-assertion-secret-at-least-32-characters
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: localdev
+
+      - name: server logs on failure
+        if: failure()
+        run: docker compose -f docker/docker-compose.yml logs --tail 200 nakama
