@@ -29,6 +29,8 @@ export * from './adaptive/mastery';
 // --- rules -----------------------------------------------------------------
 export * from './rules/types';
 export * from './rules/registry';
+export * from './rules/validate';
+export * from './rules/record';
 
 export { congklakEngine, CONGKLAK_ENGINE_VERSION } from './rules/congklak';
 export { bentengEngine, BENTENG_ENGINE_VERSION, unitFreshness } from './rules/benteng';
@@ -58,3 +60,4 @@ export {
   unitById,
   legalityOf,
 } from './rules/benteng';
+
