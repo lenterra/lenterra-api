@@ -61,3 +61,5 @@ export {
   legalityOf,
 } from './rules/benteng';
 
+// --- content ---------------------------------------------------------------
+export * from './content/validate';
