@@ -1,0 +1,27 @@
+/**
+ * @lenterra/core — the shared deterministic core.
+ *
+ * One build runs in Hermes on a student's phone and the identical logic runs in
+ * goja inside Nakama. That is only possible because this package has no runtime
+ * dependencies, no I/O, no `Date.now()`, and no `Math.random()` (TRD-ENG-001),
+ * and it is the reason ADR-011 chose TypeScript for the server modules: one
+ * rules implementation, not two that drift.
+ */
+
+export const CORE_VERSION = '0.1.0';
+
+// --- primitives ------------------------------------------------------------
+export * from './math';
+export * from './hash';
+
+// --- types -----------------------------------------------------------------
+export * from './types/taxonomy';
+export * from './types/mission';
+export * from './types/attempt';
+
+// --- adaptive engine -------------------------------------------------------
+export * from './adaptive/bkt';
+export * from './adaptive/elo';
+export * from './adaptive/select';
+export * from './adaptive/struggle';
+export * from './adaptive/mastery';
