@@ -1,0 +1,50 @@
+# Nakama server configuration.
+#
+# Secrets are supplied on the command line from the environment rather than
+# written here, so this file is safe to commit (20-02 "Configuration").
+
+name: lenterra
+
+logger:
+  level: INFO
+  format: JSON
+
+session:
+  # Long sessions with silent refresh (TRD-AUTH-007). Sign-in happens roughly
+  # once per 90 days, so a student on a bus with one bar of signal is not asked
+  # to re-authenticate to play a mission they downloaded last week.
+  token_expiry_sec: 86400 # 24 hours
+  refresh_token_expiry_sec: 7776000 # 90 days
+
+socket:
+  max_message_size_bytes: 262144
+  # A replay is a few hundred bytes; a sync batch of 50 attempts is well inside
+  # this. The cap exists so a malformed client cannot exhaust server memory.
+  max_request_size_bytes: 4194304
+  read_timeout_ms: 15000
+  write_timeout_ms: 15000
+  idle_timeout_ms: 60000
+
+runtime:
+  js_entrypoint: 'index.js'
+  # goja runs synchronously and a slow handler blocks its VM. 1 second is far
+  # above the 300 ms p95 budget (20-15) and low enough to surface a runaway
+  # handler as an error rather than as a stalled classroom.
+  event_queue_size: 65536
+  event_queue_workers: 8
+
+console:
+  # Never publicly exposed. Compose binds this to loopback as well.
+  port: 7351
+
+metrics:
+  # Scraped for RPC latency and error rate (20-13).
+  prometheus_port: 9100
+  namespace: lenterra
+
+social:
+  steam:
+    publisher_key: ''
+
+leaderboard:
+  blacklist_rank_cache: []

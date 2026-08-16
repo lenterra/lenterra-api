@@ -1,0 +1,77 @@
+# Local development stack.
+#
+# The development machine is aarch64. Postgres and Nakama both publish arm64
+# images, so local parity with production holds without emulation (20-18).
+#
+# Order matters: Nakama runs its own `migrate up` to create the tables it owns,
+# and only then does `npm run migrate` add the lenterra_* tables that reference
+# users(id). dev-up.mjs enforces that sequence.
+
+name: lenterra
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nakama}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-nakama}']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  nakama:
+    image: registry.heroiclabs.com/heroiclabs/nakama:3.22.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        /nakama/nakama migrate up \
+          --database.address ${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-nakama}
+        exec /nakama/nakama \
+          --config /nakama/data/config.yml \
+          --database.address ${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-localdev}@postgres:5432/${POSTGRES_DB:-nakama} \
+          --socket.server_key ${NAKAMA_SERVER_KEY:-lenterra-localdev-key} \
+          --runtime.http_key ${NAKAMA_HTTP_KEY:-lenterra-localdev-http} \
+          --runtime.env ASSERTION_HMAC_SECRET=${ASSERTION_HMAC_SECRET:-change-me-32-bytes-minimum-localdev-only} \
+          --runtime.env ASSERTION_HMAC_SECRET_PREVIOUS=${ASSERTION_HMAC_SECRET_PREVIOUS:-} \
+          --runtime.env JOIN_GRANT_HMAC_SECRET=${JOIN_GRANT_HMAC_SECRET:-change-me-join-grant-localdev-only} \
+          --runtime.env VERIFIER_URL=${VERIFIER_URL:-http://verifier:8787}
+    volumes:
+      - ../modules/build:/nakama/data/modules:ro
+      - ./config.yml:/nakama/data/config.yml:ro
+    ports:
+      - '7350:7350'
+      # The console is a full administrative interface over children's data.
+      # Bound to loopback and reached through an SSH tunnel — never a public
+      # port (20-18).
+      - '127.0.0.1:7351:7351'
+    healthcheck:
+      test: ['CMD', '/nakama/nakama', 'healthcheck']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  verifier:
+    build:
+      context: ..
+      dockerfile: verifier/Dockerfile
+    environment:
+      THIRDWEB_SECRET_KEY: ${THIRDWEB_SECRET_KEY:-}
+      ASSERTION_HMAC_SECRET: ${ASSERTION_HMAC_SECRET:-change-me-32-bytes-minimum-localdev-only}
+      AUTH_DOMAIN: ${AUTH_DOMAIN:-localhost:8787}
+      VERIFIER_PORT: '8787'
+    ports:
+      - '8787:8787'
+
+volumes:
+  pgdata: {}
