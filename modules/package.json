@@ -6,8 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "rollup -c rollup.config.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test test/"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@lenterra/core": "*"

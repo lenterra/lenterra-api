@@ -15,6 +15,8 @@
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "test:schema": "node --test test/schema.test.mjs",
+    "test:integration": "node --test \"test/integration/*.test.mjs\"",
     "build": "npm run build -w @lenterra/core && npm run build -w @lenterra/modules",
     "build:core": "npm run build -w @lenterra/core",
     "build:modules": "npm run build -w @lenterra/modules",
