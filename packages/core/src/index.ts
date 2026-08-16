@@ -25,3 +25,36 @@ export * from './adaptive/elo';
 export * from './adaptive/select';
 export * from './adaptive/struggle';
 export * from './adaptive/mastery';
+
+// --- rules -----------------------------------------------------------------
+export * from './rules/types';
+export * from './rules/registry';
+
+export { congklakEngine, CONGKLAK_ENGINE_VERSION } from './rules/congklak';
+export { bentengEngine, BENTENG_ENGINE_VERSION, unitFreshness } from './rules/benteng';
+
+export type { CongklakState } from './rules/congklak/state';
+export type { CongklakMove } from './rules/congklak/moves';
+export type { BentengState, BentengUnit, BentengBase, Team } from './rules/benteng/state';
+export type { BentengMove } from './rules/benteng/moves';
+
+export {
+  standardBoard,
+  storeOf,
+  rowOf,
+  oppositePit,
+  scoreOf,
+  seedsInRow,
+  pitsPerSide,
+  hasExposedPit,
+  greedyPit,
+} from './rules/congklak';
+
+export {
+  freshnessOf,
+  isCapturable,
+  activeUnits,
+  baseOf,
+  unitById,
+  legalityOf,
+} from './rules/benteng';
