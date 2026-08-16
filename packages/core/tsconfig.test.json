@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Tests import from `dist`, so they exercise the artifact that actually
+    // ships rather than the source. That needs interop (the built package is
+    // CommonJS, the tests are ESM) and a rootDir wide enough to cover both
+    // trees. Both are noEmit-only, so no helper reaches the goja bundle.
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

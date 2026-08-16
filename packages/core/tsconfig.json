@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // ES2019 + CommonJS is the intersection that works everywhere this package
+    // runs: Metro/Hermes in the app, and rollup+babel down to ES5 for goja.
+    // The core never targets goja directly — the modules bundle downlevels it.
+    "target": "ES2019",
+    "lib": ["ES2019"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "rootDir": "src",
+    // No DOM, no Node. A reference to either is a bug in a package that must
+    // run inside goja.
+    "types": []
+  },
+  "include": ["src/**/*.ts"]
+}

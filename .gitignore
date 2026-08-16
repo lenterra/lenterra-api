@@ -1,0 +1,10 @@
+node_modules/
+build/
+dist/
+*.tsbuildinfo
+
+.env
+.env.local
+
+docker/data/
+coverage/
