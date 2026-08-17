@@ -110,6 +110,7 @@ function fixture(): {
     courseId: 'algo.loops',
     titleKey: 'x.title',
     readingMinutes: 3,
+    skillNodes: ['algo.iteration'],
     blocks: [{ kind: 'text', textKey: 'x.body' }],
     check: PUBLIC,
   };
@@ -135,6 +136,7 @@ function fixture(): {
     courseId: 'algo.loops',
     titleKey: 'x.title',
     readingMinutes: 3,
+    skillNodes: [],
     blocks: [{ kind: 'text', textKey: 'x.body' }],
   });
 

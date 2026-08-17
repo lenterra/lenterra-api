@@ -236,7 +236,10 @@ export function compileCourses(knownMissionIds = []) {
 
         check = { id: checkId, passMark, items };
         answers[checkId] = { items: keyItems, passMark, skillWeights: authored.check.weights ?? {} };
-        lessonNodes[lessonId] = Object.keys(authored.check.weights ?? {});
+        // Heaviest first, so `lessonForNode` can pick the lesson that leans on
+        // a node rather than the first one that mentions it.
+        const weights = authored.check.weights ?? {};
+        lessonNodes[lessonId] = Object.keys(weights).sort((a, b) => weights[b] - weights[a]);
       }
 
       const lesson = {
@@ -244,6 +247,7 @@ export function compileCourses(knownMissionIds = []) {
         courseId,
         titleKey: emit(`${lessonBase}.title`, authored.title, lessonId),
         readingMinutes: authored.readingMinutes,
+        skillNodes: lessonNodes[lessonId] ?? [],
         blocks,
         ...(check ? { check } : {}),
       };
