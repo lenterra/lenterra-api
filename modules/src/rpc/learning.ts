@@ -112,7 +112,66 @@ export function progressGet(c: Ctx, _req: ProgressReq) {
     });
   }
 
-  return { mastery, games: [], courses, certificates, weeklyActivity: [] };
+  // --- per-game progress ---------------------------------------------------
+  const catalog = currentCatalog(c);
+
+  const availableRows = c.nk.sqlQuery(Q.missionCountsByGame, [catalog.version]) as {
+    game_id: string;
+    n: number;
+  }[];
+  const available: Record<string, number> = {};
+  for (let i = 0; i < availableRows.length; i++) {
+    const row = availableRows[i] as { game_id: string; n: number };
+    available[row.game_id] = Number(row.n);
+  }
+
+  const gameRows = c.nk.sqlQuery(Q.gameProgress, [c.userId]) as {
+    game_id: string;
+    missions_passed: number;
+    attempts: number;
+    highest_rank: number | null;
+  }[];
+  const games: {
+    gameId: string;
+    missionsCompleted: number;
+    missionsAvailable: number;
+    highestRank: number;
+  }[] = [];
+  for (let i = 0; i < gameRows.length; i++) {
+    const row = gameRows[i] as {
+      game_id: string;
+      missions_passed: number;
+      attempts: number;
+      highest_rank: number | null;
+    };
+    games.push({
+      gameId: row.game_id,
+      // Distinct missions passed, not attempts made. A student who replays one
+      // mission thirty times has not completed thirty, and a counter saying
+      // otherwise is flattery that stops meaning anything.
+      missionsCompleted: Number(row.missions_passed),
+      missionsAvailable: available[row.game_id] ?? 0,
+      highestRank: row.highest_rank === null ? 0 : Number(row.highest_rank),
+    });
+  }
+
+  // --- activity ------------------------------------------------------------
+  const activityRows = c.nk.sqlQuery(Q.weeklyActivity, [c.userId]) as {
+    date: string;
+    attempts: number;
+    total_ms: number;
+  }[];
+  const weeklyActivity: { date: string; attempts: number; minutes: number }[] = [];
+  for (let i = 0; i < activityRows.length; i++) {
+    const row = activityRows[i] as { date: string; attempts: number; total_ms: number };
+    weeklyActivity.push({
+      date: row.date,
+      attempts: Number(row.attempts),
+      minutes: Math.round(Number(row.total_ms) / 60000),
+    });
+  }
+
+  return { mastery, games, courses, certificates, weeklyActivity };
 }
 
 // ---------------------------------------------------------------------------

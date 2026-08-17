@@ -272,6 +272,57 @@ export const Q = {
     WHERE e.user_id = $1
     GROUP BY e.skill_node_id, a.mission_id`,
 
+  /**
+   * Per-game progress for the record tab.
+   *
+   * Distinct missions *passed*, not attempts made: a student who replays one
+   * mission thirty times has not progressed thirty missions, and a counter
+   * that says otherwise is the kind of flattery that stops meaning anything.
+   */
+  gameProgress: `
+    WITH played AS (
+      SELECT a.game_id, a.mission_id, a.outcome, a.submitted_at,
+             -- Resolved by subquery, not a join: a mission version can appear
+             -- in several catalog versions, and joining would multiply the
+             -- attempt rows and inflate every count below it.
+             (SELECT max(m.rank) FROM lenterra_mission m
+               WHERE m.mission_id = a.mission_id) AS rank
+      FROM lenterra_attempt a
+      WHERE a.user_id = $1 AND a.validation_status = 'validated'
+    )
+    SELECT game_id,
+           count(DISTINCT mission_id) FILTER (WHERE outcome = 'success') AS missions_passed,
+           count(*) AS attempts,
+           max(rank) FILTER (WHERE outcome = 'success') AS highest_rank,
+           extract(epoch FROM max(submitted_at)) * 1000 AS last_played_ms
+    FROM played GROUP BY game_id`,
+
+  /**
+   * Activity for the last eight weeks, bucketed by week.
+   *
+   * Weekly rather than daily on purpose. A student's own history at day
+   * resolution is a record of when they were awake and near a phone, and the
+   * product has no use for that precision — the streak already covers "did I
+   * play today". Coarser is both sufficient and safer (TRD-OBS-002).
+   *
+   * Weeks with no activity are absent rather than zero-filled; the client
+   * knows the range and fills the gaps.
+   */
+  weeklyActivity: `
+    SELECT to_char(date_trunc('week', submitted_at), 'YYYY-MM-DD') AS date,
+           count(*) AS attempts,
+           sum(duration_ms) AS total_ms
+    FROM lenterra_attempt
+    WHERE user_id = $1
+      AND validation_status = 'validated'
+      AND submitted_at > now() - interval '56 days'
+    GROUP BY 1 ORDER BY 1`,
+
+  /** How many missions exist per game in a catalog, for "7 of 20". */
+  missionCountsByGame: `
+    SELECT game_id, count(*) AS n FROM lenterra_mission
+    WHERE catalog_version = $1 GROUP BY game_id`,
+
   masteryTrend: `
     SELECT skill_node_id,
            sum(CASE WHEN mastery_after > mastery_before THEN 1
@@ -565,6 +616,61 @@ export const Q = {
   assignmentTargets: `
     SELECT count(*) AS n FROM lenterra_class_member
     WHERE class_id = $1 AND removed_at IS NULL AND ($2::uuid IS NULL OR user_id = $2)`,
+
+  // --- deletion and moderation ---------------------------------------------
+
+  deletionRequest: `
+    INSERT INTO lenterra_deletion_request (id, user_id, scheduled_for, requested_by)
+    VALUES ($1, $2, now() + interval '30 days', $3)
+    ON CONFLICT (user_id) DO UPDATE
+      SET cancelled_at = NULL,
+          requested_at = now(),
+          scheduled_for = now() + interval '30 days',
+          requested_by = EXCLUDED.requested_by
+      WHERE lenterra_deletion_request.executed_at IS NULL
+    RETURNING id, extract(epoch FROM scheduled_for) * 1000 AS scheduled_ms`,
+
+  deletionCancel: `
+    UPDATE lenterra_deletion_request SET cancelled_at = now()
+    WHERE user_id = $1 AND executed_at IS NULL AND cancelled_at IS NULL
+    RETURNING id`,
+
+  deletionPending: `
+    SELECT id, extract(epoch FROM scheduled_for) * 1000 AS scheduled_ms
+    FROM lenterra_deletion_request
+    WHERE user_id = $1 AND cancelled_at IS NULL AND executed_at IS NULL`,
+
+  /** Accounts whose window has elapsed. Run by the retention job. */
+  deletionDue: `
+    SELECT id, user_id FROM lenterra_deletion_request
+    WHERE cancelled_at IS NULL AND executed_at IS NULL AND scheduled_for <= now()
+    LIMIT 100`,
+
+  deletionMarkExecuted: `
+    UPDATE lenterra_deletion_request SET executed_at = now() WHERE id = $1`,
+
+  moderationReport: `
+    INSERT INTO lenterra_moderation_report (id, reporter_user_id, subject_user_id, reason, context)
+    VALUES ($1,$2,$3,$4,$5::jsonb)
+    ON CONFLICT DO NOTHING
+    RETURNING id`,
+
+  moderationOpen: `
+    SELECT id, reporter_user_id, subject_user_id, reason,
+           extract(epoch FROM created_at) * 1000 AS created_ms
+    FROM lenterra_moderation_report
+    WHERE status = 'open' ORDER BY created_at LIMIT 100`,
+
+  moderationResolve: `
+    UPDATE lenterra_moderation_report
+    SET status = $2, resolved_by = $3, resolved_at = now()
+    WHERE id = $1 AND status = 'open'
+    RETURNING subject_user_id`,
+
+  /** Reports older than the response commitment, for the alerting check. */
+  moderationOverdue: `
+    SELECT count(*) AS n FROM lenterra_moderation_report
+    WHERE status = 'open' AND created_at < now() - interval '72 hours'`,
 
   // --- audit and telemetry -------------------------------------------------
 

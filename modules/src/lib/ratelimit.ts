@@ -32,6 +32,11 @@ export const LIMITS: Record<string, RateLimit> = {
   'v1.catalog.pull': { limit: 30, windowSeconds: 3600 },
   'v1.teacher.class.summary': { limit: 60, windowSeconds: 60 },
   'v1.friend.searchByCode': { limit: 20, windowSeconds: 60 },
+  // Tight, because both are identity-adjacent in opposite directions: deleting
+  // an account is irreversible, and a report queue that can be flooded is a
+  // queue in which the real report is the one nobody reaches.
+  'v1.account.delete.request': { limit: 3, windowSeconds: 3600 },
+  'v1.moderation.report': { limit: 10, windowSeconds: 3600 },
 };
 
 function windowStart(now: number, windowSeconds: number): string {

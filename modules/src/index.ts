@@ -38,6 +38,13 @@ import {
   teacherReclaimApprove,
   teacherStudentDetail,
 } from './rpc/teacher';
+import {
+  accountDeleteCancel,
+  accountDeleteRequest,
+  moderationQueue,
+  moderationReport,
+  moderationResolve,
+} from './rpc/account';
 import { adminCatalogPublish, adminPurge, adminRoleGrant } from './rpc/admin';
 
 function InitModule(
@@ -124,6 +131,24 @@ function InitModule(
     'v1.teacher.reclaim.approve',
     rpc('v1.teacher.reclaim.approve', teacherReclaimApprove),
   );
+
+  // --- rpc: account and safety --------------------------------------------
+  initializer.registerRpc(
+    'v1.account.delete.request',
+    rpc('v1.account.delete.request', accountDeleteRequest, {
+      rateLimit: LIMITS['v1.account.delete.request'],
+    }),
+  );
+  initializer.registerRpc(
+    'v1.account.delete.cancel',
+    rpc('v1.account.delete.cancel', accountDeleteCancel),
+  );
+  initializer.registerRpc(
+    'v1.moderation.report',
+    rpc('v1.moderation.report', moderationReport, { rateLimit: LIMITS['v1.moderation.report'] }),
+  );
+  initializer.registerRpc('v1.moderation.queue', rpc('v1.moderation.queue', moderationQueue));
+  initializer.registerRpc('v1.moderation.resolve', rpc('v1.moderation.resolve', moderationResolve));
 
   // --- rpc: admin ---------------------------------------------------------
   initializer.registerRpc('v1.admin.catalog.publish', rpc('v1.admin.catalog.publish', adminCatalogPublish));

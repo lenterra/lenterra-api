@@ -95,12 +95,53 @@ export function adminPurge(c: Ctx) {
   const jti = c.nk.sqlExec(Q.purgeJti, []);
   const idempotency = c.nk.sqlExec(Q.idempotencyPurge, []);
   const rateLimits = c.nk.sqlExec(Q.rateLimitPurge, []);
+  const deleted = executeDueDeletions(c);
 
-  audit(c, 'maintenance.purge', 'system', 'retention', {});
+  audit(c, 'maintenance.purge', 'system', 'retention', { accountsDeleted: deleted });
 
   return {
     authJti: jti.rowsAffected,
     idempotency: idempotency.rowsAffected,
     rateLimits: rateLimits.rowsAffected,
+    accountsDeleted: deleted,
   };
+}
+
+/**
+ * Carry out deletions whose thirty-day window has elapsed (TRD-SEC-011).
+ *
+ * `nk.accountDeleteId` removes the Nakama account; every `lenterra_*` table
+ * references `users(id)` with `ON DELETE CASCADE`, so the learning history,
+ * points ledger, telemetry and friend edges go with it. That cascade is why
+ * deletion is one call rather than a list of tables somebody has to remember
+ * to extend when a table is added.
+ *
+ * The audit row is written *before* the account goes, and holds only the
+ * request id — the record that a deletion happened has to survive the deletion
+ * without preserving anything about who it was.
+ */
+function executeDueDeletions(c: Ctx): number {
+  const due = c.nk.sqlQuery(Q.deletionDue, []) as { id: string; user_id: string }[];
+  let count = 0;
+
+  for (let i = 0; i < due.length; i++) {
+    const row = due[i] as { id: string; user_id: string };
+    // Subject is the request, not the user: the user id is about to stop
+    // existing, and keeping it would defeat the deletion it records.
+    audit(c, 'account.delete.execute', 'request', row.id, {});
+
+    try {
+      // `false` keeps the recorded ledger consistent rather than attempting a
+      // wallet-style recall of anything the account contributed.
+      c.nk.accountDeleteId(row.user_id, false);
+      c.nk.sqlExec(Q.deletionMarkExecuted, [row.id]);
+      count++;
+    } catch (err) {
+      // One failure must not stop the rest of the batch: the next run retries
+      // it, and a stalled queue would silently miss the thirty-day promise.
+      c.logger.error('deletion %s failed: %s', row.id, String(err));
+    }
+  }
+
+  return count;
 }
