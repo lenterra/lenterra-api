@@ -722,6 +722,26 @@ export const Q = {
     FROM lenterra_account_profile
     WHERE user_id = ANY($1::uuid[])`,
 
+  /**
+   * The same, but only for students in the caller's own school.
+   *
+   * `equippedForUsers` above is called with a list the server itself assembled
+   * from a class roster, so its scope is already decided before it runs. This
+   * one answers a list the *client* chose, and an unscoped version of it would
+   * let any student pass any set of user ids and learn which of them exist and
+   * what they are wearing — an enumeration oracle over other schools' children,
+   * for the sake of colouring an avatar.
+   *
+   * Same predicate as `friendByCode`, and for the same reason: outside your
+   * school, the answer is silence rather than a refusal.
+   */
+  equippedForPeers: `
+    SELECT p.user_id, p.equipped_avatar_color, p.equipped_title
+    FROM lenterra_account_profile p
+    WHERE p.user_id = ANY($1::uuid[])
+      AND p.school_id IS NOT NULL
+      AND p.school_id = (SELECT school_id FROM lenterra_account_profile WHERE user_id = $2)`,
+
   /** Take off anything the student no longer owns. Used after a reversal. */
   unequipItem: `
     UPDATE lenterra_account_profile

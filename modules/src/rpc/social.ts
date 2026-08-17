@@ -17,7 +17,14 @@ import {
 } from '@lenterra/core';
 
 import { conflict, forbidden, invalidArgument, notFound } from '../lib/errors';
-import { optionalString, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
+import {
+  optionalString,
+  requireArray,
+  requireInt,
+  requireString,
+  toIso,
+  type Ctx,
+} from '../lib/ctx';
 import { Q } from '../db/queries';
 import { balance } from '../domain/ledger';
 import { loadProfile } from '../domain/profile';
@@ -442,6 +449,61 @@ export function wornBy(
     };
   }
   return worn;
+}
+
+// ---------------------------------------------------------------------------
+// v1.reward.worn
+// ---------------------------------------------------------------------------
+
+export interface WornReq {
+  userIds: string[];
+}
+
+/**
+ * What a client-chosen set of students are wearing.
+ *
+ * The leaderboard gets cosmetics for free, because the server assembles that
+ * roster itself and can look them up while it does. The friends list cannot:
+ * it comes from Nakama's own friend API, which knows nothing about our profile
+ * table, so a classmate appeared in their bought colour on one screen and in
+ * the name-derived default on the next — two taps apart, the same person, two
+ * different colours. A cosmetic somebody spent points on that shows up in some
+ * places and not others reads as the purchase not having worked.
+ *
+ * **Scoped to the caller's school**, which is the whole of the thinking here.
+ * The list of ids is chosen by the client, so an unscoped lookup would answer
+ * questions about children the caller has no relationship to. Ids outside the
+ * school are simply absent from the result — not refused, which would confirm
+ * they exist.
+ *
+ * Absence and "wearing nothing" are deliberately the same answer: the client
+ * falls back to its own derived colour either way, so there is nothing to tell
+ * the two apart with.
+ */
+export function rewardWorn(c: Ctx, req: WornReq) {
+  const userIds = requireArray<string>(req.userIds, 'userIds', 100);
+  if (userIds.length === 0) return { worn: {} };
+
+  for (let i = 0; i < userIds.length; i++) {
+    requireString(userIds[i], 'userIds[]', 64);
+  }
+
+  const rows = c.nk.sqlQuery(Q.equippedForPeers, [userIds, c.userId]) as {
+    user_id: string;
+    equipped_avatar_color: string | null;
+    equipped_title: string | null;
+  }[];
+
+  const worn: Record<string, { avatarColor: string | null; title: string | null }> = {};
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i] as (typeof rows)[number];
+    worn[row.user_id] = {
+      avatarColor: row.equipped_avatar_color ?? null,
+      title: row.equipped_title ?? null,
+    };
+  }
+
+  return { worn };
 }
 
 // ---------------------------------------------------------------------------

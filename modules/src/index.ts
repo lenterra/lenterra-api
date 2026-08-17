@@ -38,6 +38,7 @@ import {
   pointsHistory,
   rewardEquip,
   rewardRedeem,
+  rewardWorn,
 } from './rpc/social';
 import {
   teacherAssignmentCreate,
@@ -137,6 +138,7 @@ function InitModule(
   initializer.registerRpc('v1.points.history', rpc('v1.points.history', pointsHistory));
   initializer.registerRpc('v1.reward.redeem', rpc('v1.reward.redeem', rewardRedeem));
   initializer.registerRpc('v1.reward.equip', rpc('v1.reward.equip', rewardEquip));
+  initializer.registerRpc('v1.reward.worn', rpc('v1.reward.worn', rewardWorn));
   initializer.registerRpc('v1.certificate.list', rpc('v1.certificate.list', certificateList));
   initializer.registerRpc(
     'v1.certificate.visibility',

@@ -17,7 +17,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { Q } from '../modules/src/db/queries.ts';
-import { rewardEquip, rewardRedeem, wornBy } from '../modules/src/rpc/social.ts';
+import { rewardEquip, rewardRedeem, rewardWorn, wornBy } from '../modules/src/rpc/social.ts';
 import { fakeCtx, refusal, stub, type Responder } from './fake-nk.mts';
 
 const ME = '55555555-5555-4555-8555-555555555555';
@@ -369,5 +369,96 @@ describe('wornBy', () => {
       false,
       'equippedForUsers must not select the board skin',
     );
+  });
+});
+
+describe('rewardWorn', () => {
+  /**
+   * The friends-list lookup. Unlike `wornBy`, whose roster the server builds
+   * itself, this one answers a list of user ids the *client* chose — which is
+   * the whole reason it is scoped, and the only thing worth testing hard.
+   */
+  test('returns what the named students are wearing', () => {
+    const fake = fakeCtx(Q, {
+      userId: ME,
+      queries: stub([
+        [
+          Q.equippedForPeers,
+          () => [
+            { user_id: CLASSMATE, equipped_avatar_color: 'avatar.color.laut', equipped_title: null },
+          ],
+        ],
+      ]),
+    });
+
+    const result = rewardWorn(fake.ctx, { userIds: [CLASSMATE] });
+
+    assert.deepEqual(result.worn[CLASSMATE], { avatarColor: 'avatar.color.laut', title: null });
+  });
+
+  test('asks a school-scoped statement, and passes the caller as the scope', () => {
+    // The predicate itself is proved against real Postgres in schema.test.mjs;
+    // what is proved here is that this handler uses the scoped statement at all
+    // and hands it the *caller's* id rather than anything from the request.
+    const fake = fakeCtx(Q, {
+      userId: ME,
+      queries: stub([[Q.equippedForPeers, () => []]]),
+    });
+
+    rewardWorn(fake.ctx, { userIds: [CLASSMATE], userId: 'someone-else' } as never);
+
+    assert.deepEqual(fake.paramsOf(Q.equippedForPeers), [[CLASSMATE], ME]);
+    assert.equal(fake.countOf(Q.equippedForUsers), 0, 'never the unscoped one');
+  });
+
+  test('the scoped statement really is scoped', () => {
+    // A guard on the SQL, not on the handler. Dropping the school predicate
+    // would turn this RPC into an enumeration oracle over other schools'
+    // children and no handler test would notice.
+    assert.match(Q.equippedForPeers, /school_id\s+IS NOT NULL/);
+    assert.match(Q.equippedForPeers, /school_id\s*=\s*\(SELECT school_id/);
+  });
+
+  test('a student outside the school is absent, not refused', () => {
+    // Absent and "wearing nothing" are the same answer on purpose: a refusal
+    // would confirm the id exists.
+    const fake = fakeCtx(Q, {
+      userId: ME,
+      queries: stub([[Q.equippedForPeers, () => []]]),
+    });
+
+    const result = rewardWorn(fake.ctx, { userIds: ['99999999-9999-4999-8999-999999999999'] });
+
+    assert.deepEqual(result.worn, {});
+  });
+
+  test('an empty list costs no round trip', () => {
+    const fake = fakeCtx(Q, { userId: ME, queries: stub([]) });
+
+    assert.deepEqual(rewardWorn(fake.ctx, { userIds: [] }).worn, {});
+    assert.equal(fake.calls.length, 0);
+  });
+
+  test('a hundred ids is the ceiling', () => {
+    const many = [];
+    for (let i = 0; i < 101; i++) many.push(CLASSMATE);
+
+    const fake = fakeCtx(Q, { userId: ME, queries: stub([[Q.equippedForPeers, () => []]]) });
+    const error = refusal(() => rewardWorn(fake.ctx, { userIds: many }));
+
+    assert.equal(error.code, 'INVALID_ARGUMENT');
+    assert.equal(fake.calls.length, 0);
+  });
+
+  test('userIds must be an array of strings', () => {
+    const fake = fakeCtx(Q, { userId: ME, queries: stub([[Q.equippedForPeers, () => []]]) });
+
+    assert.equal(refusal(() => rewardWorn(fake.ctx, { userIds: CLASSMATE } as never)).code, 'INVALID_ARGUMENT');
+    assert.equal(refusal(() => rewardWorn(fake.ctx, { userIds: [42] } as never)).code, 'INVALID_ARGUMENT');
+    assert.equal(fake.calls.length, 0, 'and nothing is queried before the list is checked');
+  });
+
+  test('board skins stay out of this one too', () => {
+    assert.equal(/equipped_board_skin/.test(Q.equippedForPeers), false);
   });
 });
