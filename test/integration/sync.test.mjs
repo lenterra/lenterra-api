@@ -200,7 +200,7 @@ describe('v1.sync.pull', () => {
     for (const entry of res.data.mastery ?? []) {
       assert.ok(typeof entry.band === 'string');
       // A raw mastery value on the wire would eventually be rendered, and
-      // PRD-ADPT-005 exists because a number invites comparison between
+      // Bands exist because a number invites comparison between
       // children in a way a band does not.
       assert.equal(entry.mastery, undefined, 'a raw mastery value reached the client');
     }

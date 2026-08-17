@@ -22,7 +22,7 @@ export interface PublishReq {
  *
  * Rollback is `promote: true` on a previous version — one step, because the
  * moment rollback is needed is the moment nobody wants to read a runbook
- * (PRD-CNT-008). The database guarantees exactly one current version, so a
+ *. The database guarantees exactly one current version, so a
  * half-finished promotion is not a state that can exist.
  */
 export function adminCatalogPublish(c: Ctx, req: PublishReq) {

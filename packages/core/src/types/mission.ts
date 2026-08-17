@@ -1,5 +1,5 @@
 /**
- * Mission definitions (PRD-LRN-002).
+ * Mission definitions.
  *
  * A mission is authored content, validated before publication (10-12) and
  * shipped through the catalog. These types are the contract that content
@@ -23,8 +23,7 @@ export type AiTier = 'mudah' | 'sedang' | 'sulit';
 export const AI_TIERS: readonly AiTier[] = ['mudah', 'sedang', 'sulit'];
 
 // ---------------------------------------------------------------------------
-// Goals
-// ---------------------------------------------------------------------------
+// Goals ---------------------------------------------------------------------------
 
 /**
  * What the student has to achieve.
@@ -179,16 +178,15 @@ export const DEFAULT_GAME_CONFIG: Required<
 };
 
 // ---------------------------------------------------------------------------
-// Mission
-// ---------------------------------------------------------------------------
+// Mission ---------------------------------------------------------------------------
 
 export interface Mission {
   id: string; // 'congklak.m07'
   game: GameId;
   rank: number; // 1-based position in the ladder
-  contentVersion: number; // bumps on any gameplay change (PRD-CNT-004)
+  contentVersion: number; // bumps on any gameplay change
 
-  /** Must sum to 1.0 ± 0.001, with one node ≥ 0.4 (PRD-LRN-002, design rule 1). */
+  /** Must sum to 1.0 ± 0.001, with one node ≥ 0.4 (design rule 1). */
   skillWeights: Partial<Record<SkillNodeId, number>>;
 
   /** Initial ELO rating; retuned from data (20-06). */
@@ -213,7 +211,7 @@ export interface Mission {
   /** Seed for deterministic AI. Part of the definition so play is reproducible. */
   seed: number;
 
-  /** One sentence naming the mechanic that produces the evidence (PRD-LRN-002). */
+  /** One sentence naming the mechanic that produces the evidence. */
   rationale: string;
 
   /** Localisation keys; the strings themselves are catalog content. */

@@ -271,7 +271,7 @@ export const Q = {
     LIMIT 40`,
 
   /**
-   * Every (student, node) mastery row in a class (PRD-SOC-009).
+   * Every (student, node) mastery row in a class.
    *
    * Bands are computed from these in the core rather than in SQL, so the class
    * goal counts a node as Proficient by exactly the rule the student's own
@@ -290,7 +290,7 @@ export const Q = {
     FROM lenterra_class_member
     WHERE class_id = $1 AND removed_at IS NULL`,
 
-  // --- consent (PRD-ONB-018) ------------------------------------------------
+  // --- consent ------------------------------------------------
 
   /**
    * Is school-level consent on file, and not withdrawn?
@@ -655,7 +655,7 @@ export const Q = {
    * Evidence behind one node: how many distinct missions, and over how many
    * distinct days. Both matter for a certificate — a node evidenced twice by
    * the same mission in one evening is not the same as two missions across a
-   * fortnight, and only the second is worth certifying (PRD-RWD-012).
+   * fortnight, and only the second is worth certifying.
    */
   masteryEvidenceSpread: `
     SELECT e.skill_node_id,

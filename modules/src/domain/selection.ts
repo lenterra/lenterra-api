@@ -140,7 +140,7 @@ export function recommend(
 
 /**
  * A teacher's assignment takes precedence over the engine's pick in the UI
- * (PRD-ADPT-013). The engine is a recommendation; a teacher is a decision.
+ *. The engine is a recommendation; a teacher is a decision.
  */
 export function currentAssignment(c: Ctx, userId: string): Assignment | null {
   const rows = c.nk.sqlQuery(Q.assignmentsForUser, [userId]) as {

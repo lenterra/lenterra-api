@@ -3,7 +3,7 @@
  *
  * Exercised on every publish but never directly, which meant its own branches
  * were the least-tested code guarding the most-reviewed artefact. Each case
- * breaks one rule from the content table (10-12 PRD-CNT-002) and asserts the
+ * breaks one rule from the content table (10-12) and asserts the
  * refusal, because a check nobody has seen reject anything is indistinguishable
  * from a check that does not work.
  */

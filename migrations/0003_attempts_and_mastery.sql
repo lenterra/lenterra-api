@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS lenterra_catalog_version (
 );
 
 -- The rollback mechanism: promoting a version is one UPDATE, and the database
--- guarantees exactly one current version exists (PRD-CNT-008).
+-- guarantees exactly one current version exists.
 CREATE UNIQUE INDEX IF NOT EXISTS lenterra_catalog_version_current_idx
   ON lenterra_catalog_version (status) WHERE status = 'current';
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS lenterra_catalog_part (
 
 CREATE TABLE IF NOT EXISTS lenterra_mission (
   mission_id      TEXT NOT NULL,                  -- 'congklak.m11'
-  content_version INT  NOT NULL,                  -- bumps on gameplay change (PRD-CNT-004)
+  content_version INT  NOT NULL,                  -- bumps on gameplay change
   catalog_version TEXT NOT NULL REFERENCES lenterra_catalog_version(version) ON DELETE CASCADE,
   game_id         TEXT NOT NULL,
   rank            INT  NOT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS lenterra_skill_mastery (
   skill_node_id     TEXT NOT NULL,
   mastery           DOUBLE PRECISION NOT NULL CHECK (mastery BETWEEN 0 AND 1),
   evidence_count    INT  NOT NULL DEFAULT 0,
-  distinct_sources  INT  NOT NULL DEFAULT 0,      -- distinct missions/checks (PRD-LRN-005)
+  distinct_sources  INT  NOT NULL DEFAULT 0,      -- distinct missions/checks
   first_evidence_at TIMESTAMPTZ,
   last_evidence_at  TIMESTAMPTZ,
   last_attempt_id   UUID REFERENCES lenterra_attempt(id),
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS lenterra_skill_mastery (
 CREATE INDEX IF NOT EXISTS lenterra_skill_mastery_node_idx
   ON lenterra_skill_mastery (skill_node_id, mastery);
 
--- Append-only audit of every mastery change (PRD-LRN-003, PRD-ADPT-010).
+-- Append-only audit of every mastery change.
 CREATE TABLE IF NOT EXISTS lenterra_mastery_event (
   id             UUID PRIMARY KEY,
   user_id        UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

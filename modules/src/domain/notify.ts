@@ -1,5 +1,5 @@
 /**
- * In-app notifications (PRD-APP-060).
+ * In-app notifications.
  *
  * Nakama's own notification system, delivered in-app. Push is deliberately out
  * of scope for R1: it needs store presence and a consent conversation about

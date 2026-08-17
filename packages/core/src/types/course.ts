@@ -1,7 +1,7 @@
 /**
  * Course, lesson, and check definitions (10-08).
  *
- * Courses are catalog content, not app code (PRD-CRS-001): shipping a new
+ * Courses are catalog content, not app code: shipping a new
  * lesson or fixing a typo is a publish, never a release. These types are the
  * contract that authoring, validation, the publish pipeline, the lesson reader
  * and server-side grading all agree on.
@@ -18,9 +18,9 @@ import type { SkillDomainId, SkillNodeId } from './taxonomy';
  * Access tier.
  *
  * Every R1 course is `free` and every account holds `free`, so no student meets
- * a restriction (PRD-CRS-008). The field exists now because retrofitting an
+ * a restriction. The field exists now because retrofitting an
  * entitlement check into a live catalogue with cached clients is genuinely
- * painful, and adding one costs nothing today (PRD-CRS-012).
+ * painful, and adding one costs nothing today.
  */
 export type Entitlement = 'free' | 'paket-sekolah';
 
@@ -45,7 +45,7 @@ export type LessonBlock =
    *
    * `altKey` is required, not optional — an image with no alternative text is
    * unreadable to a screen reader and invisible to a student whose connection
-   * dropped the asset (PRD-ACC-013).
+   * dropped the asset.
    */
   | { kind: 'image'; assetId: string; altKey: string }
   /** A worked example, set apart from the body so it can be skimmed back to. */
@@ -55,7 +55,7 @@ export type LessonBlock =
   /**
    * A link into the mission where the idea lives.
    *
-   * The other direction of PRD-CRS-006: a lesson can send a student into the
+   * The other direction of the recovery link: a lesson can send a student into the
    * game, not only a failed game into a lesson.
    */
   | { kind: 'gameLink'; missionId: string; labelKey: string };
@@ -86,7 +86,7 @@ export interface CheckItemPublic {
   /** `predict`: the position to read. A `MissionSetup`, rendered by the board. */
   position?: unknown;
   /**
-   * Names the misconception behind a wrong answer (PRD-CRS-005).
+   * Names the misconception behind a wrong answer.
    *
    * Shipped to the client because the student has to see it offline, the moment
    * they answer, which is the only moment it teaches anything. Authored so it
@@ -110,7 +110,7 @@ export interface CheckPublic {
 export interface CheckAnswerKey {
   items: { itemId: string; correct: unknown; explainKey: string }[];
   passMark: number;
-  /** Sums to 1.0 ± 0.001, same rule as a mission's (PRD-CRS-004). */
+  /** Sums to 1.0 ± 0.001, same rule as a mission's. */
   skillWeights: Partial<Record<SkillNodeId, number>>;
 }
 
@@ -127,7 +127,7 @@ export const DEFAULT_PASS_MARK = 0.7;
  *
  * What actually protects the evidence is that the score is graded again
  * server-side from `checks.answers` and only the server's grade is persisted
- * (PRD-CRS-004). Local grading exists so a student offline sees a result and
+ *. Local grading exists so a student offline sees a result and
  * an explanation immediately; defeating it buys a green tick that the next sync
  * overwrites, and moves no mastery at all.
  *
@@ -168,7 +168,7 @@ export interface Lesson {
   /**
    * Authored reading time, in minutes.
    *
-   * Capped at 6 (PRD-CRS-010): a student with a 40-minute borrowed-phone window
+   * Capped at 6: a student with a 40-minute borrowed-phone window
    * budgets by this number, so a lesson that overruns it costs them a session
    * they had planned. Validation checks it against word count, and the pilot
    * replaces the estimate with a measured median.
@@ -180,7 +180,7 @@ export interface Lesson {
    * Shipped to the client even though the weights themselves are not: knowing a
    * lesson teaches `algo.iteration` gives away nothing about the answers, and
    * without it the app cannot answer "which lesson covers the node this student
-   * keeps failing" — which is the whole of PRD-CRS-006.
+   * keeps failing" — which is the whole of the recovery offer.
    */
   skillNodes: SkillNodeId[];
   blocks: LessonBlock[];
@@ -217,7 +217,7 @@ export function courseMinutes(course: CourseSummary): number {
 }
 
 /**
- * The lesson that best covers a node, for the recovery offer in PRD-CRS-006.
+ * The lesson that best covers a node, for the recovery offer.
  *
  * "Best" means the one that weights the node most heavily, not the first one
  * that mentions it. A student who has failed three missions on `algo.greedy`

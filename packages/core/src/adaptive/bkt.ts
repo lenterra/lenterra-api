@@ -7,8 +7,7 @@
  * stage: a teacher must be able to see *why* the system claims a weakness;
  * there is no training corpus because zero students have used the product; the
  * client must predict difficulty offline with the same maths; and re-running
- * the engine over stored history must reproduce stored mastery exactly
- * (PRD-LRN-003).
+ * the engine over stored history must reproduce stored mastery exactly.
  *
  * Everything here is pure. No clock, no randomness, no I/O (TRD-ADPT-001).
  */
@@ -167,17 +166,16 @@ export function effectiveWeight(
 }
 
 // ---------------------------------------------------------------------------
-// Caps
-// ---------------------------------------------------------------------------
+// Caps ---------------------------------------------------------------------------
 
-/** Proficient ceiling for single-source evidence (PRD-LRN-005). */
+/** Proficient ceiling for single-source evidence. */
 export const SINGLE_SOURCE_CEILING = 0.84;
 export const THIN_EVIDENCE_CEILING = 0.92;
 
 /**
  * Two caps that stop BKT's optimism from overstating what we know.
  *
- * The first is the mechanism behind PRD-LRN-005: a student who has only ever
+ * The first is the multi-source cap: a student who has only ever
  * played one mission has demonstrated *that mission*, not the skill. Without
  * it, twenty replays of one easy mission would read as Mastered — which is
  * exactly the claim the transfer metric M-L05 exists to test.
@@ -193,7 +191,7 @@ export function applyMasteryCaps(
 }
 
 // ---------------------------------------------------------------------------
-// Decay (PRD-LRN-006, R2)
+// Decay (R2)
 // ---------------------------------------------------------------------------
 
 export const DECAY_GRACE_DAYS = 30;

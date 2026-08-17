@@ -287,7 +287,7 @@ test('two equally good missions are ordered by id, not by array position', () =>
   // Ties are broken on the id so the same student on two devices, or the phone
   // and the server, produce the same recommendation. A tie resolved by
   // whichever the catalog listed first is a tie resolved by a detail nobody
-  // controls (PRD-ADPT-004).
+  // controls.
   const far = (id: string) => ({
     id,
     gameId: 'congklak' as const,

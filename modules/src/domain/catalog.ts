@@ -1,7 +1,7 @@
 /**
  * Catalog access.
  *
- * Missions are content, not code (PRD-LRN-001). The server reads them from the
+ * Missions are content, not code. The server reads them from the
  * catalog tables and hands them to the shared engine, so a mission can be
  * retuned or a label corrected without a server deploy — and so the definition
  * the server validates against is exactly the one the client played.

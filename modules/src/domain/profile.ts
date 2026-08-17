@@ -123,7 +123,7 @@ export function requireMemberOf(c: Ctx, classId: string, userId: string): void {
 }
 
 /**
- * Display-name validation (PRD-ONB-003).
+ * Display-name validation.
  *
  * The contact-details check is the one that matters: a display name is visible
  * to a whole class, and a child who puts a phone number in it has published it

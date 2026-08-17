@@ -39,7 +39,7 @@ export function teacherClassCreate(c: Ctx, req: ClassCreateReq) {
   const profile = requireRole(c, ['teacher', 'school_admin', 'staff']);
   if (!profile.schoolId) throw invalidArgument('Your account is not attached to a school');
 
-  // The consent gate (PRD-ONB-018).
+  // The consent gate.
   //
   // Refused here rather than warned about later, because a class that exists is
   // a class students can join, and a student joining is the moment a minor's
@@ -257,7 +257,7 @@ export function teacherClassSummary(c: Ctx, req: ClassSummaryReq) {
     below_proficient: number;
     total: number;
   }[];
-  // Teaching notes for the nodes that came back as gaps (PRD-TCH-012).
+  // Teaching notes for the nodes that came back as gaps.
   //
   // Naming a weakness without saying what to do about it leaves a teacher who
   // is not certified in this subject worse off than before the dashboard spoke:
@@ -286,7 +286,7 @@ export function teacherClassSummary(c: Ctx, req: ClassSummaryReq) {
   }
 
   // The dashboard cannot silently present an incomplete picture, so the
-  // contract itself tells it the picture is incomplete (PRD-TCH-010).
+  // contract itself tells it the picture is incomplete.
   const staleRows = c.nk.sqlQuery(Q.classStaleCount, [klass.id]);
   const stale = staleRows.length === 0 ? 0 : Number((staleRows[0] as { stale: number }).stale);
 
@@ -343,7 +343,7 @@ export function teacherStudentDetail(c: Ctx, req: { classId: string; userId: str
 
   // Complete, never sampled. This is the query that makes the dashboard
   // trustworthy — a teacher who cannot see the whole chain has no reason to
-  // believe the summary above it (PRD-TCH-008).
+  // believe the summary above it.
   const evidenceRows = c.nk.sqlQuery(Q.evidenceChain, [userId]) as {
     skill_node_id: SkillNodeId;
     at_ms: number;
@@ -629,7 +629,7 @@ export function teacherClassList(c: Ctx) {
 }
 
 /**
- * Remove a student from a class (PRD-TCH-003).
+ * Remove a student from a class.
  *
  * Ends the membership; it never deletes the student's work. A teacher tidying
  * a roster must not be able to destroy a term of a child's learning history,
@@ -649,7 +649,7 @@ export function teacherClassRemove(c: Ctx, req: { classId: string; userId: strin
 }
 
 /**
- * Turn the class leaderboard off (PRD-SOC-008).
+ * Turn the class leaderboard off.
  *
  * A teacher who knows their class knows when ranking helps and when it makes
  * the bottom three stop trying. The setting is theirs, and it is per class
@@ -668,7 +668,7 @@ export function teacherLeaderboardSet(c: Ctx, req: { classId: string; enabled: b
 }
 
 // ---------------------------------------------------------------------------
-// v1.teacher.consent.* (PRD-ONB-018)
+// v1.teacher.consent.*
 // ---------------------------------------------------------------------------
 
 export interface ConsentRecordReq {
@@ -759,7 +759,7 @@ export function teacherConsentStatus(c: Ctx): ConsentStatusRes {
  * being created and is the signal to begin deletion; silently unmaking classes
  * mid-term would destroy a teacher's work and a student's record as a side
  * effect of an administrative act, and deletion is a request with its own
- * thirty-day path (PRD-ONB-018).
+ * thirty-day path.
  */
 export function teacherConsentWithdraw(c: Ctx) {
   const profile = requireRole(c, ['school_admin', 'staff']);

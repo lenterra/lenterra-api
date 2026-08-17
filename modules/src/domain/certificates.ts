@@ -23,7 +23,7 @@ export { CERTIFICATES };
  * The snapshot stored with the certificate.
  *
  * Kept because a certificate has to be able to state its own limits
- * (PRD-RWD-013): how many attempts stand behind it and over what period. One
+ *: how many attempts stand behind it and over what period. One
  * that can only say "issued" is asking to be over-read by whoever it is shown
  * to, which is exactly the person it must not mislead.
  */
@@ -163,8 +163,8 @@ export function issueEarned(
       body,
       // Hashing the snapshot is what will later let a third party check that a
       // displayed certificate matches what was issued, without re-deriving it
-      // from an evidence chain that mastery decay will have moved on from
-      // (PRD-RWD-014 builds on this).
+      // from an evidence chain that mastery decay will have moved on from.
+      // Public verification builds on this hash.
       c.nk.sha256Hash(body),
     ]);
 

@@ -2,7 +2,7 @@
 --
 -- Both tables back promises the product makes in writing and had no mechanism
 -- for: a student can ask for their data to be deleted (TRD-SEC-011), and a
--- student can report another (PRD-SOC-014, TRD-SEC-016). The moderation table
+-- student can report another (TRD-SEC-016). The moderation table
 -- shipped in 0005 with nothing writing to it; this adds the queue view it
 -- needs and the deletion side that was missing entirely.
 

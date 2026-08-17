@@ -155,7 +155,7 @@ export function applyEvidence(
 }
 
 /**
- * Replay a full evidence history from scratch (PRD-LRN-003).
+ * Replay a full evidence history from scratch.
  *
  * This is what makes an engine bug recoverable by recomputation rather than by
  * guesswork, and what TRD-ADPT-001's 1e-9 reproducibility assertion tests.

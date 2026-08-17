@@ -382,7 +382,7 @@ test('an explanation too short to name a misconception is caught', () => {
 });
 
 test('an explanation that just repeats the right answer is flagged', () => {
-  // PRD-CRS-005: name the misconception, do not restate the answer. This is the
+  // Name the misconception, do not restate the answer. This is the
   // shape a rushed author reaches for and it teaches nothing a student could
   // not read off the screen.
   const input = fixture();

@@ -59,7 +59,7 @@ export function readMastery(c: Ctx, userId: string): MasterySnapshot {
   }
 
   // Which missions have already contributed to each node. Needed so the
-  // multi-source cap (PRD-LRN-005) counts distinct *sources*, not attempts —
+  // multi-source cap counts distinct *sources*, not attempts —
   // twenty replays of one easy mission must not read as mastery of the skill.
   const keyRows = c.nk.sqlQuery(Q.masterySourceKeys, [userId]) as {
     skill_node_id: SkillNodeId;

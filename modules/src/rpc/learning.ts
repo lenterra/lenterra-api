@@ -55,7 +55,7 @@ export interface ProgressReq {
  * Bands, never raw numbers.
  *
  * The student app must be structurally incapable of showing a mastery value
- * (PRD-ADPT-005) — a number invites comparison and gaming, and the number is a
+ * — a number invites comparison and gaming, and the number is a
  * probability estimate that no 14-year-old should be asked to interpret. The
  * teacher RPCs return raw values; this one does not.
  */
@@ -191,7 +191,7 @@ export interface CheckSubmitReq {
 /**
  * Grade a course check server-side.
  *
- * The client's provisional grade is never persisted (PRD-CRS-004). The device
+ * The client's provisional grade is never persisted. The device
  * grades against a digest so an offline student sees a result and an
  * explanation immediately; this is the grade that counts, computed from the
  * answer key in a catalog part `v1.catalog.pull` refuses to serve.

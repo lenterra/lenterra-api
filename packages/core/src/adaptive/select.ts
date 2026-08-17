@@ -1,5 +1,5 @@
 /**
- * Mission selection (20-06 "Mission selection", PRD-ADPT-003).
+ * Mission selection (20-06 "Mission selection").
  *
  * Deterministic by construction (TRD-ADPT-004). That is not a nicety: the
  * client runs this same function offline from cached parameters, and the
@@ -48,7 +48,7 @@ export interface Recommendation {
   gameId: GameId;
   reason: RecommendationReason;
   primarySkillNodeId: SkillNodeId;
-  /** 0–1. Returned so a client/server divergence is detectable (PRD-ADPT-004). */
+  /** 0–1. Returned so a client/server divergence is detectable. */
   predictedSuccess: number;
   displayReasonKey: string;
   /** Internal ranking score. Not shown to anyone; useful in telemetry. */
@@ -95,7 +95,7 @@ export function gapScore(mission: MissionSummary, input: SelectionInput): number
 }
 
 /**
- * Anti-drilling (PRD-ADPT-003).
+ * Anti-drilling.
  *
  * Without this, the mathematically optimal policy is to drill the weakest node
  * until the student quits — defensible as arithmetic and ruinous as pedagogy.

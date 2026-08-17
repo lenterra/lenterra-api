@@ -4,8 +4,7 @@
  * Rule 3 — capture requires strictly lower freshness — is the whole game. It is
  * implemented as an explicit comparison rather than folded into movement,
  * because a rejected capture is not an error to swallow: it is diagnostic
- * evidence for `sec.access` and must be reportable with both numbers
- * (PRD-GAME-012).
+ * evidence for `sec.access` and must be reportable with both numbers.
  */
 
 import type { MoveEvent, MoveResult } from '../types';

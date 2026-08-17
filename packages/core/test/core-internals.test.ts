@@ -33,8 +33,7 @@ import type { Mission } from '../dist/types/mission.js';
 import type { CongklakMove } from '../dist/index.js';
 
 // ---------------------------------------------------------------------------
-// Numbers
-// ---------------------------------------------------------------------------
+// Numbers ---------------------------------------------------------------------------
 
 test('clamping collapses NaN rather than letting it spread', () => {
   // A NaN mastery value written to the database poisons every later update and
@@ -96,8 +95,7 @@ test('rngInt stays in range, including for a zero bound', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Mastery
-// ---------------------------------------------------------------------------
+// Mastery ---------------------------------------------------------------------------
 
 function evidence(overrides: Partial<EvidenceInput> = {}): EvidenceInput {
   return {
@@ -124,7 +122,7 @@ test('a zero or negative weight contributes nothing', () => {
 });
 
 test('one source repeated cannot reach the top band', () => {
-  // The multi-source cap (PRD-LRN-005). Without it, a student who replays one
+  // The multi-source cap. Without it, a student who replays one
   // mission thirty times is indistinguishable from one who has demonstrated the
   // skill across different problems.
   const history: EvidenceInput[] = [];

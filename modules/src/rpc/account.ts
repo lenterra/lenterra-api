@@ -50,7 +50,7 @@ export interface UpgradeRes {
  * nothing to merge — the same Nakama user id keeps its progress, points, and
  * mastery by construction, and the only thing that changes is what they can sign
  * in with next time. Creating a second account and copying rows between them
- * would be the outcome PRD-ONB-004 exists to prevent.
+ * would be exactly the split-account outcome this path exists to prevent.
  */
 export function accountUpgrade(c: Ctx, req: UpgradeReq): UpgradeRes {
   const assertion = requireString(req.assertion, 'assertion', 4096);

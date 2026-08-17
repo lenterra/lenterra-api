@@ -45,7 +45,7 @@ export function detectStruggle(recent: AttemptSummary[]): StruggleDetection | nu
 }
 
 /**
- * Support offered to a struggling student (PRD-ADPT-006).
+ * Support offered to a struggling student.
  *
  * Ordered by how little it interrupts: an easier mission keeps them playing, a
  * hint keeps them in this mission, a lesson steps out of the game entirely.

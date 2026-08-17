@@ -1,7 +1,7 @@
 -- 0004 — Points, streaks, achievements, certificates, courses.
 --
 -- Points are a ledger, never a counter. Balance is always SUM(delta)
--- (PRD-RWD-002), so a balance can never drift from the reasons behind it, and
+--, so a balance can never drift from the reasons behind it, and
 -- a correction is a compensating row rather than an edit.
 
 BEGIN;
@@ -54,7 +54,7 @@ CREATE INDEX IF NOT EXISTS lenterra_redemption_user_idx
   ON lenterra_redemption (user_id, created_at DESC);
 
 -- The evidence snapshot is taken at issuance and never recomputed: a
--- certificate must stay meaningful after mastery decay (PRD-LRN-006), and it
+-- certificate must stay meaningful after mastery decay, and it
 -- must be exactly what gets hashed on-chain at R3.
 CREATE TABLE IF NOT EXISTS lenterra_certificate (
   id                UUID PRIMARY KEY,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS lenterra_certificate (
   onchain_chain     TEXT,
   onchain_tx        TEXT,
   onchain_token_id  TEXT,
-  public_verifiable BOOLEAN NOT NULL DEFAULT false,   -- student-controlled (PRD-RWD-014)
+  public_verifiable BOOLEAN NOT NULL DEFAULT false,   -- student-controlled
   UNIQUE (user_id, definition_id)
 );
 

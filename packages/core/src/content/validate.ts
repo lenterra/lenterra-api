@@ -1,5 +1,5 @@
 /**
- * Content validation (10-12 PRD-CNT-002).
+ * Content validation (10-12).
  *
  * Runs in CI before a mission can be merged, and again server-side before a
  * catalog version can be published. Both call this function, because content
@@ -119,7 +119,7 @@ export function validateMission(mission: Mission, known?: Set<string>): ContentI
         known.add(key);
       }
     }
-    // The anti-skin rule (PRD-LRN-002): a mission may not claim a skill
+    // The anti-skin rule: a mission may not claim a skill
     // because its artwork mentions it. The rationale has to name the mechanic.
     if (!namesAMechanic(rationale)) {
       add(
@@ -188,7 +188,7 @@ export function validateMissionSet(missions: Mission[]): ContentIssue[] {
   }
 
   // Ladder integrity: ranks must be contiguous from 1. A gap means a mission
-  // was removed and the selector's "highest unlocked rank + 1" (PRD-LRN-007)
+  // was removed and the selector's "highest unlocked rank + 1"
   // would silently stop unlocking.
   const games = Object.keys(ranksByGame).sort();
   for (let i = 0; i < games.length; i++) {
@@ -260,7 +260,7 @@ export function primaryNodeOfMission(mission: Mission): SkillNodeId | null {
  * Does the rationale reference an actual game mechanic?
  *
  * A keyword check, deliberately. It cannot judge pedagogy — that is what the
- * two-reviewer rule is for (PRD-CNT-005) — but it does catch the specific
+ * two-reviewer rule is for — but it does catch the specific
  * failure it is aimed at: a rationale that restates the skill name instead of
  * naming the mechanic that produces the evidence.
  */

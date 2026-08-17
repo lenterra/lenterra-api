@@ -338,7 +338,7 @@ export function submitAttempt(
     const id = achievements[i] as string;
     emit(c, 'achievement.earned', { achievementId: id });
     // In-app only in R1. Push needs store presence and a consent conversation
-    // about minors the pilot does not need to have (PRD-APP-060, OQ-05).
+    // about minors the pilot does not need to have (OQ-05).
     notify(c, c.userId, {
       code: NOTIFICATION_CODE.achievement,
       subjectKey: 'notification.achievement',

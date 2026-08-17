@@ -1,5 +1,5 @@
 /**
- * What a certificate means (PRD-RWD-012).
+ * What a certificate means.
  *
  * A certificate is the one artefact from this product a student might show to
  * somebody who has never heard of it — a school, an employer, a parent. That

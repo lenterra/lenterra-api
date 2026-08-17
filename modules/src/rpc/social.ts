@@ -25,8 +25,7 @@ import { readMastery } from '../domain/mastery';
 import { CERTIFICATES, type CertificateEvidence } from '../domain/certificates';
 
 // ---------------------------------------------------------------------------
-// Points
-// ---------------------------------------------------------------------------
+// Points ---------------------------------------------------------------------------
 
 export interface PointsHistoryReq {
   cursor?: string;
@@ -234,7 +233,7 @@ export function certificateList(c: Ctx) {
 
     // Read from the stored snapshot rather than recomputed. A certificate has
     // to keep saying what it said when it was issued, even after mastery has
-    // moved on (PRD-RWD-013) — recomputing would quietly restate the claim.
+    // moved on — recomputing would quietly restate the claim.
     const nodes: string[] = [];
     if (evidence) {
       for (let n = 0; n < evidence.nodes.length; n++) {
@@ -260,7 +259,7 @@ export function certificateList(c: Ctx) {
 
   // --- what is left to earn ------------------------------------------------
   // An empty certificates tab that says only "none yet" tells a student
-  // nothing about how to change that (PRD-APP-055). This is the same predicate
+  // nothing about how to change that. This is the same predicate
   // that issues them, read for its refusals instead of its verdict.
   const held: Record<string, boolean> = {};
   for (let i = 0; i < earned.length; i++) {
@@ -458,7 +457,7 @@ export interface FriendSearchReq {
  *
  * A code from another school returns `null` rather than "wrong school", because
  * a distinguishable response confirms the code exists and turns this into an
- * enumeration oracle over other schools' children (PRD-SOC-010).
+ * enumeration oracle over other schools' children.
  */
 export function friendSearchByCode(c: Ctx, req: FriendSearchReq) {
   const friendCode = requireString(req.friendCode, 'friendCode', 16).toUpperCase();
@@ -498,7 +497,7 @@ export interface ClassGoalRes {
 }
 
 /**
- * Progress toward the class goal (PRD-SOC-009).
+ * Progress toward the class goal.
  *
  * Deliberately not gated on `leaderboard_enabled`. A teacher who switches the
  * ranking off is switching off competition, and this is the mechanic that is

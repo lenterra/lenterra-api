@@ -1,5 +1,5 @@
 /**
- * Deterministic Benteng opponent (PRD-GAME-015).
+ * Deterministic Benteng opponent.
  *
  * Tiers, per the spec: *mudah* advances toward the base and refreshes when
  * stale; *sedang* adds opportunistic capture and retreat; *sulit* runs a 2-ply

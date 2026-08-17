@@ -1,15 +1,15 @@
 /**
- * Course validation and check grading (10-08, 10-12 PRD-CNT-002).
+ * Course validation and check grading (10-08, 10-12).
  *
  * Two jobs, in one file because they share the same definitions:
  *
  *  - **Validation** runs in CI before a lesson can merge and again before a
  *    catalog version can be published, on exactly the same inputs. Content that
  *    reached a student having skipped it is content nobody checked, and the
- *    security lessons are the ones where that matters most (PRD-CRS-009).
+ *    security lessons are the ones where that matters most.
  *  - **Grading** is one implementation used twice: provisionally on the device
  *    so an offline student sees a result immediately, and authoritatively on
- *    the server, whose grade is the only one persisted (PRD-CRS-004). Two
+ *    the server, whose grade is the only one persisted. Two
  *    implementations would eventually disagree, and the student would watch a
  *    correct answer turn wrong on sync with no explanation.
  */
@@ -34,8 +34,7 @@ import { SKILL_NODE_IDS, isSkillNodeId, type SkillNodeId } from '../types/taxono
 import type { ContentIssue, ContentIssueSeverity } from './validate';
 
 // ---------------------------------------------------------------------------
-// Grading
-// ---------------------------------------------------------------------------
+// Grading ---------------------------------------------------------------------------
 
 export interface CheckAnswer {
   itemId: string;
@@ -136,7 +135,7 @@ export interface CourseValidationInput {
  * The floor of the range reported for Indonesian secondary students reading
  * unfamiliar expository text. Deliberately the floor: overestimating speed
  * produces lessons that overrun the number a student planned their session
- * around, which is the failure PRD-CRS-010 exists to prevent.
+ * around, which is the failure a stated reading time exists to prevent.
  */
 export const WORDS_PER_MINUTE = 130;
 
@@ -148,7 +147,7 @@ export const READING_TIME_TOLERANCE = 0.6;
  *
  * The check is part of the lesson from the student's side — they do not stop
  * the clock when the prose ends — so it counts toward the number they budget
- * their session against (PRD-CRS-010). Reading the prompt and options is
+ * their session against. Reading the prompt and options is
  * already covered by the word count; this is the thinking on top of it.
  */
 export const CHECK_ITEM_SECONDS = 20;
@@ -188,7 +187,7 @@ export function validateCourseSet(input: CourseValidationInput): ContentIssue[] 
       add('error', 'schema', course.id, 'contentVersion must be a positive integer');
     }
 
-    // R1 sells nothing (PRD-CRS-008). A non-free course in a published R1
+    // R1 sells nothing. A non-free course in a published R1
     // catalog would put a lock on a screen shown to a child in a pilot that is
     // free, which is the specific thing that requirement forbids.
     if (course.entitlement !== 'free') {
@@ -275,7 +274,7 @@ export function validateCourseSet(input: CourseValidationInput): ContentIssue[] 
   }
 
   // Every node needs a lesson. This is what allows a node to reach Mastered on
-  // multi-source evidence (PRD-LRN-005) when only one game touches it — without
+  // multi-source evidence when only one game touches it — without
   // it, a student can max out the game ladder and still be capped at Proficient
   // through no fault of their own.
   for (let i = 0; i < SKILL_NODE_IDS.length; i++) {
@@ -366,7 +365,7 @@ function validateLesson(
     }
   }
 
-  // The honest-reading-time check (PRD-CRS-010). Before pilot data exists the
+  // The honest-reading-time check. Before pilot data exists the
   // word count is the only evidence we have, so a number that contradicts it is
   // a guess dressed as a measurement. Explanations are excluded deliberately:
   // a student only reads the ones for answers they got wrong.
@@ -508,7 +507,7 @@ function validateCheck(
 /**
  * An explanation must name the misconception, not restate the answer.
  *
- * PRD-CRS-005. Restating the right answer teaches nothing a student could not
+ * Restating the right answer teaches nothing a student could not
  * read off the screen, and it is the shape a rushed author reaches for. The
  * check is a heuristic — it catches the verbatim case, which is the common one.
  */

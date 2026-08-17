@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS lenterra_class (
   join_code            TEXT,                      -- NULL once revoked
   join_code_expires_at TIMESTAMPTZ,
   max_members          INT NOT NULL DEFAULT 40,
-  leaderboard_enabled  BOOLEAN NOT NULL DEFAULT true,   -- PRD-SOC-008
+  leaderboard_enabled  BOOLEAN NOT NULL DEFAULT true,
   created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
   archived_at          TIMESTAMPTZ
 );
@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS lenterra_class_teacher_idx
   ON lenterra_class (teacher_user_id) WHERE archived_at IS NULL;
 
 -- removed_at rather than deletion: removing a student from a class must never
--- destroy their learning history (PRD-TCH-003).
+-- destroy their learning history.
 CREATE TABLE IF NOT EXISTS lenterra_class_member (
   class_id   UUID NOT NULL REFERENCES lenterra_class(id) ON DELETE CASCADE,
   user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS lenterra_class_member (
 CREATE INDEX IF NOT EXISTS lenterra_class_member_user_idx
   ON lenterra_class_member (user_id) WHERE removed_at IS NULL;
 
--- Teacher-approved account reclaim for class-code students (PRD-ONB-005).
+-- Teacher-approved account reclaim for class-code students.
 CREATE TABLE IF NOT EXISTS lenterra_reclaim_request (
   id                UUID PRIMARY KEY,
   class_id          UUID NOT NULL REFERENCES lenterra_class(id) ON DELETE CASCADE,

@@ -67,8 +67,7 @@ const MISSION: Mission = {
 };
 
 // ---------------------------------------------------------------------------
-// Mastery
-// ---------------------------------------------------------------------------
+// Mastery ---------------------------------------------------------------------------
 
 test('an abandoned attempt produces no evidence at all', () => {
   // Closing the app mid-mission must not be able to lower a student's mastery.
@@ -140,11 +139,10 @@ test('a domain rollup over nothing is empty rather than a confident zero', () =>
 });
 
 // ---------------------------------------------------------------------------
-// Bands
-// ---------------------------------------------------------------------------
+// Bands ---------------------------------------------------------------------------
 
 test('a band needs evidence behind it, not just a value', () => {
-  // The distinction PRD-ADPT-005 rests on: 0.7 from one lucky attempt and 0.7
+  // The distinction bands rest on: 0.7 from one lucky attempt and 0.7
   // from twenty are not the same claim about a child.
   assert.notEqual(bandOf(0.9, 0), bandOf(0.9, 20));
 });
@@ -207,8 +205,7 @@ test('a class that overshoots has met its goal rather than exceeded a quota', ()
 });
 
 // ---------------------------------------------------------------------------
-// Struggle
-// ---------------------------------------------------------------------------
+// Struggle ---------------------------------------------------------------------------
 
 test('struggle needs consecutive failures on the same skill', () => {
   const fail = (primaryNode: string): AttemptSummary =>
@@ -248,8 +245,7 @@ test('support offered matches support that exists', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Selection
-// ---------------------------------------------------------------------------
+// Selection ---------------------------------------------------------------------------
 
 const candidate = (id: string, rating: number, node: string, rank = 3) => ({
   id,

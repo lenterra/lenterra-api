@@ -61,7 +61,7 @@ export const RATING_FLOOR = 700;
 export const RATING_CEILING = 1600;
 
 /**
- * Seed a rating from the three-mission placement sequence (PRD-LRN-009).
+ * Seed a rating from the three-mission placement sequence.
  *
  * K = 60 because three observations must move the estimate meaningfully.
  * Mission K = 0 because placement results must not distort the difficulty

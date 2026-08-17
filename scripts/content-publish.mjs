@@ -4,7 +4,7 @@
 // Publishing is separate from promoting. A version lands as `draft`, and
 // `v1.admin.catalog.publish` promotes it — so content can be staged and
 // reviewed against a real server before a single student sees it, and rolling
-// back is one promotion of the previous version (PRD-CNT-008).
+// back is one promotion of the previous version.
 //
 // Nothing is written unless every check passes. Content that reached students
 // having skipped validation is content nobody validated.
@@ -100,7 +100,7 @@ async function main() {
 
     // One part per course. A student opening `sec.basics` pulls its five
     // lessons, not all forty — which on a metered connection is the difference
-    // between reading a lesson and deciding not to (PRD-CRS-003).
+    // between reading a lesson and deciding not to.
     for (const [name, bodies] of Object.entries(compiled.lessonParts)) {
       const body = JSON.stringify(bodies);
       parts.push({ part: name, sha256: sha256(body), bytes: Buffer.byteLength(body), body: bodies });
@@ -132,7 +132,7 @@ async function main() {
   }
 
   // Teaching notes ride the catalog like everything else, so a corrected
-  // misconception reaches a teacher without an app release (PRD-CNT-007).
+  // misconception reaches a teacher without an app release.
   const notes = loadTeachingNotes();
   if (Object.keys(notes).length > 0) {
     const body = JSON.stringify(notes);

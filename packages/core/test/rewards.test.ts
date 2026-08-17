@@ -250,7 +250,7 @@ describe('achievementsFrom', () => {
   });
 
   test('at least three achievements need no competition with anyone', () => {
-    // PRD-RWD-011: a student with no classmates must still have things to earn.
+    // A student with no classmates must still have things to earn.
     const solo = facts({
       totalValidatedAttempts: 1,
       distinctGamesPlayed: 2,

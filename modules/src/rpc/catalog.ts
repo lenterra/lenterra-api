@@ -3,7 +3,7 @@
  *
  * `changed` in the manifest is what makes the difference between a 40 KB and a
  * 4 MB update on a metered connection, which for the target student is the
- * difference between updating and not updating (PRD-ACC-007).
+ * difference between updating and not updating.
  */
 
 import { invalidArgument } from '../lib/errors';

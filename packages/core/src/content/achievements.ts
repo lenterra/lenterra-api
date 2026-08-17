@@ -1,5 +1,5 @@
 /**
- * Achievements (PRD-RWD-011).
+ * Achievements.
  *
  * The set is small and deliberately varied. Four of the nine are reachable
  * without competing against anyone — the requirement is at least three — and

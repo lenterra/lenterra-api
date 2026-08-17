@@ -2,7 +2,7 @@
  * Points, streaks, and achievements.
  *
  * The balance is always `SUM(delta)` over the ledger; no mutable counter exists
- * anywhere (PRD-RWD-002). A student who sees their balance change without a
+ * anywhere. A student who sees their balance change without a
  * visible reason reads it as the system cheating, and a counter that drifts
  * from its reasons is unrepairable — a ledger can always be re-summed.
  */
@@ -118,7 +118,7 @@ export function achievementsOf(c: Ctx, userId: string): string[] {
  *
  * Not zero. A student replaying a mission they enjoy should not be punished for
  * it — but the reward has to be small enough that grinding is a worse strategy
- * than progressing (PRD-RWD-007).
+ * than progressing.
  */
 export function pointsForAttempt(
   outcome: string,

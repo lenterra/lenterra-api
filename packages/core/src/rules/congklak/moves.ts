@@ -1,5 +1,5 @@
 /**
- * Congklak move application — the complete rule set (PRD-GAME-001).
+ * Congklak move application — the complete rule set.
  *
  * The demo implemented sowing, store-skipping, and the extra turn correctly.
  * Continuation, capture, game end, and sweep were absent, and each absence had

@@ -7,7 +7,7 @@
 -- school might give, and they are not the same answer.
 --
 -- Without it the row attests that a box was ticked. With it the row attests to
--- something a person can be asked to produce (PRD-ONB-018, TRD-SEC-014).
+-- something a person can be asked to produce (TRD-SEC-014).
 
 ALTER TABLE lenterra_consent
   ADD COLUMN IF NOT EXISTS process_note TEXT;

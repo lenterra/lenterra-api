@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Runs every content check and fails the build on an error.
 //
-// Two reviewers still have to approve a mission (PRD-CNT-005) — this cannot
+// Two reviewers still have to approve a mission — this cannot
 // judge whether a mission teaches anything. What it can do is refuse the ways
 // content breaks silently: weights that do not sum, a skill claimed with no
 // mechanic behind it, a ladder with a gap, a mission nobody can win, and a

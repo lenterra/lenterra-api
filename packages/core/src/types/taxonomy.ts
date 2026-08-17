@@ -2,7 +2,7 @@
  * The skill taxonomy: 3 domains, 17 nodes (10-03).
  *
  * Labels and descriptions are *content* — they live in the catalog and can be
- * edited without an app release (PRD-LRN-001). The **IDs** are not content:
+ * edited without an app release. The **IDs** are not content:
  * they key stored mastery, so an ID may be retired but never renamed or
  * reused. They are declared here as types precisely so a rename becomes a
  * compile error rather than a silent data corruption.
@@ -83,7 +83,7 @@ export function nodesInDomain(domain: SkillDomainId): SkillNodeId[] {
 }
 
 // ---------------------------------------------------------------------------
-// Mastery bands (PRD-LRN-004)
+// Mastery bands
 // ---------------------------------------------------------------------------
 
 export type MasteryBand = 'not_started' | 'emerging' | 'developing' | 'proficient' | 'mastered';
@@ -103,7 +103,7 @@ export const MASTERY_BAND_FLOOR: Record<Exclude<MasteryBand, 'not_started'>, num
  * as "Baru mulai" would claim evidence that does not exist.
  *
  * One implementation, used by the student app, the teacher heatmap, and the
- * certificate check alike (PRD-LRN-004). Three implementations would drift.
+ * certificate check alike. Three implementations would drift.
  */
 export function bandOf(mastery: number, evidenceCount: number): MasteryBand {
   if (evidenceCount <= 0) return 'not_started';

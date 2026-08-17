@@ -1,5 +1,5 @@
 /**
- * The class goal (PRD-SOC-009).
+ * The class goal.
  *
  * The only R1 social mechanic where a stronger student gains from helping a
  * weaker one. Everything else on the board tab is a ranking, and a ranking is

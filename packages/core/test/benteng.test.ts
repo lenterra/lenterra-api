@@ -72,7 +72,7 @@ test('a staler unit may not capture a fresher one', () => {
   assert.equal(legality.legal, false);
   assert.equal(legality.reason, 'stale');
   // Both numbers are surfaced so the UI can state the comparison rather than
-  // just buzzing (PRD-GAME-012).
+  // just buzzing.
   assert.deepEqual(legality.rejection, { moverFreshness: 5, targetFreshness: 0 });
 });
 

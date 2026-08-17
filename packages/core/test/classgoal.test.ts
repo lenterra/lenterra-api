@@ -1,5 +1,5 @@
 /**
- * The class goal (PRD-SOC-009).
+ * The class goal.
  *
  * The requirement has one clause that is easy to write and easy to violate:
  * the goal must be achievable by a class where several students are struggling.

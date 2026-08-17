@@ -43,7 +43,7 @@ export function loadMissions(game) {
 }
 
 /**
- * Teaching notes, one per skill node (PRD-TCH-012).
+ * Teaching notes, one per skill node.
  *
  * Authored alongside the missions rather than written into the dashboard,
  * because a note about what students typically get wrong is content that has
@@ -230,7 +230,7 @@ export function flattenKeys(object, prefix = '') {
 }
 
 /**
- * Every check in the content validation table (10-12 PRD-CNT-002).
+ * Every check in the content validation table (10-12).
  *
  * Returns issues rather than throwing, so one broken mission does not hide the
  * other nineteen — an author fixing content wants the whole list.

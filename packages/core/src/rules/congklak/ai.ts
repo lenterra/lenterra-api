@@ -1,5 +1,5 @@
 /**
- * Deterministic Congklak opponent, three tiers (PRD-GAME-003).
+ * Deterministic Congklak opponent, three tiers.
  *
  * Determinism is not a nicety here. The server re-executes every replay, and a
  * non-deterministic opponent would make every offline attempt unverifiable —

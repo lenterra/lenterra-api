@@ -209,7 +209,7 @@ export const bentengEngine: GameEngine<BentengState, BentengMove> = {
 };
 
 /**
- * Freshness readout for the UI (PRD-GAME-013).
+ * Freshness readout for the UI.
  *
  * Exposed from the core so the number the student sees is the number the rule
  * uses — a second implementation in the component is how a UI ends up showing

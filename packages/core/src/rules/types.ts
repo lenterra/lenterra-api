@@ -40,7 +40,7 @@ export type MoveEventKind =
  * The animation is driven *from* this list after the fact, which inverts the
  * demo's coupling: logical state is correct the moment the move is applied,
  * and the visuals are a replay of events that already happened. That is what
- * makes a skippable animation implementable at all (PRD-GAME-006).
+ * makes a skippable animation implementable at all.
  */
 export interface MoveEvent {
   kind: MoveEventKind;

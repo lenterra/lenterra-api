@@ -1,5 +1,5 @@
 /**
- * When the product is allowed to interrupt a student (PRD-APP-060).
+ * When the product is allowed to interrupt a student.
  *
  * Two limits, pure so they can be asserted at their boundaries:
  *

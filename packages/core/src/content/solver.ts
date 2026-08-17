@@ -2,7 +2,7 @@
  * The reference solver.
  *
  * Three checks in the content validation table need to actually play the game
- * (10-12 PRD-CNT-002):
+ * (10-12):
  *
  *  - **Solvability.** Every published mission must have at least one winning
  *    line. A mission nobody can beat is not hard, it is broken, and a student

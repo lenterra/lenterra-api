@@ -108,7 +108,7 @@ export function compileCourses(knownMissionIds = []) {
     const courseId = course.id;
     const base = `course.${courseId}`;
 
-    // Review is a publication gate, not metadata (PRD-CRS-009). Cybersecurity
+    // Review is a publication gate, not metadata. Cybersecurity
     // content that is wrong is worse than none, so a `sec.*` course with no
     // factual reviewer must not reach a student.
     for (const pass of ['pedagogy', 'factual', 'language']) {
@@ -122,7 +122,7 @@ export function compileCourses(knownMissionIds = []) {
         });
       } else if (record.by === course.author) {
         // The author approving their own work on the same document is the
-        // failure PRD-CRS-009's separate-pass rule exists to prevent.
+        // failure the separate-pass rule exists to prevent.
         issues.push({
           severity: 'error',
           check: 'review',
