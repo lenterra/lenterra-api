@@ -27,7 +27,13 @@ if (deps.length > 0) {
 // --- no forbidden globals or imports --------------------------------------
 const FORBIDDEN = [
   { pattern: /\bDate\.now\s*\(/, why: 'reads a clock; pass time in as a parameter' },
-  { pattern: /\bnew\s+Date\s*\(/, why: 'reads a clock; pass time in as a parameter' },
+  // Argument-less only. `new Date(epochMs)` is a pure conversion from a
+  // timestamp the caller passed in — goja implements it, and it is how
+  // `isQuietHour` turns an instant into a local hour. Forbidding both spellings
+  // flagged that as a clock read and left this gate red on every push, which is
+  // worse than not having it: a gate that is always failing is one people learn
+  // to skip past.
+  { pattern: /\bnew\s+Date\s*\(\s*\)/, why: 'reads a clock; pass time in as a parameter' },
   { pattern: /\bMath\.random\s*\(/, why: 'non-deterministic; use createRng(seed)' },
   { pattern: /\brequire\s*\(/, why: 'no dynamic require in a bundled goja module' },
   { pattern: /\bprocess\./, why: 'no process in goja or Hermes' },
