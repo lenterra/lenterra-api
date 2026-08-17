@@ -1,0 +1,56 @@
+# TLS and routing for the API.
+#
+# One hostname covers both services. `/verifier/*` reaches the auth sidecar,
+# everything else reaches Nakama. That is a deployment decision rather than an
+# architectural one — the two are separate processes and stay separate — but it
+# means one DNS record and one certificate, and a certificate that lapses takes
+# every classroom offline at once.
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$LENTERRA_API_DOMAIN} {
+	# Structured, so a failing sign-in can be traced without reading prose.
+	log {
+		output stdout
+		format json
+	}
+
+	encode gzip zstd
+
+	# The verifier. Stripped before proxying, because it knows nothing about
+	# the prefix — it serves /session/class-code, not /verifier/session/…
+	handle_path /verifier/* {
+		reverse_proxy verifier:8787
+	}
+
+	# Nakama's console is a full administrative interface over children's
+	# data. It is not published by compose and it is refused here as well, so
+	# that exposing it later takes two deliberate changes rather than one.
+	# Reaching it means an SSH tunnel to the container.
+	handle /console* {
+		respond "Not found" 404
+	}
+
+	handle {
+		reverse_proxy nakama:7350 {
+			# Nakama's realtime socket upgrades on this path. Caddy proxies
+			# websockets transparently, but the timeouts have to allow a
+			# connection that is idle by design.
+			transport http {
+				read_timeout 10m
+				write_timeout 10m
+			}
+		}
+	}
+
+	# The app talks to this from school networks that sometimes rewrite
+	# headers. Nothing here depends on a client-set header, and this makes
+	# that explicit rather than incidental.
+	header {
+		-Server
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+	}
+}

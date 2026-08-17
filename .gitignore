@@ -5,6 +5,9 @@ dist/
 
 .env
 .env.local
+# Production secrets, generated on the server. The example beside it is
+# committed; this never is.
+docker/.env.prod
 
 docker/data/
 coverage/

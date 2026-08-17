@@ -1,0 +1,125 @@
+# The production stack.
+#
+# One VPS, four containers, one public port. Postgres and Nakama are not
+# published to the host at all — Caddy is the only thing the internet reaches,
+# and it terminates TLS for lenterra-api.faizath.com.
+#
+# The differences from `docker-compose.yml` are not cosmetic, and each is here
+# because the development version would be actively wrong in production:
+#
+#   - no published database port, and no default password
+#   - no default secrets: every one is required, and the stack refuses to start
+#     without it rather than running on a value from a public repository
+#   - the Nakama console is not published even on loopback; reaching it means an
+#     SSH tunnel to the container, which is the point
+#   - restart policies, so a reboot brings the classroom back without a person
+#
+# Bring it up with `npm run deploy` from a checkout on the server, which builds,
+# migrates in the right order, and waits for health. Doing it by hand means
+# remembering that Nakama's own `migrate up` has to precede ours.
+
+name: lenterra-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Deliberately no `ports`. Children's learning records are in here, and a
+    # published 5432 with a guessable password is how they leave.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  nakama:
+    image: registry.heroiclabs.com/heroiclabs/nakama:3.22.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        /nakama/nakama migrate up \
+          --database.address ${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+        exec /nakama/nakama \
+          --config /nakama/data/config.yml \
+          --database.address ${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} \
+          --socket.server_key ${NAKAMA_SERVER_KEY:?set NAKAMA_SERVER_KEY} \
+          --runtime.http_key ${NAKAMA_HTTP_KEY:?set NAKAMA_HTTP_KEY} \
+          --console.username ${NAKAMA_CONSOLE_USER:?set NAKAMA_CONSOLE_USER} \
+          --console.password ${NAKAMA_CONSOLE_PASSWORD:?set NAKAMA_CONSOLE_PASSWORD} \
+          --runtime.env ASSERTION_HMAC_SECRET=${ASSERTION_HMAC_SECRET:?set ASSERTION_HMAC_SECRET} \
+          --runtime.env ASSERTION_HMAC_SECRET_PREVIOUS=${ASSERTION_HMAC_SECRET_PREVIOUS:-} \
+          --runtime.env JOIN_GRANT_HMAC_SECRET=${JOIN_GRANT_HMAC_SECRET:?set JOIN_GRANT_HMAC_SECRET} \
+          --runtime.env VERIFIER_URL=http://verifier:8787
+    volumes:
+      - ../modules/build:/nakama/data/modules:ro
+      - ./config.yml:/nakama/data/config.yml:ro
+    # No ports. Caddy reaches 7350 over the compose network; the console on
+    # 7351 is a full administrative interface over children's data and is
+    # reachable only through an SSH tunnel to this container.
+    #
+    # CONFORMANCE_ENABLED is absent rather than set to 0. The test seam is not
+    # registered at all unless it is on, and production should not be one
+    # environment variable away from having it.
+    healthcheck:
+      test: ['CMD', '/nakama/nakama', 'healthcheck']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  verifier:
+    build:
+      context: ..
+      dockerfile: verifier/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      nakama:
+        condition: service_healthy
+    environment:
+      ASSERTION_HMAC_SECRET: ${ASSERTION_HMAC_SECRET:?set ASSERTION_HMAC_SECRET}
+      JOIN_GRANT_HMAC_SECRET: ${JOIN_GRANT_HMAC_SECRET:?set JOIN_GRANT_HMAC_SECRET}
+      NAKAMA_URL: http://nakama:7350
+      NAKAMA_HTTP_KEY: ${NAKAMA_HTTP_KEY:?set NAKAMA_HTTP_KEY}
+      # Only the optional wallet path needs thirdweb. Left empty, the wallet
+      # endpoints answer 503 and everything else works — which is the correct
+      # behaviour for a deployment that has not set one up.
+      THIRDWEB_SECRET_KEY: ${THIRDWEB_SECRET_KEY:-}
+      AUTH_DOMAIN: ${AUTH_DOMAIN:-lenterra-api.faizath.com}
+      VERIFIER_PORT: '8787'
+    # No ports either. Caddy routes /verifier/* here.
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - nakama
+      - verifier
+    environment:
+      LENTERRA_API_DOMAIN: ${LENTERRA_API_DOMAIN:?set LENTERRA_API_DOMAIN}
+      # Where Let's Encrypt sends expiry warnings. A certificate that lapses
+      # takes every classroom offline at once.
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  pgdata: {}
+  # The certificate and its account key. Losing this volume means re-issuing on
+  # next start, which is fine once and rate-limited if it becomes a habit.
+  caddy-data: {}
+  caddy-config: {}
