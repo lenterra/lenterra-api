@@ -64,6 +64,12 @@ jobs:
       - name: unit tests
         run: npm test
 
+      # The core is the one package where a bug is wrong twice — on the phone
+      # and in the validator, identically — so the two agree on a wrong answer
+      # and nothing looks broken (TRD-TEST-001).
+      - name: core coverage gate
+        run: npm run test:coverage
+
       - name: schema tests
         run: npm run test:schema
         env:
