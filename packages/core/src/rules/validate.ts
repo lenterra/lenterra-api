@@ -21,7 +21,7 @@ import type {
   ValidationResult,
 } from '../types/attempt';
 import { canonicalJson, sha256 } from '../hash';
-import type { GameEngine, MoveEvent } from './types';
+import type { GameEngine, MoveEvent, StateMetrics } from './types';
 
 /** A replay longer than this is malformed, not merely long. */
 export const MAX_REPLAY_MOVES = 2000;
@@ -163,12 +163,20 @@ export function validateReplay<S, M>(
     outcome: actual,
     suspicious: plausibility.suspicious,
     suspicionReasons: plausibility.reasons,
-    derivedMetrics: metricsFrom(events, {
-      moveCount: terminated ? Math.min(replay.moves.length, MAX_REPLAY_MOVES) : replay.moves.length,
-      playerMoveCount,
-      greedyMoveTaken,
-      optimalMoveRank: rankedMoves === 0 ? null : rankTotal / rankedMoves,
-    }),
+    // Position-derived counters are merged in here rather than left at zero.
+    // They were previously computed by nothing, so every Benteng attempt
+    // reported no exposure and no losses however it was played.
+    derivedMetrics: withStateMetrics(
+      metricsFrom(events, {
+        moveCount: terminated
+          ? Math.min(replay.moves.length, MAX_REPLAY_MOVES)
+          : replay.moves.length,
+        playerMoveCount,
+        greedyMoveTaken,
+        optimalMoveRank: rankedMoves === 0 ? null : rankTotal / rankedMoves,
+      }),
+      engine.stateMetrics ? engine.stateMetrics(state) : {},
+    ),
   };
 }
 
@@ -253,6 +261,7 @@ function metricsFrom(
     optimalMoveRank: base.optimalMoveRank,
     maxExposureTurns: 0,
     illegalCaptureAttempts: 0,
+    unitsLost: 0,
   };
 }
 
@@ -262,10 +271,7 @@ function metricsFrom(
  * Benteng tracks exposure and illegal capture attempts on the state itself
  * because they are properties of positions, not of events.
  */
-export function withStateMetrics(
-  metrics: DerivedMetrics,
-  extra: { maxExposureTurns?: number; illegalCaptureAttempts?: number },
-): DerivedMetrics {
+export function withStateMetrics(metrics: DerivedMetrics, extra: StateMetrics): DerivedMetrics {
   return {
     moveCount: metrics.moveCount,
     playerMoveCount: metrics.playerMoveCount,
@@ -276,5 +282,6 @@ export function withStateMetrics(
     optimalMoveRank: metrics.optimalMoveRank,
     maxExposureTurns: extra.maxExposureTurns ?? metrics.maxExposureTurns,
     illegalCaptureAttempts: extra.illegalCaptureAttempts ?? metrics.illegalCaptureAttempts,
+    unitsLost: extra.unitsLost ?? metrics.unitsLost,
   };
 }

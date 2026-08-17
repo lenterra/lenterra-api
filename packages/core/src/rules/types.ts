@@ -88,6 +88,23 @@ export interface GameEngine<S, M> {
   rankMove(state: S, move: M): number | null;
   /** Is this the greedy choice — the pit with the most seeds? */
   isGreedyMove(state: S, move: M): boolean;
+  /**
+   * Counters the event stream cannot carry.
+   *
+   * Some metrics are properties of *positions* rather than of moves — how long
+   * a unit stood capturable, how many units were lost — and reconstructing them
+   * from events would mean re-deriving state the engine already holds. Engines
+   * with none of these may omit it.
+   */
+  stateMetrics?(state: S): StateMetrics;
+}
+
+/** Engine-specific counters read off the final state. */
+export interface StateMetrics {
+  maxExposureTurns?: number;
+  illegalCaptureAttempts?: number;
+  /** Units the student lost. Zero is what "kept everyone alive" means. */
+  unitsLost?: number;
 }
 
 export type { AiTier, GameConfig, GameId, MissionGoal, MissionSetup, GoalStatus };

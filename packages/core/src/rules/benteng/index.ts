@@ -8,7 +8,14 @@ import type { GameEngine, MoveResult } from '../types';
 import { aiMove, rankMove } from './ai';
 import { applyMove as applyRules, isLegal, legalMoves, type BentengMove } from './moves';
 import { evaluateGoal } from './outcome';
-import { freshnessOf, unitById, type BentengBase, type BentengState, type BentengUnit } from './state';
+import {
+  freshnessOf,
+  teamIndex,
+  unitById,
+  type BentengBase,
+  type BentengState,
+  type BentengUnit,
+} from './state';
 
 export const BENTENG_ENGINE_VERSION = '1.0.0';
 
@@ -153,6 +160,21 @@ export const bentengEngine: GameEngine<BentengState, BentengMove> = {
   /** Benteng has no "fullest pit"; the greedy analogue does not apply. */
   isGreedyMove() {
     return false;
+  },
+
+  /**
+   * Counters that live on the position rather than in the event stream.
+   *
+   * Exposure is a run length over turns and losses are a running total; both
+   * are already maintained by `applyMove`, and recomputing them from events in
+   * the validator would be a second implementation of the same rule.
+   */
+  stateMetrics(state: BentengState) {
+    return {
+      maxExposureTurns: state.maxExposureTurns,
+      illegalCaptureAttempts: state.illegalCaptureAttempts,
+      unitsLost: state.unitsLostBy[teamIndex(state.playerSide)],
+    };
   },
 };
 

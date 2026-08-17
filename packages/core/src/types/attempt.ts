@@ -65,6 +65,8 @@ export interface DerivedMetrics {
   /** Benteng: longest run of turns a unit spent capturable. */
   maxExposureTurns: number;
   illegalCaptureAttempts: number;
+  /** Benteng: units the student lost over the whole game. */
+  unitsLost: number;
 }
 
 export interface ValidationSuccess {
