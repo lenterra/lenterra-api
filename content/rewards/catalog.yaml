@@ -1,0 +1,93 @@
+# The reward catalogue.
+#
+# `v1.reward.redeem` has always read a `rewards.catalog` part, and no file
+# authored one — so points accumulated against a shop that could not exist and
+# every redemption failed with "No reward catalogue published".
+#
+# **Nothing here is worth money and nothing here affects play.** Both rules
+# matter more than the list itself:
+#
+#   - Money. The audience is thirteen-year-olds, and a points economy that
+#     converts to anything real is a safeguarding and regulatory question this
+#     product has not asked, let alone answered.
+#   - Play. A reward that made a mission easier would make points a shortcut
+#     past the learning they are supposed to record, and a reward that made one
+#     harder would punish a student for spending them.
+#
+# So a reward is something to look at: a colour, a board, a title under a name.
+# A student who never opens the shop is not behind anybody who does.
+#
+# Costs are round numbers a child can hold in their head, spaced so the first
+# one is reachable in about a week of ordinary play and the last is a term's
+# work. They are not tuned to a curve; a curve here would be optimising for
+# time spent in the app, which is not what this product is for.
+#
+# Item ids are permanent. A redemption stores the id, so renaming one would
+# orphan what somebody already owns. Strings live in `content/strings/*.yaml`
+# under `reward:` and can be reworded freely.
+
+avatar.color.laut:
+  cost: 100
+  kind: avatar_color
+  value: '#0E7C86'
+
+avatar.color.senja:
+  cost: 100
+  kind: avatar_color
+  value: '#C2410C'
+
+avatar.color.hutan:
+  cost: 150
+  kind: avatar_color
+  value: '#15803D'
+
+avatar.color.ungu:
+  cost: 150
+  kind: avatar_color
+  value: '#7A5AF8'
+
+# Board skins are cosmetic only. The pits, the seeds, and every rule stay
+# exactly where they are — a board that read differently would be a board that
+# played differently for the student who owns it.
+board.congklak.kayu:
+  cost: 300
+  kind: board_skin
+  value: congklak.kayu
+
+board.congklak.batu:
+  cost: 500
+  kind: board_skin
+  value: congklak.batu
+
+board.benteng.pasir:
+  cost: 300
+  kind: board_skin
+  value: benteng.pasir
+
+board.benteng.malam:
+  cost: 500
+  kind: board_skin
+  value: benteng.malam
+
+# Titles are shown under a display name, to the student's own class only. They
+# describe effort rather than rank: "Rajin Berlatih" is something anybody can
+# reach, unlike a title that only the top of a leaderboard could buy.
+title.rajin:
+  cost: 200
+  kind: title
+  value: rajin
+
+title.penjelajah:
+  cost: 400
+  kind: title
+  value: penjelajah
+
+title.penjaga:
+  cost: 600
+  kind: title
+  value: penjaga
+
+title.pemikir:
+  cost: 800
+  kind: title
+  value: pemikir

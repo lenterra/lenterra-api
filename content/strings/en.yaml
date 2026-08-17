@@ -34,3 +34,19 @@ mission:
     m10: { title: "Recover", brief: "Two of your units are gone. The position is bad, not lost.", hint1: "A breach is not the end of the game. Find the one route still open.", fail: { lost: "The position could not be saved." } }
     m11: { title: "Full Match", brief: "A full game, three a side, nothing given.", hint1: "Everything you have learned is needed here, and nothing will remind you.", fail: { lost: "They reached your fort first." } }
     m12: { title: "Tough Opponent", brief: "An opponent thinking three moves ahead. Four against three.", hint1: "This one closes gaps before you can use them. Make two threats at once.", fail: { lost: "They closed every route you tried." } }
+
+# Reward names. Cosmetic items only: nothing here is worth money and nothing
+# here changes how a game plays.
+reward:
+  avatar.color.laut: "Sea"
+  avatar.color.senja: "Dusk"
+  avatar.color.hutan: "Forest"
+  avatar.color.ungu: "Violet"
+  board.congklak.kayu: "Wooden Board"
+  board.congklak.batu: "Stone Board"
+  board.benteng.pasir: "Sand Field"
+  board.benteng.malam: "Night Field"
+  title.rajin: "Steady Practiser"
+  title.penjelajah: "Board Explorer"
+  title.penjaga: "Fort Keeper"
+  title.pemikir: "Long Thinker"

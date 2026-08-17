@@ -34,3 +34,19 @@ mission:
     m10: { title: "Pulihkan Keadaan", brief: "Dua bidakmu sudah hilang. Posisinya buruk, tapi belum kalah.", hint1: "Kebobolan bukan akhir permainan. Cari satu jalan yang masih terbuka.", fail: { lost: "Posisinya sudah tidak bisa diselamatkan." } }
     m11: { title: "Pertandingan Penuh", brief: "Permainan penuh, tiga lawan tiga, tanpa bantuan.", hint1: "Semua yang kamu pelajari dipakai di sini, dan tidak ada yang mengingatkan.", fail: { lost: "Lawan lebih dulu mencapai bentengmu." } }
     m12: { title: "Lawan Tangguh", brief: "Lawan yang berpikir tiga langkah ke depan. Empat lawan tiga.", hint1: "Lawan ini menutup celah sebelum kamu sempat memakainya. Buat dua ancaman sekaligus.", fail: { lost: "Lawan menutup semua jalanmu." } }
+
+# Reward names. Cosmetic items only: nothing here is worth money and nothing
+# here changes how a game plays.
+reward:
+  avatar.color.laut: "Warna Laut"
+  avatar.color.senja: "Warna Senja"
+  avatar.color.hutan: "Warna Hutan"
+  avatar.color.ungu: "Warna Ungu"
+  board.congklak.kayu: "Papan Kayu"
+  board.congklak.batu: "Papan Batu"
+  board.benteng.pasir: "Lapangan Pasir"
+  board.benteng.malam: "Lapangan Malam"
+  title.rajin: "Rajin Berlatih"
+  title.penjelajah: "Penjelajah Papan"
+  title.penjaga: "Penjaga Benteng"
+  title.pemikir: "Pemikir Panjang"

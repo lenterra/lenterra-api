@@ -12,7 +12,7 @@
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 
-import { checkAll, loadStrings, loadTeachingNotes, report } from './content-lib.mjs';
+import { checkAll, checkRewards, loadStrings, loadTeachingNotes, report } from './content-lib.mjs';
 import { compileCourses } from './course-lib.mjs';
 import { checkGreedyTrapQuota, hasErrors } from '../packages/core/dist/index.js';
 
@@ -141,6 +141,31 @@ async function main() {
       sha256: sha256(body),
       bytes: Buffer.byteLength(body),
       body: notes,
+    });
+  }
+
+  // The reward catalogue. `v1.reward.redeem` reads this part to learn what an
+  // item costs, so publishing without it is what made every redemption fail
+  // with "No reward catalogue published" — the shop existed in the schema, the
+  // ledger, and the handler, and nowhere else.
+  //
+  // Validated here as well as in `content:validate`, because a cost of zero
+  // reaching the ledger would make an item free permanently and a negative one
+  // would pay a student for taking it. That is not a mistake to catch after
+  // publishing.
+  const { rewards, issues: rewardIssues } = checkRewards();
+  if (hasErrors(rewardIssues)) {
+    console.error('\nrewards: refusing to publish');
+    report(rewardIssues);
+    process.exit(1);
+  }
+  if (Object.keys(rewards).length > 0) {
+    const body = JSON.stringify(rewards);
+    parts.push({
+      part: 'rewards.catalog',
+      sha256: sha256(body),
+      bytes: Buffer.byteLength(body),
+      body: rewards,
     });
   }
 

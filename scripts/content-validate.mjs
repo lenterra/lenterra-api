@@ -7,7 +7,7 @@
 // mechanic behind it, a ladder with a gap, a mission nobody can win, and a
 // greedy-trap quota that has quietly eroded as content was added.
 
-import { checkAll, checkTeachingNotes, report } from './content-lib.mjs';
+import { checkAll, checkRewards, checkTeachingNotes, report } from './content-lib.mjs';
 import { compileCourses } from './course-lib.mjs';
 import { checkGreedyTrapQuota } from '../packages/core/dist/index.js';
 
@@ -92,6 +92,22 @@ if (compiled.courses.length === 0) {
     );
   }
   if (counts.errors === 0) console.log('  ✓ course content is valid');
+}
+
+// Rewards are checked last because they are the least load-bearing content and
+// the most likely to be absent. What the checks are actually protecting is a
+// ledger: a zero or negative cost would make an item free forever, or award
+// points for taking it.
+const { rewards, issues: rewardIssues } = checkRewards();
+const rewardIds = Object.keys(rewards);
+if (rewardIds.length === 0) {
+  console.log('\nrewards: none authored');
+} else {
+  console.log(`\nrewards: ${rewardIds.length} items`);
+  const counts = report(rewardIssues);
+  totalErrors += counts.errors;
+  totalWarnings += counts.warnings;
+  if (counts.errors === 0) console.log('  ✓ reward catalogue is valid');
 }
 
 console.log(`\n${totalErrors} error(s), ${totalWarnings} warning(s)`);

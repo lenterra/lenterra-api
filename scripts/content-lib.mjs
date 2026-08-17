@@ -50,10 +50,23 @@ export function loadMissions(game) {
  * to be reviewed by someone who has taught the age group — and a wrong note
  * sends a lesson in the wrong direction with more confidence than no note.
  */
-export function loadTeachingNotes() {
-  const path = join(contentDir, 'teaching', 'notes.yaml');
+/**
+ * Read a YAML file that is allowed not to exist, and allowed to be empty.
+ *
+ * `yaml.load('')` throws in this version rather than returning nothing, so a
+ * content file somebody has created but not written yet would take down every
+ * check with a parse error instead of being treated as the absent content it
+ * is.
+ */
+function loadYaml(path) {
   if (!existsSync(path)) return {};
-  return yaml.load(readFileSync(path, 'utf8')) ?? {};
+  const text = readFileSync(path, 'utf8');
+  if (text.trim().length === 0) return {};
+  return yaml.load(text) ?? {};
+}
+
+export function loadTeachingNotes() {
+  return loadYaml(join(contentDir, 'teaching', 'notes.yaml'));
 }
 
 /**
@@ -101,9 +114,105 @@ export function checkTeachingNotes(allMissionIds) {
 }
 
 export function loadStrings(locale) {
-  const path = join(contentDir, 'strings', `${locale}.yaml`);
-  if (!existsSync(path)) return {};
-  return yaml.load(readFileSync(path, 'utf8')) ?? {};
+  return loadYaml(join(contentDir, 'strings', `${locale}.yaml`));
+}
+
+/** @param dir Overridden by tests, so a candidate catalogue can be checked without editing the real one. */
+export function loadRewards(dir = contentDir) {
+  return loadYaml(join(dir, 'rewards', 'catalog.yaml'));
+}
+
+function loadStringsFrom(dir, locale) {
+  return loadYaml(join(dir, 'strings', `${locale}.yaml`));
+}
+
+/** What a reward may be. Anything affecting play is deliberately absent. */
+const REWARD_KINDS = ['avatar_color', 'board_skin', 'title'];
+
+/**
+ * Check the reward catalogue.
+ *
+ * The cost check is an error rather than a warning because of what the server
+ * does with it: `rewardRedeem` debits `item.cost` from a ledger. A zero would
+ * make an item free forever, and a negative one would *award* points for taking
+ * it — a balance that grows every time a student redeems.
+ *
+ * A missing string is an error too. The name is the only thing a student sees;
+ * an item whose name is missing renders as its id, and `board.congklak.kayu` in
+ * a shop is indistinguishable from a bug.
+ */
+export function checkRewards(dir = contentDir, locales = ['id', 'en']) {
+  const rewards = loadRewards(dir);
+  const issues = [];
+  const ids = Object.keys(rewards);
+
+  if (ids.length === 0) {
+    // Not an error. The catalogue is optional content, and the server refuses
+    // redemptions cleanly when no part is published.
+    return { rewards, issues };
+  }
+
+  const strings = {};
+  for (const locale of locales) strings[locale] = flattenKeys(loadStringsFrom(dir, locale));
+
+  for (const [id, item] of Object.entries(rewards)) {
+    const where = `reward ${id}`;
+
+    if (!item || typeof item !== 'object') {
+      issues.push({ level: 'error', rule: 'reward_shape', where, message: 'is not a mapping' });
+      continue;
+    }
+
+    if (!Number.isInteger(item.cost) || item.cost <= 0) {
+      issues.push({
+        level: 'error',
+        rule: 'reward_cost',
+        where,
+        message: `cost must be a positive whole number, got ${JSON.stringify(item.cost)}`,
+      });
+    }
+
+    if (!REWARD_KINDS.includes(item.kind)) {
+      issues.push({
+        level: 'error',
+        rule: 'reward_kind',
+        where,
+        message: `kind must be one of ${REWARD_KINDS.join(', ')}, got ${JSON.stringify(item.kind)}`,
+      });
+    }
+
+    if (typeof item.value !== 'string' || item.value.length === 0) {
+      issues.push({ level: 'error', rule: 'reward_value', where, message: 'value must be a string' });
+    }
+
+    for (const locale of locales) {
+      if (typeof strings[locale][`reward.${id}`] !== 'string') {
+        issues.push({
+          level: locale === 'id' ? 'error' : 'warning',
+          rule: 'reward_string',
+          where,
+          // Indonesian is the source locale (ADR-010): a missing English name
+          // is a gap somebody notices, a missing Indonesian one is a hole in
+          // the version the audience actually reads.
+          message: `no reward.${id} string in ${locale}`,
+        });
+      }
+    }
+  }
+
+  const values = ids.map((id) => `${rewards[id]?.kind}:${rewards[id]?.value}`);
+  for (let i = 0; i < values.length; i += 1) {
+    if (values.indexOf(values[i]) !== i) {
+      issues.push({
+        level: 'error',
+        rule: 'reward_duplicate',
+        where: `reward ${ids[i]}`,
+        message: `duplicates the effect of ${ids[values.indexOf(values[i])]}`,
+      });
+    }
+  }
+
+  return { rewards, issues };
 }
 
 /** Flatten `{a: {b: 'x'}}` to `{'a.b': 'x'}` so key lookups are direct. */

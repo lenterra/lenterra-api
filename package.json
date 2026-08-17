@@ -33,6 +33,7 @@
     "dev:reload": "npm run build:modules && npm run guard:bundle && docker compose -f docker/docker-compose.yml restart nakama",
     "test:coverage": "node scripts/coverage-gate.mjs",
     "test:contract": "node --test \"test/*.test.mts\"",
+    "test:content": "node --test test/rewards.test.mjs",
     "fixtures:generate": "node scripts/fixtures-generate.mjs",
     "test:conformance": "node --test test/conformance.test.mjs"
   },
