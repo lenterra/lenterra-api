@@ -13,6 +13,7 @@ import { createHash } from 'node:crypto';
 import pg from 'pg';
 
 import { checkAll, loadStrings, loadTeachingNotes, report } from './content-lib.mjs';
+import { compileCourses } from './course-lib.mjs';
 import { checkGreedyTrapQuota, hasErrors } from '../packages/core/dist/index.js';
 
 const GAMES = ['congklak', 'benteng'];
@@ -80,8 +81,47 @@ async function main() {
     process.exit(1);
   }
 
+  // --- courses -------------------------------------------------------------
+  const compiled = compileCourses(allMissions.map((m) => m.id));
+  if (hasErrors(compiled.issues)) {
+    console.error('\ncourses: refusing to publish');
+    report(compiled.issues);
+    process.exit(1);
+  }
+
+  if (compiled.courses.length > 0) {
+    const index = JSON.stringify(compiled.courses);
+    parts.push({
+      part: 'courses',
+      sha256: sha256(index),
+      bytes: Buffer.byteLength(index),
+      body: compiled.courses,
+    });
+
+    // One part per course. A student opening `sec.basics` pulls its five
+    // lessons, not all forty — which on a metered connection is the difference
+    // between reading a lesson and deciding not to (PRD-CRS-003).
+    for (const [name, bodies] of Object.entries(compiled.lessonParts)) {
+      const body = JSON.stringify(bodies);
+      parts.push({ part: name, sha256: sha256(body), bytes: Buffer.byteLength(body), body: bodies });
+    }
+
+    // The answer key. Listed in the manifest so a byte-count mismatch does not
+    // look like corruption, and refused by `v1.catalog.pull` (TRD-API-006).
+    const answers = JSON.stringify(compiled.answers);
+    parts.push({
+      part: 'checks.answers',
+      sha256: sha256(answers),
+      bytes: Buffer.byteLength(answers),
+      body: compiled.answers,
+    });
+  }
+
   for (const locale of ['id', 'en']) {
-    const strings = loadStrings(locale);
+    // Course prose is generated from the authored lesson files rather than
+    // hand-maintained in `content/strings/`, and merges into the same part so
+    // the client has one place to look for any string.
+    const strings = { ...loadStrings(locale), ...compiled.strings[locale] };
     const body = JSON.stringify(strings);
     parts.push({
       part: `strings.${locale}`,
@@ -124,12 +164,18 @@ async function main() {
         parts: parts.map((p) => ({ part: p.part, sha256: p.sha256, bytes: p.bytes })),
         totalBytes: parts.reduce((sum, p) => sum + p.bytes, 0),
         missions: allMissions.length,
+        courses: compiled.courses.length,
+        lessons: compiled.lessons.length,
       };
 
       await client.query(
         `INSERT INTO lenterra_catalog_version (version, status, manifest, notes)
          VALUES ($1, 'draft', $2, $3)`,
-        [version, JSON.stringify(manifest), `${allMissions.length} missions`],
+        [
+          version,
+          JSON.stringify(manifest),
+          `${allMissions.length} missions, ${compiled.courses.length} courses`,
+        ],
       );
 
       for (const part of parts) {
@@ -165,7 +211,10 @@ async function main() {
         );
       }
 
-      console.log(`published ${version} as draft — ${allMissions.length} missions, ${parts.length} parts`);
+      console.log(
+        `published ${version} as draft — ${allMissions.length} missions, ` +
+          `${compiled.courses.length} courses, ${compiled.lessons.length} lessons, ${parts.length} parts`,
+      );
     }
 
     if (promote) {

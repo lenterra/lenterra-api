@@ -1,0 +1,628 @@
+id: comp.numbers
+domain: computation
+contentVersion: 1
+entitlement: free
+prerequisites: []
+skillNodes: [comp.counting, comp.arithmetic]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: subject-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Bilangan dan Menghitung
+  en: Numbers and Counting
+summary:
+  id: >-
+    Menghitung biji congklak terlihat sepele sampai kamu salah satu kali dan
+    kalah karenanya. Di sini kita pelan-pelan: menghitung tanpa hilang, menambah
+    sambil berjalan, dan membaca seluruh papan sebagai angka.
+  en: >-
+    Counting congklak seeds looks trivial until you miscount once and lose
+    because of it. This course takes it slowly: counting without losing track,
+    adding as you go, and reading a whole board as numbers.
+
+lessons:
+  - id: l01
+    readingMinutes: 4
+    title:
+      id: Menghitung Tanpa Kehilangan Hitungan
+      en: Counting Without Losing Count
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Waktu kamu main congklak, hal pertama yang kamu lakukan sebelum
+            memilih lubang adalah menghitung bijinya. Tujuh biji di lubang ini,
+            empat di lubang sebelah. Kelihatannya mudah. Tapi coba perhatikan
+            apa yang terjadi kalau kamu buru-buru: kamu mengambil segenggam,
+            mulai menyebar, dan di tengah jalan lupa sudah berapa yang jatuh.
+            Biji terakhir mendarat di tempat yang tidak kamu duga, dan giliranmu
+            hilang.
+          en: >-
+            When you play congklak, the first thing you do before choosing a
+            hole is count its seeds. Seven here, four next door. It looks easy.
+            But watch what happens when you rush: you scoop a handful, start
+            sowing, and halfway through you lose track of how many have dropped.
+            The last seed lands somewhere you did not expect, and your turn is
+            gone.
+      - kind: text
+        text:
+          id: >-
+            Kehilangan hitungan bukan tanda kamu tidak pintar. Itu tanda kamu
+            menghitung tanpa cara. Orang yang jarang salah hitung bukan orang
+            yang lebih cepat, melainkan orang yang punya kebiasaan: satu biji,
+            satu sentuhan, satu angka. Tidak ada yang dilewati, tidak ada yang
+            dihitung dua kali. Kebiasaan itu bisa dilatih, dan papan congklak
+            adalah tempat latihan yang bagus karena hasilnya langsung kelihatan.
+          en: >-
+            Losing count is not a sign that you are not clever. It is a sign
+            that you are counting without a method. People who rarely miscount
+            are not faster; they have a habit: one seed, one touch, one number.
+            Nothing skipped, nothing counted twice. That habit can be trained,
+            and a congklak board is a good place to train it because the result
+            shows up immediately.
+      - kind: example
+        text:
+          id: >-
+            Lubang kedua dari kirimu berisi biji. Jangan langsung ambil semua.
+            Sentuh satu per satu sambil menyebut angkanya dalam hati: satu, dua,
+            tiga, empat, lima, enam, tujuh. Berhenti. Sekarang kamu tahu angkanya
+            tujuh, dan kamu tahu itu benar karena setiap biji kamu sentuh tepat
+            sekali.
+          en: >-
+            The second hole from your left has seeds in it. Do not scoop them
+            all at once. Touch them one at a time, saying the number to yourself:
+            one, two, three, four, five, six, seven. Stop. Now you know the
+            number is seven, and you know it is right because you touched each
+            seed exactly once.
+        caption:
+          id: Satu sentuhan, satu angka. Itu seluruh tekniknya.
+          en: One touch, one number. That is the whole technique.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau lubangnya penuh dan biji-bijinya menumpuk, geser yang sudah
+            dihitung ke satu sisi lubang. Yang belum tersentuh tetap di sisi
+            lain. Matamu jadi punya batas yang jelas, dan kamu tidak perlu
+            mengingat sampai mana tadi.
+          en: >-
+            If the hole is full and the seeds are piled up, push the counted ones
+            to one side. The untouched ones stay on the other. Now your eye has a
+            clear boundary, and you do not have to remember where you were.
+      - kind: text
+        text:
+          id: >-
+            Di komputer, hal yang sama punya nama: menghitung adalah dasar dari
+            hampir semua yang dilakukan sebuah program. Sebuah program yang
+            memeriksa daftar nama, menghitung barang di gudang, atau membaca
+            pesan satu per satu, semuanya melakukan hal yang barusan kamu
+            lakukan dengan biji congklak. Kalau hitungannya meleset satu saja,
+            hasilnya salah, dan komputer tidak akan memberitahumu.
+          en: >-
+            In computing the same thing has a name: counting is the basis of
+            almost everything a program does. A program checking a list of names,
+            counting stock in a warehouse, or reading messages one by one is
+            doing what you just did with congklak seeds. If the count is off by
+            one, the result is wrong, and the computer will not tell you.
+      - kind: gameLink
+        mission: congklak.m01
+        label:
+          id: Coba di misi Sebar Pertama
+          en: Try it in First Sowing
+    check:
+      passMark: 0.7
+      weights: { comp.counting: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kamu menghitung sebuah lubang dua kali dan mendapat angka berbeda:
+              pertama enam, lalu tujuh. Apa yang paling mungkin terjadi?
+            en: >-
+              You count a hole twice and get different numbers: six, then seven.
+              What most likely happened?
+          options:
+            - id: Bijinya bertambah sendiri di antara dua hitungan
+              en: A seed appeared between the two counts
+            - id: Salah satu hitungan melewati atau mengulang sebuah biji
+              en: One of the counts skipped or repeated a seed
+            - id: Lubang itu memang tidak bisa dihitung
+              en: That hole simply cannot be counted
+          answer: 1
+          explain:
+            id: >-
+              Dua angka berbeda dari benda yang sama berarti prosesnya yang
+              berbeda, bukan bendanya. Hampir selalu ada satu biji yang tersentuh
+              dua kali atau terlewat, dan itulah alasan menghitung perlu cara
+              yang tetap, bukan sekadar cepat.
+            en: >-
+              Two different numbers from the same objects means the process
+              differed, not the objects. Almost always one seed was touched twice
+              or missed, which is why counting needs a fixed method rather than
+              speed.
+        - kind: choice
+          prompt:
+            id: >-
+              Mengapa memisahkan biji yang sudah dihitung ke satu sisi lubang
+              membantu?
+            en: >-
+              Why does pushing counted seeds to one side of the hole help?
+          options:
+            - id: Karena biji jadi lebih mudah diambil nanti
+              en: Because the seeds are easier to pick up later
+            - id: Karena kamu tidak perlu mengingat sampai mana kamu tadi
+              en: Because you no longer have to remember where you were
+            - id: Karena aturan congklak mengharuskannya
+              en: Because the rules of congklak require it
+          answer: 1
+          explain:
+            id: >-
+              Kesalahan menghitung hampir selalu terjadi karena ingatan, bukan
+              karena mata. Begitu batas antara yang sudah dan belum dihitung
+              terlihat, ingatanmu tidak lagi dipakai, dan tidak ada lagi yang
+              bisa lupa.
+            en: >-
+              Counting mistakes almost always come from memory, not from
+              eyesight. Once the boundary between counted and uncounted is
+              visible, your memory is no longer involved, so there is nothing
+              left to forget.
+        - kind: choice
+          prompt:
+            id: >-
+              Sebuah program menghitung jumlah siswa yang hadir dan hasilnya
+              kurang satu dari kenyataan. Apa yang bisa kamu simpulkan?
+            en: >-
+              A program counts how many students are present and reports one
+              fewer than reality. What can you conclude?
+          options:
+            - id: Programnya benar, kenyataannya yang salah
+              en: The program is right and reality is wrong
+            - id: Ada satu orang yang tidak ikut terhitung oleh programnya
+              en: One person was not included by the program's counting
+            - id: Komputer memang tidak bisa menghitung dengan tepat
+              en: Computers simply cannot count precisely
+          answer: 1
+          explain:
+            id: >-
+              Komputer menghitung persis seperti yang diperintahkan, termasuk
+              ketika perintahnya melewatkan satu. Selisih satu hampir selalu
+              berarti ada satu hal yang tidak masuk hitungan, dan tugasmu adalah
+              menemukan yang mana.
+            en: >-
+              A computer counts exactly as instructed, including when the
+              instruction misses one. A difference of one almost always means one
+              thing was left out, and your job is to find which.
+
+  - id: l02
+    readingMinutes: 4
+    title:
+      id: Menambah Sambil Berjalan
+      en: Adding As You Go
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Menghitung isi satu lubang itu satu hal. Menjaga jumlah yang terus
+            berubah adalah hal lain, dan inilah yang sebenarnya kamu lakukan
+            sepanjang permainan congklak. Lumbungmu bertambah satu di sini, dua
+            di sana, dan setelah sepuluh giliran kamu tidak lagi ingat berapa
+            isinya kecuali kamu menghitung ulang dari nol.
+          en: >-
+            Counting one hole is one thing. Keeping a total that keeps changing
+            is another, and it is what you actually do throughout a game of
+            congklak. Your store gains one here, two there, and after ten turns
+            you no longer remember what is in it unless you recount from zero.
+      - kind: text
+        text:
+          id: >-
+            Ada cara yang lebih hemat. Alih-alih menghitung ulang seluruh
+            lumbung setiap kali, simpan satu angka di kepalamu dan ubah angka itu
+            setiap ada biji masuk. Lumbungmu berisi lima, masuk satu, sekarang
+            enam. Masuk dua lagi, sekarang delapan. Kamu tidak pernah menghitung
+            lebih dari satu langkah, tapi angkamu selalu benar.
+          en: >-
+            There is a cheaper way. Instead of recounting the whole store each
+            time, hold one number in your head and change it whenever a seed
+            arrives. Your store has five, one arrives, now six. Two more arrive,
+            now eight. You never count more than one step, yet your number is
+            always right.
+      - kind: example
+        text:
+          id: >-
+            Lumbungmu berisi tiga. Giliran pertama menambah dua, jadi lima.
+            Giliran kedua menambah satu, jadi enam. Giliran ketiga menambah tiga,
+            jadi sembilan. Perhatikan bahwa kamu tidak pernah menghitung sampai
+            sembilan; kamu hanya menambah tiga kali. Jauh lebih sedikit
+            pekerjaan, dan jauh lebih sedikit peluang salah.
+          en: >-
+            Your store holds three. The first turn adds two, making five. The
+            second adds one, making six. The third adds three, making nine.
+            Notice you never counted to nine; you only added three times. Far
+            less work, and far fewer chances to slip.
+        caption:
+          id: Tiga, lima, enam, sembilan. Satu angka yang terus diperbarui.
+          en: Three, five, six, nine. One number, kept up to date.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Cara ini punya satu kelemahan yang perlu kamu tahu: kalau kamu salah
+            sekali, salahnya ikut terbawa sampai akhir. Menghitung ulang dari
+            nol memang lebih lambat, tapi memaafkan kesalahan sebelumnya. Karena
+            itu pemain yang baik sesekali menghitung ulang untuk memastikan.
+          en: >-
+            This method has one weakness worth knowing: if you get it wrong once,
+            the error rides along to the end. Recounting from zero is slower but
+            forgives earlier mistakes. That is why good players recount now and
+            then to be sure.
+      - kind: text
+        text:
+          id: >-
+            Program komputer bekerja persis begini. Ketika sebuah aplikasi
+            menghitung total belanjaanmu, ia tidak menjumlahkan ulang seluruh
+            keranjang setiap kali kamu menambah barang. Ia menyimpan satu angka
+            dan menambahnya. Nama untuk angka yang disimpan dan terus diperbarui
+            itu adalah penghitung berjalan, dan hampir tidak ada program yang
+            tidak memakainya.
+          en: >-
+            Programs work exactly like this. When an app totals your shopping, it
+            does not re-add the whole basket each time you put something in. It
+            keeps one number and adds to it. The name for a stored number that
+            keeps being updated is a running total, and almost no program does
+            without one.
+      - kind: gameLink
+        mission: congklak.m09
+        label:
+          id: Latih di misi Enam Biji
+          en: Practise in Six Seeds
+    check:
+      passMark: 0.7
+      weights: { comp.arithmetic: 0.7, comp.counting: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Lumbungmu berisi empat. Tiga giliran berikutnya menambah dua, nol,
+              dan tiga biji. Berapa isinya sekarang?
+            en: >-
+              Your store holds four. The next three turns add two, zero, and
+              three seeds. What does it hold now?
+          options:
+            - id: Delapan
+              en: Eight
+            - id: Sembilan
+              en: Nine
+            - id: Lima
+              en: Five
+          answer: 1
+          explain:
+            id: >-
+              Empat ditambah dua menjadi enam, ditambah nol tetap enam, ditambah
+              tiga menjadi sembilan. Giliran yang menambah nol tetap giliran, dan
+              melewatinya begitu saja adalah cara paling umum meleset satu
+              langkah.
+            en: >-
+              Four plus two is six, plus zero is still six, plus three is nine. A
+              turn that adds nothing is still a turn, and skipping past it is the
+              most common way to drop a step.
+        - kind: order
+          prompt:
+            id: >-
+              Susun langkah menjaga jumlah berjalan, dari awal sampai akhir.
+            en: >-
+              Put the steps of keeping a running total in order, first to last.
+          fragments:
+            - id: Tambahkan biji yang baru masuk ke angka itu
+              en: Add the newly arrived seeds to that number
+            - id: Mulai dari isi lumbung saat ini
+              en: Start from what the store holds now
+            - id: Simpan hasilnya sebagai angka yang baru
+              en: Keep the result as the new number
+          answer: [1, 0, 2]
+          explain:
+            id: >-
+              Urutannya penting karena setiap langkah memakai hasil langkah
+              sebelumnya. Menambah sebelum tahu angka awalnya berarti kamu
+              menambah ke sesuatu yang belum ada.
+            en: >-
+              Order matters because each step uses the result of the one before.
+              Adding before you know the starting number means adding to
+              something that is not there yet.
+        - kind: choice
+          prompt:
+            id: >-
+              Kapan menghitung ulang seluruh lumbung dari nol lebih baik daripada
+              menjaga jumlah berjalan?
+            en: >-
+              When is recounting the whole store from zero better than keeping a
+              running total?
+          options:
+            - id: Selalu, karena menghitung ulang tidak pernah salah
+              en: Always, because recounting is never wrong
+            - id: Ketika kamu ragu jumlah yang kamu simpan masih benar
+              en: When you doubt the number you have been carrying
+            - id: Tidak pernah, karena menghitung ulang buang waktu
+              en: Never, because recounting wastes time
+          answer: 1
+          explain:
+            id: >-
+              Keduanya berguna untuk hal yang berbeda. Jumlah berjalan itu cepat
+              tetapi membawa kesalahan lama; menghitung ulang itu lambat tetapi
+              memulai bersih. Memilih di antaranya adalah soal seberapa besar
+              keraguanmu, bukan soal mana yang lebih benar.
+            en: >-
+              Both are useful for different things. A running total is fast but
+              carries old errors; recounting is slow but starts clean. Choosing
+              between them is a question of how much you doubt, not of which is
+              more correct.
+
+  - id: l03
+    readingMinutes: 3
+    title:
+      id: Membaca Papan Sebagai Angka
+      en: Reading the Board as Numbers
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Sampai sekarang kamu menghitung satu lubang pada satu waktu. Pemain
+            yang sudah terbiasa melakukan sesuatu yang berbeda: mereka melihat
+            seluruh papan sekaligus, dan yang mereka lihat bukan biji, melainkan
+            deretan angka. Barisan mereka mungkin terbaca tujuh, nol, tiga, tiga,
+            satu. Itu satu pandangan, bukan lima.
+          en: >-
+            So far you have counted one hole at a time. Experienced players do
+            something different: they see the whole board at once, and what they
+            see is not seeds but a row of numbers. Their side might read seven,
+            zero, three, three, one. That is one glance, not five.
+      - kind: text
+        text:
+          id: >-
+            Kemampuan itu tidak datang dari bakat. Datangnya dari mengenali
+            kelompok kecil tanpa menghitung: dua biji terlihat seperti dua,
+            tiga terlihat seperti tiga, dan begitu jumlahnya di atas lima kamu
+            memecahnya menjadi kelompok yang kamu kenal. Enam adalah tiga dan
+            tiga. Delapan adalah lima dan tiga.
+          en: >-
+            That ability is not talent. It comes from recognising small groups
+            without counting: two seeds look like two, three look like three, and
+            once there are more than five you break them into groups you know.
+            Six is three and three. Eight is five and three.
+      - kind: callout
+        tone: culture
+        text:
+          id: >-
+            Papan congklak tidak sama di setiap daerah. Ada yang punya lima
+            lubang per sisi, ada yang tujuh, ada yang sembilan. Yang berubah
+            hanya jumlah lubangnya; cara membacanya sebagai deretan angka tetap
+            sama, dan itulah sebabnya orang yang biasa main di papan lima cepat
+            menyesuaikan diri di papan tujuh.
+          en: >-
+            Congklak boards differ by region. Some have five holes a side, some
+            seven, some nine. Only the number of holes changes; reading them as a
+            row of numbers works the same way, which is why someone used to a
+            five-hole board adapts quickly to a seven.
+      - kind: text
+        text:
+          id: >-
+            Membaca papan sebagai angka mengubah pertanyaan yang bisa kamu
+            tanyakan. Selama papan hanya berupa biji, kamu bertanya lubang mana
+            yang penuh. Begitu papan menjadi angka, kamu bisa bertanya lubang
+            mana yang jaraknya pas ke lumbung, atau sisi mana yang lebih berat.
+            Pertanyaan kedua itu tidak mungkin diajukan sebelum angkanya ada.
+          en: >-
+            Reading the board as numbers changes the questions you can ask. While
+            the board is only seeds, you ask which hole is full. Once it is
+            numbers, you can ask which hole is exactly the right distance from
+            the store, or which side is heavier. That second question cannot be
+            asked before the numbers exist.
+    check:
+      passMark: 0.7
+      weights: { comp.counting: 0.65, comp.arithmetic: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Barisanmu terbaca dua, nol, empat, satu, tiga. Berapa seluruh biji
+              di barisanmu?
+            en: >-
+              Your row reads two, zero, four, one, three. How many seeds are in
+              your row altogether?
+          options:
+            - id: Sembilan
+              en: Nine
+            - id: Sepuluh
+              en: Ten
+            - id: Sebelas
+              en: Eleven
+          answer: 1
+          explain:
+            id: >-
+              Dua dan empat menjadi enam, ditambah satu menjadi tujuh, ditambah
+              tiga menjadi sepuluh. Lubang yang kosong tetap perlu dilewati satu
+              per satu; melompatinya adalah cara termudah kehilangan tempat.
+            en: >-
+              Two and four make six, plus one is seven, plus three is ten. An
+              empty hole still has to be passed over one by one; skipping it is
+              the easiest way to lose your place.
+        - kind: choice
+          prompt:
+            id: >-
+              Mengapa memecah delapan menjadi lima dan tiga lebih cepat daripada
+              menghitung sampai delapan?
+            en: >-
+              Why is breaking eight into five and three faster than counting to
+              eight?
+          options:
+            - id: Karena lima dan tiga adalah kelompok yang langsung kamu kenali
+              en: Because five and three are groups you recognise at a glance
+            - id: Karena delapan bukan angka yang sebenarnya
+              en: Because eight is not a real number
+            - id: Karena menghitung selalu lebih lambat daripada apa pun
+              en: Because counting is always slower than anything else
+          answer: 0
+          explain:
+            id: >-
+              Matamu bisa mengenali kelompok kecil tanpa menghitung sama sekali,
+              tetapi tidak untuk kelompok besar. Memecah yang besar menjadi
+              beberapa yang kecil memindahkan pekerjaan dari menghitung ke
+              mengenali, dan mengenali jauh lebih murah.
+            en: >-
+              Your eye recognises small groups without counting at all, but not
+              large ones. Breaking a large group into small ones moves the work
+              from counting to recognising, and recognising is far cheaper.
+
+  - id: l04
+    readingMinutes: 4
+    title:
+      id: Selisih dan Siapa yang Unggul
+      en: Difference, and Who Is Ahead
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Di akhir permainan congklak, yang menentukan menang bukan berapa biji
+            di lumbungmu, melainkan berapa lebihnya dibanding lumbung lawan. Dua
+            puluh melawan delapan belas adalah kemenangan tipis. Dua puluh
+            melawan sepuluh adalah kemenangan besar. Angkanya sama-sama dua
+            puluh; yang berbeda adalah selisihnya.
+          en: >-
+            At the end of a congklak game, what decides the winner is not how
+            many seeds are in your store but how many more than your opponent's.
+            Twenty against eighteen is a narrow win. Twenty against ten is a big
+            one. Your number is twenty either way; what differs is the gap.
+      - kind: text
+        text:
+          id: >-
+            Selisih adalah cara membandingkan dua angka dengan satu angka. Kamu
+            tidak perlu mengingat keduanya, cukup jaraknya. Dan jarak itu bisa
+            berubah dua kali lebih cepat daripada yang kamu kira: setiap biji
+            yang berpindah dari sisi lawan ke lumbungmu menggeser selisih sebesar
+            dua, bukan satu, karena mereka kehilangan satu dan kamu mendapat satu.
+          en: >-
+            A difference compares two numbers using one number. You do not need
+            to remember both, only the gap. And that gap can move twice as fast
+            as you expect: every seed that moves from your opponent's side into
+            your store shifts the difference by two, not one, because they lose
+            one and you gain one.
+      - kind: example
+        text:
+          id: >-
+            Lumbungmu delapan belas, lumbung lawan enam belas. Selisihmu dua,
+            dan kamu unggul. Lalu lawan menembak lubangmu yang berisi tiga biji.
+            Sekarang lumbungmu tetap delapan belas, lumbung mereka sembilan
+            belas, dan selisihnya berbalik menjadi satu untuk mereka. Satu
+            langkah menggeser selisih sebanyak tiga.
+          en: >-
+            Your store has eighteen, theirs sixteen. Your lead is two. Then they
+            capture a hole of yours holding three seeds. Your store is still
+            eighteen, theirs is nineteen, and the gap has flipped to one in their
+            favour. One move shifted the difference by three.
+        caption:
+          id: Unggul dua, lalu tertinggal satu, tanpa kehilangan satu pun dari lumbungmu.
+          en: Two ahead, then one behind, without losing a single seed from your store.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau kamu sedang unggul jauh, permainan yang aman lebih berharga
+            daripada permainan yang serakah. Kalau kamu tertinggal jauh,
+            sebaliknya. Selisih bukan cuma angka untuk dilihat di akhir; ia
+            memberitahumu jenis langkah apa yang masuk akal sekarang.
+          en: >-
+            When you are well ahead, safe play is worth more than greedy play.
+            When you are well behind, the reverse. The difference is not only a
+            number to read at the end; it tells you what kind of move makes sense
+            right now.
+      - kind: gameLink
+        mission: congklak.m19
+        label:
+          id: Uji di misi Lawan Mesin
+          en: Test it in Beat the Machine
+    check:
+      passMark: 0.7
+      weights: { comp.arithmetic: 0.8, comp.counting: 0.2 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Lumbungmu dua belas, lumbung lawan lima belas. Kamu menembak lubang
+              lawan yang berisi dua biji. Berapa selisihnya sekarang?
+            en: >-
+              Your store has twelve, theirs fifteen. You capture a hole of theirs
+              holding two seeds. What is the gap now?
+          options:
+            - id: Kamu tertinggal satu
+              en: You are one behind
+            - id: Kamu unggul satu
+              en: You are one ahead
+            - id: Kamu tertinggal tiga
+              en: You are three behind
+          answer: 0
+          explain:
+            id: >-
+              Menembak dua biji membuat lumbungmu empat belas dan lumbung lawan
+              tetap lima belas, karena biji itu diambil dari lubang mereka, bukan
+              dari lumbung mereka. Selisih tiga berkurang menjadi satu, tetapi
+              belum berbalik.
+            en: >-
+              Capturing two seeds makes your store fourteen while theirs stays at
+              fifteen, because the seeds came from their hole, not their store.
+              A gap of three narrows to one, but has not flipped.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa satu biji yang berpindah dari lumbung lawan ke lumbungmu
+              menggeser selisih sebesar dua?
+            en: >-
+              Why does one seed moving from your opponent's store into yours
+              shift the gap by two?
+          options:
+            - id: Karena biji di lumbung nilainya dua kali lipat
+              en: Because seeds in a store are worth double
+            - id: Karena mereka berkurang satu dan kamu bertambah satu
+              en: Because they lose one and you gain one
+            - id: Karena selisih selalu dihitung dua kali
+              en: Because differences are always counted twice
+          answer: 1
+          explain:
+            id: >-
+              Selisih mengukur jarak antara dua angka, jadi menggerakkan kedua
+              angka ke arah berlawanan menggerakkan jaraknya dua kali lipat. Ini
+              sebabnya merebut sesuatu dari lawan selalu lebih berharga daripada
+              mendapatkannya dari tempat netral.
+            en: >-
+              A difference measures the distance between two numbers, so moving
+              both numbers in opposite directions moves the distance twice as
+              far. This is why taking something from an opponent is always worth
+              more than gaining it from neutral ground.
+        - kind: choice
+          prompt:
+            id: >-
+              Kamu unggul sembilan biji dengan sisa dua giliran. Langkah mana yang
+              paling masuk akal?
+            en: >-
+              You are nine seeds ahead with two turns left. Which move makes most
+              sense?
+          options:
+            - id: Langkah berisiko yang mungkin menambah banyak, mungkin kehilangan banyak
+              en: A risky move that might gain a lot or lose a lot
+            - id: Langkah aman yang tidak membuka lubangmu untuk ditembak
+              en: A safe move that leaves no hole of yours open to capture
+            - id: Langkah apa saja, karena sembilan sudah tidak mungkin terkejar
+              en: Any move, since nine is already uncatchable
+          answer: 1
+          explain:
+            id: >-
+              Ketika selisihmu sudah cukup, yang bisa mengubah hasil hanyalah
+              kehilangan, bukan tambahan. Risiko hanya masuk akal ketika kamu
+              butuh sesuatu yang belum kamu punya, dan sembilan biji dalam dua
+              giliran bukan sesuatu yang mustahil dikejar lewat tembakan besar.
+            en: >-
+              Once your lead is enough, only losses can change the outcome, not
+              gains. Risk is only worth taking when you need something you do not
+              have, and nine seeds in two turns is not beyond reach of one large
+              capture.

@@ -1,0 +1,608 @@
+id: sec.basics
+domain: security
+contentVersion: 1
+entitlement: free
+prerequisites: []
+skillNodes: [sec.assets, sec.threats]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: security-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Apa yang Perlu Dilindungi
+  en: What Needs Protecting
+summary:
+  id: >-
+    Keamanan dimulai dari pertanyaan yang sering dilewati: apa sebenarnya yang
+    berharga di sini, dan siapa yang mungkin menginginkannya. Benteng menjawab
+    pertanyaan itu dengan cara yang bisa kamu lihat di papan.
+  en: >-
+    Security starts with a question people skip: what here is actually valuable,
+    and who might want it. Benteng answers that question in a way you can see on
+    the board.
+
+lessons:
+  - id: l01
+    readingMinutes: 3
+    title:
+      id: Benteng Adalah yang Paling Berharga
+      en: The Fort Is the Valuable Thing
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Di permainan Benteng, kamu menang dengan mencapai benteng lawan, dan
+            kamu kalah kalau mereka mencapai bentengmu. Semua bidak di papan
+            penting, tetapi hanya satu tempat yang menentukan hasil. Bidak bisa
+            hilang dan permainan berlanjut. Benteng jatuh, permainan selesai.
+          en: >-
+            In Benteng you win by reaching your opponent's fort, and you lose if
+            they reach yours. Every unit on the board matters, but only one place
+            decides the outcome. Units can be lost and play continues. The fort
+            falls and the game is over.
+      - kind: text
+        text:
+          id: >-
+            Perbedaan itu punya nama di bidang keamanan. Hal yang harus
+            dilindungi karena kehilangannya mengakhiri segalanya disebut aset.
+            Semua hal lain adalah alat untuk melindunginya, atau jalan menuju
+            ke sana. Kalau kamu tidak tahu mana asetmu, kamu akan menjaga
+            semuanya sama kuat, dan itu berarti menjaga semuanya sama lemah.
+          en: >-
+            That difference has a name in security. The thing that must be
+            protected because losing it ends everything is called an asset.
+            Everything else is either a means of protecting it or a route towards
+            it. If you do not know what your asset is, you will guard everything
+            equally, which means guarding everything equally badly.
+      - kind: example
+        text:
+          id: >-
+            Di ponselmu, apa asetnya? Bukan ponselnya, karena ponsel bisa
+            diganti. Bukan juga aplikasinya, karena aplikasi bisa dipasang ulang.
+            Yang tidak bisa diganti adalah fotomu, pesanmu, dan akses ke akunmu.
+            Itulah aset, dan itulah yang sebenarnya dicari orang yang mencuri
+            ponsel, bukan barangnya.
+          en: >-
+            On your phone, what is the asset? Not the phone, which can be
+            replaced. Not the apps, which can be reinstalled. What cannot be
+            replaced is your photos, your messages, and access to your accounts.
+            Those are the assets, and that is what someone stealing a phone is
+            actually after, not the object.
+        caption:
+          id: Yang bisa diganti bukan aset. Yang tidak bisa, itulah aset.
+          en: What can be replaced is not the asset. What cannot be, is.
+      - kind: text
+        text:
+          id: >-
+            Menyebut aset dengan jelas mengubah setiap keputusan sesudahnya.
+            Kalau asetmu adalah akses ke akunmu, maka kata sandi lebih penting
+            daripada casing ponsel, dan mencadangkan foto lebih penting daripada
+            memasang antivirus. Urutan itu bukan selera; ia mengikuti langsung
+            dari apa yang kamu sebut berharga.
+          en: >-
+            Naming the asset plainly changes every decision after it. If your
+            asset is access to your accounts, then your password matters more
+            than a phone case, and backing up photos matters more than installing
+            antivirus. That order is not a preference; it follows directly from
+            what you called valuable.
+      - kind: gameLink
+        mission: benteng.m01
+        label:
+          id: Lihat bentengnya di misi Sentuh Benteng
+          en: See the fort in Touch the Fort
+    check:
+      passMark: 0.7
+      weights: { sec.assets: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Mana yang paling tepat disebut aset pada sebuah ponsel?
+            en: >-
+              Which is most properly called an asset on a phone?
+          options:
+            - id: Ponselnya sendiri
+              en: The phone itself
+            - id: Foto dan akses ke akun yang ada di dalamnya
+              en: The photos and account access it holds
+            - id: Aplikasi yang terpasang
+              en: The apps installed on it
+          answer: 1
+          explain:
+            id: >-
+              Ponsel dan aplikasi bisa dibeli atau dipasang lagi, jadi
+              kehilangannya adalah kerugian yang bisa dipulihkan. Yang tidak bisa
+              dipulihkan itulah yang harus paling dijaga.
+            en: >-
+              A phone and its apps can be bought or installed again, so losing
+              them is a recoverable loss. What cannot be recovered is what most
+              needs guarding.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa akibatnya kalau kamu tidak tahu apa asetmu?
+            en: >-
+              What happens if you do not know what your asset is?
+          options:
+            - id: Kamu menjaga semuanya sama kuat, sehingga tidak ada yang benar-benar terjaga
+              en: You guard everything equally, so nothing is really guarded
+            - id: Kamu jadi lebih aman karena tidak ada yang diabaikan
+              en: You become safer because nothing is neglected
+            - id: Tidak ada bedanya selama kamu berhati-hati
+              en: It makes no difference as long as you are careful
+          answer: 0
+          explain:
+            id: >-
+              Usaha menjaga selalu terbatas, jadi membaginya rata berarti setiap
+              bagian mendapat sedikit. Menjaga dengan baik selalu berarti memilih
+              apa yang dijaga lebih ketat daripada yang lain.
+            en: >-
+              Protective effort is always limited, so spreading it evenly gives
+              each part very little. Guarding well always means choosing what gets
+              guarded harder than the rest.
+
+  - id: l02
+    readingMinutes: 4
+    title:
+      id: Siapa yang Mungkin Datang
+      en: Who Might Be Coming
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Setelah tahu apa yang dilindungi, pertanyaan berikutnya adalah dari
+            siapa. Di Benteng jawabannya jelas: ada lawan, ia punya bidak, dan
+            bidaknya bergerak satu langkah per giliran ke arah bentengmu. Kamu
+            tahu persis apa yang bisa dan tidak bisa mereka lakukan.
+          en: >-
+            Once you know what is protected, the next question is from whom. In
+            Benteng the answer is clear: there is an opponent, they have units,
+            and those units move one step a turn towards your fort. You know
+            exactly what they can and cannot do.
+      - kind: text
+        text:
+          id: >-
+            Gambaran tentang siapa yang mungkin menyerang dan apa yang bisa
+            mereka lakukan disebut model ancaman. Ia tidak harus rumit; yang
+            penting ia jujur. Model ancaman yang menyebut lawan bisa melakukan
+            apa saja tidak berguna, karena tidak ada yang bisa dipertahankan
+            terhadap segalanya. Model yang menyebut lawan tidak bisa apa-apa juga
+            tidak berguna, karena tidak menuntun ke keputusan apa pun.
+          en: >-
+            A picture of who might attack and what they can do is called a threat
+            model. It need not be complicated; it needs to be honest. A threat
+            model that says the attacker can do anything is useless, because
+            nothing can be defended against everything. One that says they can do
+            nothing is useless too, because it leads to no decision at all.
+      - kind: example
+        text:
+          id: >-
+            Model ancaman untuk akun media sosialmu bisa sesederhana ini. Siapa:
+            orang yang tahu namamu dan bisa menebak kata sandimu, atau teman yang
+            sempat memegang ponselmu. Apa yang mereka mau: membaca pesanmu, atau
+            memakai akunmu. Apa yang tidak mereka punya: kemampuan menembus
+            sistem perusahaan besar. Dari situ jelas apa yang perlu kamu kerjakan
+            dan apa yang tidak.
+          en: >-
+            A threat model for your social media account can be this simple. Who:
+            someone who knows your name and might guess your password, or a friend
+            who had your phone for a moment. What they want: to read your
+            messages, or to use your account. What they do not have: the ability
+            to break into a large company's systems. From that it is clear what
+            you need to do and what you do not.
+        caption:
+          id: Model ancaman yang berguna menyebut batas, bukan hanya bahaya.
+          en: A useful threat model names limits, not only dangers.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Bahaya paling umum bukan penyerang paling canggih. Sebagian besar
+            akun yang diambil alih diambil lewat kata sandi yang dipakai ulang
+            atau lewat orang yang berpura-pura minta tolong, bukan lewat teknik
+            rumit. Model ancaman yang hanya memikirkan penyerang hebat
+            melewatkan yang benar-benar terjadi.
+          en: >-
+            The commonest danger is not the most sophisticated attacker. Most
+            accounts that get taken over are taken through reused passwords or
+            through someone pretending to need help, not through complicated
+            techniques. A threat model that only pictures a brilliant attacker
+            misses what actually happens.
+      - kind: gameLink
+        mission: benteng.m07
+        label:
+          id: Hadapi dua ancaman di misi Dua Ancaman
+          en: Face two threats in Two Threats
+    check:
+      passMark: 0.7
+      weights: { sec.threats: 0.8, sec.assets: 0.2 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Apa yang membuat sebuah model ancaman berguna?
+            en: >-
+              What makes a threat model useful?
+          options:
+            - id: Menyebut apa yang bisa dan tidak bisa dilakukan penyerang
+              en: Naming what an attacker can and cannot do
+            - id: Menganggap penyerang bisa melakukan apa saja
+              en: Assuming the attacker can do anything
+            - id: Mendaftar setiap serangan yang pernah ada
+              en: Listing every attack that has ever existed
+          answer: 0
+          explain:
+            id: >-
+              Batas kemampuan penyerang itulah yang menentukan pertahanan mana
+              yang masuk akal. Tanpa batas, tidak ada pertahanan yang cukup, dan
+              daftar panjang tanpa batas tidak membantu memilih apa pun.
+            en: >-
+              The limits of what an attacker can do are what make some defences
+              sensible and others pointless. Without limits no defence is ever
+              enough, and a long list without limits helps choose nothing.
+        - kind: choice
+          prompt:
+            id: >-
+              Menurut apa yang paling sering terjadi, bagaimana sebagian besar
+              akun pribadi diambil alih?
+            en: >-
+              Going by what most often happens, how are most personal accounts
+              taken over?
+          options:
+            - id: Lewat kata sandi yang dipakai ulang atau orang yang berpura-pura minta tolong
+              en: Through reused passwords or someone pretending to need help
+            - id: Lewat teknik canggih yang menembus sistem perusahaan
+              en: Through advanced techniques that break into company systems
+            - id: Lewat kerusakan perangkat keras ponsel
+              en: Through hardware faults in the phone
+          answer: 0
+          explain:
+            id: >-
+              Penyerang memilih jalan yang paling murah, dan jalan yang paling
+              murah hampir selalu melibatkan kebiasaan orang, bukan kelemahan
+              teknis. Membayangkan penyerang selalu canggih membuat pertahanan
+              dipasang di tempat yang salah.
+            en: >-
+              Attackers take the cheapest route, and the cheapest route almost
+              always runs through people's habits rather than technical flaws.
+              Picturing a sophisticated attacker puts the defences in the wrong
+              place.
+
+  - id: l03
+    readingMinutes: 3
+    title:
+      id: Apa yang Membuat Sesuatu Bisa Diserang
+      en: What Makes Something Attackable
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Di Benteng, bidak bisa ditangkap hanya kalau angka kesegarannya lebih
+            tinggi daripada penangkapnya. Angka itu naik setiap giliran bidak
+            berada jauh dari bentengnya sendiri. Jadi yang membuat sebuah bidak
+            bisa diserang bukan letaknya, melainkan sudah berapa lama ia tidak
+            pulang.
+          en: >-
+            In Benteng a unit can only be captured if its freshness number is
+            higher than its captor's. That number rises every turn a unit spends
+            away from its own fort. So what makes a unit attackable is not where
+            it stands but how long it has been away.
+      - kind: text
+        text:
+          id: >-
+            Aturan ini adalah gambaran yang cukup tepat tentang sesuatu yang
+            nyata. Izin akses, sesi masuk, dan token yang dipakai aplikasi
+            semuanya punya batas waktu, dan alasannya sama persis: sesuatu yang
+            berlaku selamanya akan tetap berlaku ketika ia sudah jatuh ke tangan
+            yang salah. Yang membuatnya berbahaya bukan isinya, melainkan
+            umurnya.
+          en: >-
+            This rule is a fair picture of something real. Access permissions,
+            login sessions, and the tokens apps use all have time limits, and for
+            exactly this reason: something valid forever stays valid once it has
+            fallen into the wrong hands. What makes it dangerous is not what it
+            contains but how old it is.
+      - kind: example
+        text:
+          id: >-
+            Kamu masuk ke akunmu di komputer sekolah dan lupa keluar. Kalau sesi
+            itu berakhir sendiri dalam satu jam, kerugiannya kecil. Kalau ia
+            berlaku selamanya, siapa pun yang memakai komputer itu besok masih
+            masuk sebagai kamu. Bedanya bukan pada seberapa hati-hati kamu,
+            melainkan pada apakah sesi itu punya umur.
+          en: >-
+            You sign in on a school computer and forget to sign out. If that
+            session expires in an hour, the loss is small. If it lasts forever,
+            whoever uses that computer tomorrow is still signed in as you. The
+            difference is not how careful you were but whether the session had a
+            lifetime.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau kamu memakai perangkat yang bukan milikmu, keluar dari akunmu
+            adalah hal terakhir yang kamu lakukan sebelum berdiri, bukan hal
+            pertama yang kamu ingat besok.
+          en: >-
+            On a device that is not yours, signing out is the last thing you do
+            before standing up, not the first thing you remember tomorrow.
+      - kind: gameLink
+        mission: benteng.m02
+        label:
+          id: Baca angkanya di misi Siapa Lebih Segar
+          en: Read the numbers in Who Is Fresher
+    check:
+      passMark: 0.7
+      weights: { sec.threats: 0.75, sec.assets: 0.25 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa sesi masuk yang berlaku selamanya berbahaya?
+            en: >-
+              Why is a login session that never expires dangerous?
+          options:
+            - id: Karena ia tetap berlaku setelah jatuh ke tangan yang salah
+              en: Because it stays valid after it falls into the wrong hands
+            - id: Karena ia memakai lebih banyak memori perangkat
+              en: Because it uses more memory on the device
+            - id: Karena ia membuat aplikasi berjalan lebih lambat
+              en: Because it makes the app run more slowly
+          answer: 0
+          explain:
+            id: >-
+              Bahayanya muncul justru saat sesuatu yang seharusnya sudah tidak
+              berlaku ternyata masih diterima. Batas waktu adalah cara sistem
+              membatasi kerusakan dari hal-hal yang tidak diketahui sudah bocor.
+            en: >-
+              The danger appears precisely when something that should no longer
+              work is still accepted. A time limit is how a system caps the damage
+              from things nobody knows have leaked.
+        - kind: choice
+          prompt:
+            id: >-
+              Di Benteng, apa yang membuat sebuah bidak bisa ditangkap?
+            en: >-
+              In Benteng, what makes a unit capturable?
+          options:
+            - id: Letaknya yang jauh dari bentengnya
+              en: Standing far from its own fort
+            - id: Angka kesegarannya lebih tinggi daripada penangkapnya
+              en: Its freshness number being higher than its captor's
+            - id: Jumlah bidak lawan di sekitarnya
+              en: How many enemy units are nearby
+          answer: 1
+          explain:
+            id: >-
+              Bidak yang jauh dari bentengnya biasanya memang punya angka tinggi,
+              tetapi yang diperiksa aturan adalah angkanya, bukan jaraknya. Bidak
+              yang baru saja pulang lalu berlari jauh tetap segar.
+            en: >-
+              A unit far from its fort usually does have a high number, but what
+              the rule checks is the number, not the distance. A unit that has
+              just been home and then run far is still fresh.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Menyebutkan Kerugian dengan Jujur
+      en: Naming the Loss Honestly
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Tidak semua kehilangan sama besarnya. Kehilangan satu bidak di
+            Benteng menyakitkan tetapi bisa dipulihkan. Kehilangan benteng adalah
+            akhir. Dalam keamanan nyata, perbedaan ini sering kabur karena orang
+            berbicara tentang "diretas" seolah-olah itu satu hal, padahal
+            akibatnya bisa sangat berbeda.
+          en: >-
+            Not every loss is the same size. Losing one unit in Benteng hurts but
+            can be recovered from. Losing the fort is the end. In real security
+            this distinction often blurs, because people talk about being
+            "hacked" as if it were one thing when the consequences vary
+            enormously.
+      - kind: text
+        text:
+          id: >-
+            Cara menjernihkannya adalah menyebut akibatnya, bukan kejadiannya.
+            Bukan "akunku diretas", melainkan "orang lain bisa membaca pesanku
+            selama tiga hari", atau "orang lain mengirim pesan atas namaku ke
+            teman-temanku". Kedua kalimat itu menuntut tindakan yang berbeda,
+            dan kalimat pertama tidak.
+          en: >-
+            The way to clear it up is to name the consequence rather than the
+            event. Not "my account was hacked" but "someone could read my
+            messages for three days", or "someone sent messages as me to my
+            friends". Those two demand different responses, and the vague phrase
+            demands none.
+      - kind: example
+        text:
+          id: >-
+            Ponsel hilang, tidak terkunci, dan akun media sosialmu tetap masuk di
+            dalamnya. Akibatnya: siapa pun yang memegangnya bisa mengirim pesan
+            atas namamu, membaca percakapan lamamu, dan mengganti kata sandimu.
+            Ketiganya adalah kerugian yang berbeda, dan tindakan pertamamu
+            seharusnya menghentikan yang ketiga, karena itu yang mengunci kamu di
+            luar.
+          en: >-
+            A phone is lost, unlocked, with your social account still signed in.
+            The consequences: whoever holds it can send messages as you, read your
+            old conversations, and change your password. Those are three different
+            losses, and your first action should stop the third, because that is
+            the one that locks you out.
+        caption:
+          id: Tiga kerugian berbeda dari satu kejadian, dan hanya satu yang mendesak.
+          en: Three different losses from one event, and only one is urgent.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Hati-hati dengan nasihat keamanan yang tidak menyebut kerugian apa
+            yang dicegahnya. Nasihat yang baik selalu bisa menjawab pertanyaan
+            "kalau saya tidak melakukan ini, apa yang bisa terjadi", dengan
+            jawaban yang jelas.
+          en: >-
+            Be wary of security advice that does not say which loss it prevents.
+            Good advice can always answer the question "if I do not do this, what
+            can happen" with something specific.
+    check:
+      passMark: 0.7
+      weights: { sec.assets: 0.7, sec.threats: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Ponselmu hilang dalam keadaan tidak terkunci dan akunmu masih
+              masuk. Tindakan pertama yang paling mendesak?
+            en: >-
+              Your phone is lost, unlocked, with your account still signed in.
+              What is the most urgent first action?
+          options:
+            - id: Memberi tahu teman-temanmu agar tidak percaya pesan dari akunmu
+              en: Telling your friends not to trust messages from your account
+            - id: Mengganti kata sandi dan mengeluarkan sesi dari perangkat lain
+              en: Changing your password and signing out other devices
+            - id: Melaporkan kehilangan ponselnya
+              en: Reporting the phone as lost
+          answer: 1
+          explain:
+            id: >-
+              Dua tindakan lain tetap penting, tetapi keduanya masih bisa
+              dilakukan besok. Yang tidak bisa ditunda adalah mencegah orang lain
+              mengambil alih akunmu sepenuhnya, karena setelah itu kamu kehilangan
+              kemampuan melakukan apa pun.
+            en: >-
+              The other two matter and can still be done tomorrow. What cannot
+              wait is stopping someone taking the account over completely, because
+              after that you lose the ability to do anything at all.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa menyebut akibat lebih berguna daripada menyebut kejadian?
+            en: >-
+              Why is naming the consequence more useful than naming the event?
+          options:
+            - id: Karena akibat yang berbeda menuntut tindakan yang berbeda
+              en: Because different consequences demand different actions
+            - id: Karena kejadian biasanya sulit dijelaskan
+              en: Because events are usually hard to describe
+            - id: Karena akibat selalu lebih ringan daripada yang dibayangkan
+              en: Because consequences are always milder than imagined
+          answer: 0
+          explain:
+            id: >-
+              Satu kejadian yang sama bisa berakhir dengan kerugian besar atau
+              hampir tidak ada, tergantung apa yang sebenarnya bisa dicapai orang
+              itu. Tanpa menyebut akibatnya, tidak ada dasar untuk memilih
+              tindakan.
+            en: >-
+              The same event can end in a large loss or almost none, depending on
+              what the person could actually reach. Without naming the
+              consequence there is no basis for choosing what to do.
+
+  - id: l05
+    readingMinutes: 3
+    title:
+      id: Keamanan Selalu Punya Harga
+      en: Security Always Has a Price
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Di Benteng, memulangkan bidak ke bentengmu membuatnya segar lagi dan
+            tidak bisa ditangkap. Terdengar seperti pilihan yang selalu benar,
+            sampai kamu sadar bahwa selama bidak itu pulang, ia tidak maju ke
+            benteng lawan dan tidak menjaga apa-apa. Keamanan yang kamu dapat
+            dibayar dengan waktu yang kamu hilangkan.
+          en: >-
+            In Benteng, sending a unit home to your fort makes it fresh again and
+            uncapturable. That sounds like an always-right choice until you notice
+            that while it is going home it is not advancing and not guarding
+            anything. The safety you gain is paid for with the time you lose.
+      - kind: text
+        text:
+          id: >-
+            Semua tindakan keamanan bekerja seperti ini. Kata sandi yang panjang
+            lebih sulit ditebak dan lebih sulit diingat. Mengunci layar setiap
+            menit lebih aman dan lebih menjengkelkan. Tidak ada pilihan yang
+            hanya menguntungkan, dan siapa pun yang menawarkan keamanan tanpa
+            biaya sedang menyembunyikan biayanya di suatu tempat.
+          en: >-
+            Every security measure works this way. A long password is harder to
+            guess and harder to remember. Locking the screen every minute is safer
+            and more annoying. No option is all benefit, and anyone offering
+            security at no cost is hiding the cost somewhere.
+      - kind: example
+        text:
+          id: >-
+            Kalau kamu memulangkan seluruh bidakmu bersamaan untuk membuat semuanya
+            segar, jalur ke bentengmu terbuka lebar selama beberapa giliran.
+            Kamu jadi tidak bisa ditangkap dan justru kalah. Itu bukan keamanan;
+            itu keamanan yang salah tempat.
+          en: >-
+            If you send every unit home at once so all of them are fresh, the road
+            to your fort is wide open for several turns. You become uncapturable
+            and lose anyway. That is not security; it is security in the wrong
+            place.
+      - kind: gameLink
+        mission: benteng.m08
+        label:
+          id: Atur biayanya di misi Pertahanan Berlapis
+          en: Balance the cost in Defence in Depth
+    check:
+      passMark: 0.7
+      weights: { sec.assets: 0.65, sec.threats: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa memulangkan seluruh bidak bersamaan bisa membuatmu kalah?
+            en: >-
+              Why can sending every unit home at once make you lose?
+          options:
+            - id: Karena selama mereka pulang tidak ada yang menjaga jalur ke bentengmu
+              en: Because while they are going home nothing guards the route to your fort
+            - id: Karena bidak yang pulang bersamaan kehilangan kesegarannya
+              en: Because units that go home together lose their freshness
+            - id: Karena aturan melarang lebih dari satu bidak berada di benteng
+              en: Because the rules forbid more than one unit at a fort
+          answer: 0
+          explain:
+            id: >-
+              Kesegaran yang didapat memang nyata, tetapi harga waktunya dibayar
+              bersamaan, sehingga seluruh pertahanan kosong pada saat yang sama.
+              Keamanan yang membuka satu-satunya hal yang dijaga tidak menghasilkan
+              apa-apa.
+            en: >-
+              The freshness gained is real, but the time cost is paid all at once,
+              so the whole defence is empty at the same moment. Security that
+              opens the only thing being protected achieves nothing.
+        - kind: choice
+          prompt:
+            id: >-
+              Seseorang menawarkan cara mengamankan akunmu tanpa merepotkan sama
+              sekali. Apa yang sebaiknya kamu tanyakan?
+            en: >-
+              Someone offers a way to secure your account with no inconvenience at
+              all. What should you ask?
+          options:
+            - id: Biayanya dibayar di mana, karena selalu ada
+              en: Where the cost is being paid, because there always is one
+            - id: Berapa harga yang harus dibayar dengan uang
+              en: How much money it costs
+            - id: Siapa lagi yang sudah memakainya
+              en: Who else is already using it
+          answer: 0
+          explain:
+            id: >-
+              Biaya keamanan bisa berupa waktu, kerepotan, atau perlindungan yang
+              lebih lemah di tempat lain, dan bukan hanya uang. Tawaran tanpa
+              biaya biasanya berarti biayanya ada di tempat yang belum kamu
+              lihat.
+            en: >-
+              A security cost may be time, inconvenience, or weaker protection
+              somewhere else, not only money. An offer with no cost usually means
+              the cost sits somewhere you have not looked.

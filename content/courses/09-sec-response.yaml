@@ -1,0 +1,483 @@
+id: sec.response
+domain: security
+contentVersion: 1
+entitlement: free
+prerequisites: [sec.access]
+skillNodes: [sec.risk, sec.response]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: security-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Ketika Terjadi Serangan
+  en: When Something Goes Wrong
+summary:
+  id: >-
+    Bidak yang tertangkap di Benteng tidak dihapus dari papan; ia ditahan di
+    benteng lawan dan masih bisa dibebaskan. Kursus ini tentang menimbang risiko
+    sebelum kejadian, dan tentang apa yang dikerjakan sesudahnya.
+  en: >-
+    A captured unit in Benteng is not removed from the board; it is held at the
+    enemy fort and can still be freed. This course is about weighing risk before
+    something happens, and about what is done afterwards.
+
+lessons:
+  - id: l01
+    readingMinutes: 4
+    title:
+      id: Seberapa Besar dan Seberapa Sering
+      en: How Bad and How Likely
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Setiap kali kamu memajukan bidak di Benteng, kamu mengambil risiko.
+            Tetapi risiko bukan satu hal; ia dua hal yang dikalikan. Ada
+            kemungkinan sesuatu terjadi, dan ada besarnya kerugian kalau terjadi.
+            Bidak yang mungkin tertangkap tetapi tidak penting adalah risiko
+            kecil. Bidak yang jarang tertangkap tetapi satu-satunya penjagamu
+            adalah risiko besar.
+          en: >-
+            Every time you advance a unit in Benteng you take a risk. But risk is
+            not one thing; it is two multiplied together. There is how likely
+            something is, and how much it costs if it happens. A unit that may
+            well be captured but does not matter is a small risk. A unit rarely
+            captured but which is your only defender is a large one.
+      - kind: text
+        text:
+          id: >-
+            Orang cenderung salah menilai risiko dengan cara yang bisa
+            diperkirakan. Kejadian yang mengerikan tetapi sangat jarang terasa
+            lebih mendesak daripada kejadian biasa yang sering. Dalam keamanan
+            ini berarti orang khawatir tentang penyerang canggih dan lupa
+            mengunci layar ponselnya.
+          en: >-
+            People misjudge risk in predictable ways. A terrible but very rare
+            event feels more urgent than an ordinary frequent one. In security
+            that means worrying about sophisticated attackers while forgetting to
+            lock a phone screen.
+      - kind: example
+        text:
+          id: >-
+            Kehilangan seluruh isi akunmu karena serangan besar terhadap
+            perusahaan: sangat merugikan, sangat jarang, dan hampir tidak ada
+            yang bisa kamu lakukan. Kehilangan akunmu karena kata sandi yang sama
+            dipakai di tempat lain yang bocor: cukup merugikan, cukup sering, dan
+            sepenuhnya bisa kamu cegah. Yang kedua layak mendapat perhatianmu
+            lebih dulu.
+          en: >-
+            Losing your account because of a large attack on a company: very
+            costly, very rare, and almost nothing you can do about it. Losing your
+            account because the same password was used somewhere that leaked:
+            costly enough, common enough, and entirely within your power to
+            prevent. The second deserves your attention first.
+        caption:
+          id: Perhatian pergi ke yang bisa kamu ubah, bukan ke yang paling menakutkan.
+          en: Attention goes to what you can change, not to what frightens most.
+      - kind: text
+        text:
+          id: >-
+            Ada bagian ketiga yang sering terlewat: apakah kamu bisa berbuat
+            sesuatu. Risiko yang besar tetapi di luar kendalimu tetap layak
+            dipahami, tetapi tidak layak dikhawatirkan. Waktu dan tenaga yang
+            terbatas sebaiknya pergi ke risiko yang bisa kamu kurangi.
+          en: >-
+            There is a third part people skip: whether you can do anything. A
+            large risk outside your control is still worth understanding but not
+            worth worrying about. Limited time and energy belong with the risks
+            you can actually reduce.
+      - kind: gameLink
+        mission: benteng.m09
+        label:
+          id: Timbang risikonya di misi Bebaskan Kawan
+          en: Weigh the risk in Free Your Friend
+    check:
+      passMark: 0.7
+      weights: { sec.risk: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Dua bagian apa yang membentuk besarnya sebuah risiko?
+            en: >-
+              Which two parts make up the size of a risk?
+          options:
+            - id: Seberapa mungkin terjadi dan seberapa besar kerugiannya
+              en: How likely it is and how much it costs
+            - id: Seberapa sering diberitakan dan seberapa menakutkan
+              en: How often it is reported and how frightening it is
+            - id: Seberapa lama kejadiannya dan berapa orang yang terlibat
+              en: How long it lasts and how many people are involved
+          answer: 0
+          explain:
+            id: >-
+              Kemungkinan saja tidak cukup, karena hal yang sering terjadi bisa
+              tidak berarti apa-apa; kerugian saja juga tidak cukup, karena hal
+              yang mengerikan bisa hampir mustahil. Keduanya harus dikalikan.
+            en: >-
+              Likelihood alone is not enough, because frequent things can be
+              trivial; cost alone is not enough, because terrible things can be
+              nearly impossible. The two must be multiplied.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa risiko yang di luar kendalimu tidak layak jadi perhatian
+              utama?
+            en: >-
+              Why should a risk outside your control not be your main focus?
+          options:
+            - id: Karena perhatianmu terbatas dan lebih berguna di tempat yang bisa kamu ubah
+              en: Because your attention is limited and worth more where you can change something
+            - id: Karena risiko yang di luar kendali biasanya tidak nyata
+              en: Because risks outside your control are usually not real
+            - id: Karena hanya risiko kecil yang bisa dikendalikan
+              en: Because only small risks can be controlled
+          answer: 0
+          explain:
+            id: >-
+              Risiko itu tetap nyata dan tetap perlu dipahami, terutama untuk
+              memilih layanan yang menanganinya dengan baik. Yang tidak berguna
+              adalah menghabiskan kekhawatiran di tempat yang tidak menghasilkan
+              tindakan.
+            en: >-
+              The risk is still real and still worth understanding, not least when
+              choosing a service that handles it well. What is useless is spending
+              worry where it produces no action.
+
+  - id: l02
+    readingMinutes: 3
+    title:
+      id: Yang Hilang Belum Tentu Lenyap
+      en: What Is Lost Is Not Always Gone
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Bidak yang tertangkap di Benteng tidak dibuang dari papan. Ia ditahan
+            di benteng lawan, dan bidakmu yang lain bisa datang membebaskannya.
+            Ini keputusan desain yang disengaja, karena ia mengubah cara kamu
+            memikirkan kehilangan: dari akhir menjadi keadaan yang bisa diubah.
+          en: >-
+            A captured unit in Benteng is not thrown off the board. It is held at
+            the enemy fort, and another of your units can come and free it. This
+            is a deliberate design decision, because it changes how you think
+            about loss: from an ending into a state that can be changed.
+      - kind: text
+        text:
+          id: >-
+            Di dunia nyata, hal yang sama sering benar dan sering dilupakan.
+            Akun yang diambil orang lain biasanya bisa direbut kembali. File yang
+            terhapus sering masih ada di cadangan. Kata sandi yang bocor bisa
+            diganti. Kepanikan membuat orang mengira semuanya sudah selesai,
+            padahal sebagian besar kerugian masih bisa dikurangi.
+          en: >-
+            In the real world the same is often true and often forgotten. An
+            account someone else has taken can usually be recovered. A deleted
+            file is often still in a backup. A leaked password can be changed.
+            Panic makes people assume everything is finished when most of the loss
+            can still be reduced.
+      - kind: example
+        text:
+          id: >-
+            Membebaskan bidak di Benteng butuh perjalanan ke benteng lawan, dan
+            selama perjalanan itu posisimu terbuka. Pemulihan selalu punya harga.
+            Pertanyaannya bukan apakah bisa dipulihkan, melainkan apakah harganya
+            sepadan dengan yang dipulihkan.
+          en: >-
+            Freeing a unit in Benteng means a journey to the enemy fort, and while
+            that journey happens your position is open. Recovery always has a
+            price. The question is not whether something can be recovered but
+            whether the price is worth what is recovered.
+      - kind: gameLink
+        mission: benteng.m10
+        label:
+          id: Pulihkan keadaan di misi Pulihkan Keadaan
+          en: Turn it around in Recover
+    check:
+      passMark: 0.7
+      weights: { sec.response: 0.8, sec.risk: 0.2 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa bidak yang tertangkap di Benteng ditahan, bukan dibuang dari
+              papan?
+            en: >-
+              Why is a captured Benteng unit held rather than removed from the
+              board?
+          options:
+            - id: Supaya kehilangan terlihat sebagai keadaan yang masih bisa diubah
+              en: So that a loss is visible as a state that can still be changed
+            - id: Supaya papan tetap terlihat penuh
+              en: So the board still looks full
+            - id: Supaya lawan punya lebih banyak bidak untuk dimainkan
+              en: So the opponent has more units to play with
+          answer: 0
+          explain:
+            id: >-
+              Bidak yang ditahan tetap milikmu dan tetap bisa kembali, jadi
+              kehilangan tidak sama dengan berakhir. Bidak yang dihapus dari papan
+              tidak akan pernah mengajarkan bahwa pemulihan itu mungkin.
+            en: >-
+              A held unit is still yours and can still return, so a loss is not an
+              ending. A unit deleted from the board could never teach that recovery
+              is possible.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa pertanyaan yang tepat sebelum mencoba memulihkan sesuatu yang
+              hilang?
+            en: >-
+              What is the right question before trying to recover something lost?
+          options:
+            - id: Apakah harga pemulihannya sepadan dengan yang dipulihkan
+              en: Whether the price of recovery is worth what is recovered
+            - id: Siapa yang harus disalahkan atas kehilangannya
+              en: Who is to blame for the loss
+            - id: Apakah kehilangan itu bisa dirahasiakan
+              en: Whether the loss can be kept quiet
+          answer: 0
+          explain:
+            id: >-
+              Pemulihan menghabiskan waktu dan membuka posisi, sehingga usaha
+              memulihkan sesuatu yang kecil bisa merugikan lebih besar daripada
+              kehilangannya sendiri. Mencari siapa yang salah tidak mengubah
+              keadaan sama sekali.
+            en: >-
+              Recovery costs time and opens your position, so recovering something
+              small can cost more than the loss itself. Assigning blame changes
+              the situation not at all.
+
+  - id: l03
+    readingMinutes: 4
+    title:
+      id: Urutan Tindakan Setelah Sesuatu Terjadi
+      en: The Order of Actions Afterwards
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Ketika sesuatu sudah terjadi, urutan tindakan menentukan seberapa
+            besar kerugian akhirnya. Ada urutan yang sudah teruji, dan ia sama
+            baik di papan maupun di luar: hentikan yang sedang berlangsung,
+            amankan yang belum tersentuh, baru pulihkan yang hilang.
+          en: >-
+            Once something has happened, the order of your actions decides how
+            large the final loss is. There is a tested order, and it works as well
+            on the board as off it: stop what is still happening, secure what is
+            not yet touched, then recover what is lost.
+      - kind: text
+        text:
+          id: >-
+            Kesalahan yang paling umum adalah membalik dua yang pertama. Orang
+            langsung sibuk memulihkan yang hilang sementara penyebabnya masih
+            berjalan, sehingga yang baru dipulihkan hilang lagi. Di Benteng, ini
+            seperti mengirim bidak untuk membebaskan tawanan sementara jalur ke
+            bentengmu masih terbuka.
+          en: >-
+            The commonest mistake is swapping the first two. People rush to
+            recover what is lost while the cause is still running, so what they
+            recovered is lost again. In Benteng this is sending a unit to free a
+            prisoner while the road to your own fort is still open.
+      - kind: example
+        text:
+          id: >-
+            Akunmu diambil alih. Menghentikan yang berlangsung berarti mengganti
+            kata sandi dan mengeluarkan semua sesi. Mengamankan yang belum
+            tersentuh berarti mengganti kata sandi yang sama di layanan lain.
+            Memulihkan berarti mengambil kembali akunnya dan memberi tahu
+            teman-temanmu. Ketiganya perlu, dan urutannya menentukan apakah
+            langkah ketiga bertahan.
+          en: >-
+            Your account is taken over. Stopping what is happening means changing
+            the password and signing out every session. Securing the untouched
+            means changing that same password anywhere else you used it.
+            Recovering means getting the account back and telling your friends.
+            All three are needed, and the order decides whether the third holds.
+        caption:
+          id: Memulihkan lebih dulu berarti memulihkan sesuatu yang akan hilang lagi.
+          en: Recovering first means recovering something that will be lost again.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Kalau kata sandi yang bocor kamu pakai juga di tempat lain, tempat
+            lain itu sudah terancam sejak detik yang sama, bahkan kalau belum ada
+            yang terjadi di sana. Inilah alasan sebenarnya kata sandi tidak boleh
+            dipakai ulang, dan alasannya bukan soal kerapian.
+          en: >-
+            If a leaked password is used elsewhere, those places have been at risk
+            since the same moment, even if nothing has happened there yet. This is
+            the real reason passwords should not be reused, and the reason is not
+            tidiness.
+    check:
+      passMark: 0.7
+      weights: { sec.response: 0.75, sec.risk: 0.25 }
+      items:
+        - kind: order
+          prompt:
+            id: >-
+              Susun tiga tindakan setelah akun diambil alih, dari yang pertama.
+            en: >-
+              Put the three actions after an account takeover in order, first
+              onwards.
+          fragments:
+            - id: Amankan tempat lain yang memakai kata sandi yang sama
+              en: Secure other places using the same password
+            - id: Hentikan akses yang sedang berlangsung dengan mengganti kata sandi dan mengeluarkan sesi
+              en: Stop the ongoing access by changing the password and signing out sessions
+            - id: Pulihkan akunnya dan beri tahu orang yang mungkin terkena
+              en: Recover the account and tell anyone who may be affected
+          answer: [1, 0, 2]
+          explain:
+            id: >-
+              Selama akses masih berjalan, apa pun yang dipulihkan bisa diambil
+              lagi, jadi menghentikan harus lebih dulu. Mengamankan tempat lain
+              mendahului pemulihan karena kerugian di sana masih bisa dicegah,
+              sedangkan kerugian yang sudah terjadi tidak bertambah dengan
+              menunggu beberapa menit.
+            en: >-
+              While access is still live, anything recovered can be taken again,
+              so stopping comes first. Securing other places comes before recovery
+              because the loss there can still be prevented, while a loss that has
+              already happened does not grow in the few minutes it waits.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa kata sandi yang bocor mengancam layanan lain yang memakainya,
+              meskipun belum ada kejadian di sana?
+            en: >-
+              Why does a leaked password threaten other services using it, even
+              before anything happens there?
+          options:
+            - id: Karena siapa pun yang memilikinya bisa mencobanya di mana saja kapan saja
+              en: Because whoever has it can try it anywhere, at any time
+            - id: Karena layanan lain akan diberi tahu tentang kebocoran itu
+              en: Because the other services will be told about the leak
+            - id: Karena kata sandi yang sama otomatis berubah di semua tempat
+              en: Because the same password changes everywhere automatically
+          answer: 0
+          explain:
+            id: >-
+              Yang menentukan bukan apakah sudah ada yang mencoba, melainkan
+              apakah kuncinya sudah berada di tangan orang lain. Menunggu sampai
+              ada kejadian berarti menunggu sampai kerugiannya tidak bisa dicegah
+              lagi.
+            en: >-
+              What matters is not whether anyone has tried yet but whether the key
+              is already in someone else's hands. Waiting until something happens
+              means waiting until the loss can no longer be prevented.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Memberi Tahu Orang Lain
+      en: Telling Other People
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Bagian yang paling sering dilewati setelah sesuatu terjadi adalah
+            memberi tahu orang yang mungkin terkena. Rasanya memalukan, dan itu
+            sebabnya orang menundanya. Tetapi selama teman-temanmu tidak tahu
+            akunmu diambil orang, mereka akan memercayai pesan yang datang dari
+            akun itu, dan kerugiannya menyebar.
+          en: >-
+            The most commonly skipped part of a response is telling the people who
+            might be affected. It feels embarrassing, which is why people delay
+            it. But while your friends do not know your account was taken, they
+            will trust messages coming from it, and the damage spreads.
+      - kind: text
+        text:
+          id: >-
+            Memberi tahu tidak perlu panjang dan tidak perlu menjelaskan
+            bagaimana kejadiannya. Cukup: apa yang terjadi, sejak kapan, dan apa
+            yang sebaiknya mereka lakukan. Tiga kalimat sudah cukup, dan tiga
+            kalimat yang dikirim hari ini jauh lebih berguna daripada penjelasan
+            lengkap minggu depan.
+          en: >-
+            Telling people need not be long and need not explain how it happened.
+            Enough is: what happened, since when, and what they should do. Three
+            sentences will do, and three sentences today are far more use than a
+            full explanation next week.
+      - kind: callout
+        tone: culture
+        text:
+          id: >-
+            Di banyak tempat, mengaku kena masalah keamanan terasa seperti
+            mengaku ceroboh. Padahal orang yang paling sering kena adalah orang
+            yang paling banyak dihubungi, bukan yang paling ceroboh. Menganggapnya
+            aib membuat orang diam, dan diam itulah yang membuat kerugiannya
+            menyebar.
+          en: >-
+            In many places admitting a security problem feels like admitting
+            carelessness. In fact the people most often hit are the most contacted
+            ones, not the most careless. Treating it as shameful keeps people
+            quiet, and the quiet is what lets the damage spread.
+      - kind: text
+        text:
+          id: >-
+            Kalau kamu masih di sekolah dan ini menyangkut akun sekolah atau
+            perangkat sekolah, beri tahu gurumu. Bukan karena mereka pasti tahu
+            cara memperbaikinya, melainkan karena mereka bisa memberi tahu orang
+            lain yang memakai sistem yang sama sebelum kejadiannya berulang.
+          en: >-
+            If you are at school and this involves a school account or a school
+            device, tell a teacher. Not because they will necessarily know how to
+            fix it, but because they can warn others on the same system before it
+            happens again.
+    check:
+      passMark: 0.7
+      weights: { sec.response: 0.7, sec.risk: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Apa isi terpenting dari pemberitahuan kepada orang yang mungkin
+              terkena?
+            en: >-
+              What is the most important content of a notice to people who may be
+              affected?
+          options:
+            - id: Apa yang terjadi, sejak kapan, dan apa yang sebaiknya mereka lakukan
+              en: What happened, since when, and what they should do
+            - id: Penjelasan lengkap tentang bagaimana kejadiannya
+              en: A full explanation of how it happened
+            - id: Permintaan maaf yang panjang
+              en: A long apology
+          answer: 0
+          explain:
+            id: >-
+              Yang mereka butuhkan adalah dasar untuk memutuskan tindakan mereka
+              sendiri, terutama batas waktunya. Penjelasan teknis dan permintaan
+              maaf bisa menyusul dan tidak mengubah apa yang perlu mereka
+              kerjakan.
+            en: >-
+              What they need is a basis for deciding their own actions, especially
+              the time window. Technical detail and apologies can follow and change
+              nothing about what they must do.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa menunda memberi tahu orang lain memperbesar kerugian?
+            en: >-
+              Why does delaying a notice make the damage larger?
+          options:
+            - id: Karena selama mereka belum tahu, mereka masih memercayai pesan dari akun itu
+              en: Because until they know, they still trust messages from that account
+            - id: Karena pemberitahuan yang terlambat tidak sah secara hukum
+              en: Because a late notice is not legally valid
+            - id: Karena kerugian tumbuh dengan sendirinya seiring waktu
+              en: Because damage grows on its own over time
+          answer: 0
+          explain:
+            id: >-
+              Kerugian menyebar lewat kepercayaan yang masih berlaku, bukan lewat
+              waktu itu sendiri. Setiap jam sebelum pemberitahuan adalah jam ketika
+              orang lain masih bisa tertipu atas namamu.
+            en: >-
+              The damage spreads through trust that is still in force, not through
+              time itself. Every hour before the notice is an hour when someone
+              else can still be deceived in your name.

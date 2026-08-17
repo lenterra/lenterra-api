@@ -18,6 +18,7 @@ export * from './hash';
 export * from './types/taxonomy';
 export * from './types/mission';
 export * from './types/attempt';
+export * from './types/course';
 
 // --- adaptive engine -------------------------------------------------------
 export * from './adaptive/bkt';
@@ -63,6 +64,7 @@ export {
 
 // --- content ---------------------------------------------------------------
 export * from './content/validate';
+export * from './content/courses';
 export * from './content/solver';
 export * from './content/verify';
 export * from './content/certificates';

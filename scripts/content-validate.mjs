@@ -8,6 +8,7 @@
 // greedy-trap quota that has quietly eroded as content was added.
 
 import { checkAll, checkTeachingNotes, report } from './content-lib.mjs';
+import { compileCourses } from './course-lib.mjs';
 import { checkGreedyTrapQuota } from '../packages/core/dist/index.js';
 
 const games = process.argv.slice(2).filter((a) => !a.startsWith('-'));
@@ -68,6 +69,29 @@ if (teaching.length > 0) {
   totalWarnings += counts.warnings;
 } else {
   console.log('\nteaching notes: ✓');
+}
+
+// Courses are checked against the missions that exist, because a lesson may
+// send a student into a mission and a link into nothing is worse than no link.
+const compiled = compileCourses(allMissionIds);
+if (compiled.courses.length === 0) {
+  console.log('\ncourses: none authored yet');
+} else {
+  const lessonCount = compiled.lessons.length;
+  const checkCount = Object.keys(compiled.answers).length;
+  console.log(`\ncourses: ${compiled.courses.length} courses, ${lessonCount} lessons, ${checkCount} checks`);
+  const counts = report(compiled.issues);
+  totalErrors += counts.errors;
+  totalWarnings += counts.warnings;
+
+  for (const course of compiled.courses) {
+    const minutes = course.lessons.reduce((sum, l) => sum + l.readingMinutes, 0);
+    console.log(
+      `  ${course.id.padEnd(14)} ${String(course.lessons.length).padStart(2)} lessons  ` +
+        `${String(minutes).padStart(2)} min  ${course.skillNodes.join(', ')}`,
+    );
+  }
+  if (counts.errors === 0) console.log('  ✓ course content is valid');
 }
 
 console.log(`\n${totalErrors} error(s), ${totalWarnings} warning(s)`);

@@ -1,0 +1,500 @@
+id: sec.access
+domain: security
+contentVersion: 1
+entitlement: free
+prerequisites: [sec.basics]
+skillNodes: [sec.access, sec.defense]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: security-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Izin dan Akses
+  en: Permission and Access
+summary:
+  id: >-
+    Angka kesegaran di Benteng adalah izin yang kedaluwarsa: ia menentukan siapa
+    boleh melakukan apa, dan ia melemah seiring waktu. Kursus ini tentang siapa
+    boleh masuk, sejauh mana, dan bagaimana pintunya dijaga.
+  en: >-
+    Freshness in Benteng is a permission that expires: it decides who may do
+    what, and it weakens over time. This course is about who gets in, how far,
+    and how the door is guarded.
+
+lessons:
+  - id: l01
+    readingMinutes: 3
+    title:
+      id: Izin yang Kedaluwarsa
+      en: Permission That Expires
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Angka kesegaran menentukan sesuatu yang sangat spesifik: bidak mana
+            yang boleh menangkap bidak mana. Angka rendah berarti izin kuat,
+            angka tinggi berarti izin lemah, dan angkanya naik sendiri setiap
+            giliran tanpa ada yang melakukan apa-apa. Izin itu melemah karena
+            waktu berjalan, bukan karena ada yang mencabutnya.
+          en: >-
+            The freshness number decides something very specific: which unit may
+            capture which. A low number means strong permission, a high number
+            weak, and the number rises by itself every turn with nobody doing
+            anything. The permission weakens because time passes, not because
+            anyone revoked it.
+      - kind: text
+        text:
+          id: >-
+            Ini persis cara kerja izin di sistem nyata. Ketika kamu masuk ke
+            sebuah aplikasi, kamu tidak mengirim kata sandimu berulang-ulang.
+            Kamu menerima semacam surat izin yang berlaku sampai waktu tertentu,
+            dan aplikasi memeriksa surat itu, bukan kata sandimu. Kalau surat itu
+            kedaluwarsa, kamu diminta masuk lagi.
+          en: >-
+            This is exactly how permissions work in real systems. When you sign in
+            to an app you do not send your password over and over. You receive
+            something like a pass that is valid until a certain time, and the app
+            checks the pass rather than your password. When the pass expires you
+            are asked to sign in again.
+      - kind: example
+        text:
+          id: >-
+            Bidakmu punya angka nol karena baru saja menyentuh bentengnya. Ia
+            boleh menangkap bidak lawan yang angkanya satu atau lebih. Tiga
+            giliran kemudian angkanya menjadi tiga, dan bidak lawan yang tadinya
+            bisa ia tangkap sekarang justru bisa menangkapnya. Tidak ada yang
+            berubah di papan selain waktu.
+          en: >-
+            Your unit has a zero because it just touched its fort. It may capture
+            any enemy unit with a one or higher. Three turns later its number is
+            three, and the enemy unit it could have taken can now take it.
+            Nothing changed on the board except time.
+        caption:
+          id: Izin yang sama, tiga giliran kemudian, dan arahnya berbalik.
+          en: The same permission, three turns later, pointing the other way.
+      - kind: text
+        text:
+          id: >-
+            Alasan izin dibuat kedaluwarsa bukan karena sistem tidak
+            mempercayaimu. Alasannya adalah bahwa surat izin bisa dicuri tanpa
+            ada yang tahu, dan satu-satunya cara membatasi kerusakan dari
+            pencurian yang tidak terdeteksi adalah membuat hasil curiannya
+            berhenti berlaku dengan sendirinya.
+          en: >-
+            Passes are made to expire not because the system distrusts you. It is
+            because a pass can be stolen without anyone noticing, and the only way
+            to limit the damage from an undetected theft is to make what was
+            stolen stop working on its own.
+      - kind: gameLink
+        mission: benteng.m03
+        label:
+          id: Perbarui izinmu di misi Pulang Dulu
+          en: Renew your permission in Go Home First
+    check:
+      passMark: 0.7
+      weights: { sec.access: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa izin masuk ke sebuah aplikasi dibuat kedaluwarsa?
+            en: >-
+              Why is a login pass made to expire?
+          options:
+            - id: Supaya izin yang dicuri tanpa diketahui berhenti berlaku dengan sendirinya
+              en: So a pass stolen without anyone noticing stops working by itself
+            - id: Supaya pengguna tidak lupa kata sandinya
+              en: So users do not forget their passwords
+            - id: Supaya sistem bisa menghemat ruang penyimpanan
+              en: So the system can save storage space
+          answer: 0
+          explain:
+            id: >-
+              Pencurian yang terdeteksi bisa ditangani dengan mencabut izinnya,
+              tetapi pencurian yang tidak diketahui tidak bisa. Batas waktu adalah
+              pencabutan yang berjalan sendiri untuk kasus yang tidak ada yang
+              tahu.
+            en: >-
+              A theft that is noticed can be handled by revoking the pass, but one
+              nobody knows about cannot be. An expiry is a revocation that happens
+              by itself for the cases nobody sees.
+        - kind: choice
+          prompt:
+            id: >-
+              Bidakmu berangka dua, bidak lawan berangka dua. Siapa yang bisa
+              menangkap siapa?
+            en: >-
+              Your unit has a two and the enemy unit has a two. Who can capture
+              whom?
+          options:
+            - id: Kamu bisa menangkap mereka
+              en: You can capture them
+            - id: Tidak ada yang bisa menangkap siapa pun
+              en: Neither can capture the other
+            - id: Mereka bisa menangkapmu
+              en: They can capture you
+          answer: 1
+          explain:
+            id: >-
+              Aturan menuntut angka penangkap benar-benar lebih rendah, bukan
+              sama. Izin yang setara tidak memberi kewenangan kepada siapa pun,
+              dan itu sebabnya seseorang harus pulang dulu sebelum ada yang bisa
+              terjadi.
+            en: >-
+              The rule requires the captor's number to be strictly lower, not
+              equal. Equal permission gives authority to neither, which is why
+              somebody must go home before anything can happen.
+
+  - id: l02
+    readingMinutes: 4
+    title:
+      id: Secukupnya, Tidak Lebih
+      en: Only As Much As Needed
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Di Benteng, bidak yang berdiri di bentengnya sendiri sangat aman
+            tetapi tidak berguna untuk menyerang. Bidak yang jauh di depan sangat
+            berguna tetapi mudah ditangkap. Tidak ada bidak yang bisa keduanya
+            sekaligus, dan permainan ini sebagian besar tentang menerima
+            kenyataan itu.
+          en: >-
+            In Benteng a unit standing on its own fort is very safe and useless
+            for attacking. A unit far forward is very useful and easy to capture.
+            No unit can be both, and the game is largely about accepting that.
+      - kind: text
+        text:
+          id: >-
+            Di sistem nyata ada aturan yang mengikuti pemikiran yang sama:
+            berikan setiap orang dan setiap program hanya izin yang benar-benar
+            dibutuhkan untuk pekerjaannya, tidak lebih. Aplikasi senter tidak
+            perlu membaca kontakmu. Aplikasi catatan tidak perlu tahu lokasimu.
+            Setiap izin tambahan adalah kerusakan tambahan kalau aplikasi itu
+            ternyata jahat atau ternyata bisa disalahgunakan.
+          en: >-
+            Real systems have a rule that follows the same thinking: give every
+            person and every program only the permissions their job actually
+            needs, and no more. A torch app does not need your contacts. A notes
+            app does not need your location. Every extra permission is extra
+            damage if that app turns out to be malicious or turns out to be
+            exploitable.
+      - kind: example
+        text:
+          id: >-
+            Sebuah aplikasi permainan meminta izin membaca seluruh pesanmu.
+            Pertanyaan yang tepat bukan "apakah aplikasi ini jahat", melainkan
+            "apa yang dibutuhkan permainan ini dari pesanku". Kalau tidak ada
+            jawaban yang masuk akal, izinnya tidak perlu diberikan, terlepas dari
+            apakah aplikasinya jahat atau tidak.
+          en: >-
+            A game asks for permission to read all your messages. The right
+            question is not "is this app malicious" but "what does a game need
+            from my messages". If there is no sensible answer, the permission
+            should not be given, regardless of whether the app is malicious.
+        caption:
+          id: Pertanyaannya bukan siapa yang meminta, melainkan untuk apa.
+          en: The question is not who is asking, but what for.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Izin yang diberikan biasanya tidak pernah ditinjau ulang. Aplikasi
+            yang kamu pasang dua tahun lalu mungkin masih punya izin yang kamu
+            berikan waktu itu, untuk keperluan yang sudah lama tidak ada.
+            Memeriksa daftar izin sekali dalam setahun adalah kebiasaan yang
+            murah dan jarang dilakukan.
+          en: >-
+            Granted permissions are rarely revisited. An app you installed two
+            years ago probably still holds the permission you gave it then, for a
+            purpose that stopped existing long ago. Reviewing the permission list
+            once a year is a cheap habit and a rare one.
+      - kind: gameLink
+        mission: benteng.m04
+        label:
+          id: Maju secukupnya di misi Jangan Terlalu Jauh
+          en: Advance only as far as needed in Not Too Far
+    check:
+      passMark: 0.7
+      weights: { sec.access: 0.7, sec.defense: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Sebuah aplikasi kalkulator meminta izin mengakses kameramu. Apa
+              pertanyaan yang paling tepat?
+            en: >-
+              A calculator app asks for camera access. What is the right question?
+          options:
+            - id: Untuk apa kalkulator membutuhkan kamera
+              en: What does a calculator need a camera for
+            - id: Apakah pembuat aplikasi ini terpercaya
+              en: Is the developer of this app trustworthy
+            - id: Berapa banyak orang lain yang sudah memberikan izin ini
+              en: How many other people have granted this permission
+          answer: 0
+          explain:
+            id: >-
+              Kepercayaan terhadap pembuat tidak menghapus kerusakan kalau
+              aplikasinya sendiri kelak bisa disalahgunakan. Izin yang tidak
+              dibutuhkan untuk pekerjaannya tidak perlu diberikan kepada siapa
+              pun, terpercaya atau tidak.
+            en: >-
+              Trust in a developer does not remove the damage if the app itself
+              later turns out to be exploitable. A permission the job does not
+              need should not be granted to anyone, trusted or otherwise.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa memberi izin lebih dari yang dibutuhkan berbahaya meskipun
+              programnya baik?
+            en: >-
+              Why is granting more permission than needed dangerous even when the
+              program is well intentioned?
+          options:
+            - id: Karena kerusakan yang mungkin terjadi kalau program itu disalahgunakan menjadi lebih besar
+              en: Because the possible damage grows if that program is ever exploited
+            - id: Karena program yang punya banyak izin berjalan lebih lambat
+              en: Because a program with many permissions runs more slowly
+            - id: Karena izin tambahan membuat program menjadi jahat
+              en: Because extra permissions make a program malicious
+          answer: 0
+          explain:
+            id: >-
+              Yang membatasi kerusakan bukan niat programnya, melainkan sejauh
+              mana ia bisa menjangkau. Program yang baik pun bisa punya celah,
+              dan celah itu mewarisi seluruh izin yang dimilikinya.
+            en: >-
+              What limits damage is not a program's intentions but how far it can
+              reach. Even a well-written program can have a flaw, and that flaw
+              inherits every permission the program holds.
+
+  - id: l03
+    readingMinutes: 3
+    title:
+      id: Satu Penjaga Tidak Cukup
+      en: One Guard Is Not Enough
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Ada misi di Benteng dengan dua penyerang dan dua jalur menuju
+            bentengmu, dan hanya satu penjaga. Sesudah beberapa kali mencoba,
+            kesimpulannya jelas: satu penjaga tidak bisa menutup dua jalur. Yang
+            bisa kamu lakukan adalah memutuskan jalur mana yang benar-benar
+            mengancam, dan menerima bahwa jalur lain terbuka.
+          en: >-
+            There is a Benteng mission with two attackers, two routes to your
+            fort, and one defender. After a few tries the conclusion is plain: one
+            guard cannot close two routes. What you can do is decide which route
+            genuinely threatens and accept that the other is open.
+      - kind: text
+        text:
+          id: >-
+            Pertahanan berlapis adalah jawaban untuk kenyataan itu. Bukan satu
+            penghalang yang sempurna, melainkan beberapa penghalang yang
+            masing-masing tidak sempurna, disusun sehingga menembus satu belum
+            berarti sampai. Kata sandi adalah satu lapis. Kode sekali pakai yang
+            dikirim ke ponselmu adalah lapis kedua. Keduanya bisa ditembus;
+            keduanya sekaligus jauh lebih sulit.
+          en: >-
+            Defence in depth is the answer to that. Not one perfect barrier but
+            several imperfect ones, arranged so that getting through one does not
+            mean arriving. A password is one layer. A one-time code sent to your
+            phone is a second. Either can be broken; both at once is far harder.
+      - kind: example
+        text:
+          id: >-
+            Seseorang menebak kata sandimu dengan benar. Kalau itu satu-satunya
+            lapis, mereka masuk. Kalau ada lapis kedua berupa kode di ponselmu,
+            mereka berhenti di situ, dan kamu justru mendapat pemberitahuan bahwa
+            ada yang mencoba. Lapis kedua tidak hanya menahan; ia juga memberi
+            tahu.
+          en: >-
+            Someone guesses your password correctly. If that is the only layer,
+            they are in. If a second layer sends a code to your phone, they stop
+            there, and you receive a notice that somebody tried. The second layer
+            does not only block; it also tells you.
+      - kind: gameLink
+        mission: benteng.m07
+        label:
+          id: Pilih jalur yang dijaga di misi Dua Ancaman
+          en: Choose which route to guard in Two Threats
+    check:
+      passMark: 0.7
+      weights: { sec.defense: 0.75, sec.access: 0.25 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Apa yang dimaksud pertahanan berlapis?
+            en: >-
+              What does defence in depth mean?
+          options:
+            - id: Beberapa penghalang yang masing-masing tidak sempurna, sehingga menembus satu belum berarti sampai
+              en: Several imperfect barriers, so getting through one is not arriving
+            - id: Satu penghalang yang dibuat sekuat mungkin
+              en: One barrier made as strong as possible
+            - id: Mengganti penghalang setiap kali ada serangan
+              en: Replacing the barrier after every attack
+          answer: 0
+          explain:
+            id: >-
+              Menguatkan satu penghalang tetap meninggalkan satu titik yang, kalau
+              jebol, mengakhiri segalanya. Nilai lapisan justru terletak pada
+              kenyataan bahwa masing-masing boleh gagal.
+            en: >-
+              Strengthening one barrier still leaves a single point whose failure
+              ends everything. The value of layers lies precisely in each one
+              being allowed to fail.
+        - kind: choice
+          prompt:
+            id: >-
+              Selain menahan, apa manfaat lain dari lapis kedua seperti kode
+              sekali pakai?
+            en: >-
+              Besides blocking, what else does a second layer like a one-time code
+              give you?
+          options:
+            - id: Ia memberitahumu bahwa ada yang sudah menembus lapis pertama
+              en: It tells you somebody already got through the first layer
+            - id: Ia membuat kata sandimu menjadi lebih panjang
+              en: It makes your password longer
+            - id: Ia mengganti kata sandimu secara otomatis
+              en: It changes your password automatically
+          answer: 0
+          explain:
+            id: >-
+              Kode yang datang tanpa kamu minta berarti seseorang sudah tahu kata
+              sandimu, dan itu informasi yang tidak akan pernah kamu dapat dari
+              satu lapis saja. Menahan dan memberi tahu adalah dua manfaat yang
+              berbeda.
+            en: >-
+              A code arriving unrequested means somebody already has your
+              password, and that is information a single layer would never give
+              you. Blocking and warning are two separate benefits.
+
+  - id: l04
+    readingMinutes: 4
+    title:
+      id: Ketika Penjaga Dipancing Keluar
+      en: When the Guard Is Lured Out
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Ada misi di Benteng yang mengajarkan satu hal yang tidak nyaman:
+            pertahanan bisa dikalahkan tanpa ditembus. Kamu memancing penjaga
+            keluar dari posisinya dengan bidak umpan, lalu lewat dari sisi yang
+            ditinggalkannya. Penjaganya tidak kalah; ia hanya berada di tempat
+            yang salah.
+          en: >-
+            One Benteng mission teaches something uncomfortable: a defence can be
+            beaten without being broken. You lure the guard out of position with a
+            decoy, then pass on the side it left. The guard did not lose; it was
+            simply in the wrong place.
+      - kind: text
+        text:
+          id: >-
+            Serangan yang bekerja seperti ini juga ada di luar papan, dan itulah
+            bentuk serangan yang paling sering berhasil terhadap orang biasa.
+            Pesan yang mendesak, tautan yang terlihat resmi, atau seseorang yang
+            mengaku dari layanan pelanggan, semuanya bekerja dengan memancing
+            perhatianmu ke satu arah sementara yang sebenarnya terjadi ada di
+            arah lain.
+          en: >-
+            Attacks that work this way exist off the board too, and they are the
+            kind that most often succeed against ordinary people. An urgent
+            message, a link that looks official, someone claiming to be from
+            support, all work by pulling your attention one way while what matters
+            happens the other.
+      - kind: example
+        text:
+          id: >-
+            Sebuah pesan mengatakan akunmu akan ditutup dalam satu jam kecuali
+            kamu masuk lewat tautan yang disertakan. Rasa mendesak itulah
+            umpannya. Kalau kamu berhenti sebentar dan membuka aplikasinya
+            sendiri, bukan lewat tautan, seluruh serangan itu tidak punya jalan
+            masuk sama sekali.
+          en: >-
+            A message says your account will be closed within the hour unless you
+            sign in through the link provided. The urgency is the decoy. If you
+            pause and open the app yourself instead of using the link, the whole
+            attack has no way in at all.
+        caption:
+          id: Yang dipancing bukan sistemnya, melainkan perhatianmu.
+          en: What is being lured is not the system, but your attention.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Aturan sederhana yang menutup sebagian besar serangan jenis ini:
+            jangan pernah masuk ke akun lewat tautan yang dikirim kepadamu. Buka
+            aplikasi atau situsnya sendiri. Kalau pesan itu benar, isinya akan
+            tetap ada di sana.
+          en: >-
+            A simple rule that closes most of these: never sign in through a link
+            that was sent to you. Open the app or site yourself. If the message
+            was genuine, what it said will still be there.
+      - kind: gameLink
+        mission: benteng.m06
+        label:
+          id: Jadilah yang memancing di misi Umpan
+          en: Be the one setting the bait in The Decoy
+    check:
+      passMark: 0.7
+      weights: { sec.defense: 0.65, sec.access: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Sebuah pesan mendesakmu masuk ke akun lewat tautan yang
+              disertakannya. Apa tindakan paling aman?
+            en: >-
+              A message urgently asks you to sign in through the link it includes.
+              What is the safest thing to do?
+          options:
+            - id: Membuka aplikasi atau situsnya sendiri, tanpa memakai tautan itu
+              en: Open the app or site yourself, without using the link
+            - id: Memeriksa apakah tautannya terlihat resmi lalu memakainya
+              en: Check whether the link looks official, then use it
+            - id: Membalas pesan itu untuk menanyakan apakah benar
+              en: Reply to the message asking whether it is genuine
+          answer: 0
+          explain:
+            id: >-
+              Tautan yang terlihat resmi bisa dibuat mirip dengan mudah, dan
+              membalas hanya berbicara dengan pengirimnya sendiri. Membuka
+              sendiri memutus jalur yang dikendalikan penyerang, tanpa perlu
+              menilai apakah pesannya asli.
+            en: >-
+              An official-looking link is easy to fake, and replying only talks to
+              the sender. Opening it yourself cuts the channel the attacker
+              controls, without needing to judge whether the message was real.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa kesamaan antara memancing penjaga keluar di Benteng dan pesan
+              mendesak yang meminta kamu segera masuk?
+            en: >-
+              What do luring a guard out in Benteng and an urgent sign-in message
+              have in common?
+          options:
+            - id: Keduanya memindahkan perhatian pertahanan ke tempat yang salah, bukan menembusnya
+              en: Both move the defence's attention to the wrong place rather than breaking it
+            - id: Keduanya membutuhkan alat yang canggih
+              en: Both require sophisticated tools
+            - id: Keduanya hanya berhasil pada pemain pemula
+              en: Both only work against beginners
+          answer: 0
+          explain:
+            id: >-
+              Pertahanan pada kedua kasus tetap utuh dan tetap kuat; yang gagal
+              adalah penempatannya pada saat yang menentukan. Karena itu pertahanan
+              yang tidak bergantung pada perhatian jauh lebih dapat diandalkan.
+            en: >-
+              In both cases the defence stays intact and stays strong; what fails
+              is where it was pointed at the deciding moment. This is why a
+              defence that does not depend on attention is far more reliable.

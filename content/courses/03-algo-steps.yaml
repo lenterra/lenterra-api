@@ -1,0 +1,593 @@
+id: algo.steps
+domain: algorithms
+contentVersion: 1
+entitlement: free
+prerequisites: [comp.numbers]
+skillNodes: [algo.sequencing, algo.branching]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: subject-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Langkah demi Langkah
+  en: Step by Step
+summary:
+  id: >-
+    Setiap kali kamu menjelaskan cara main congklak kepada orang lain, kamu
+    sedang menulis algoritma. Kursus ini tentang urutan yang harus benar, dan
+    tentang langkah yang tergantung pada keadaan.
+  en: >-
+    Every time you explain congklak to someone, you are writing an algorithm.
+    This course is about orders that must be right, and about steps that depend
+    on the situation.
+
+lessons:
+  - id: l01
+    readingMinutes: 4
+    title:
+      id: Urutan yang Tidak Boleh Ditukar
+      en: The Order You Cannot Swap
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Coba jelaskan satu giliran congklak kepada orang yang belum pernah
+            main. Kamu akan berkata kira-kira begini: pilih satu lubang di
+            barisanmu, ambil semua bijinya, lalu jatuhkan satu per satu ke lubang
+            berikutnya searah jarum jam. Tiga langkah, dan urutannya tidak bisa
+            ditukar. Menjatuhkan sebelum mengambil tidak berarti apa-apa.
+          en: >-
+            Try explaining one congklak turn to someone who has never played. You
+            will say something like: pick a hole in your row, take all its seeds,
+            then drop them one at a time into the following holes. Three steps,
+            and the order cannot be swapped. Dropping before taking means
+            nothing.
+      - kind: text
+        text:
+          id: >-
+            Deretan langkah yang urutannya menentukan hasil punya nama:
+            algoritma. Kata itu terdengar rumit, tetapi kamu sudah membuat
+            puluhan hari ini. Cara kamu memasak air, cara kamu menuju sekolah,
+            cara kamu menjelaskan congklak, semuanya adalah deretan langkah yang
+            akan gagal kalau urutannya dibalik.
+          en: >-
+            A sequence of steps whose order decides the outcome has a name: an
+            algorithm. The word sounds complicated, but you have written dozens
+            today. How you boil water, how you get to school, how you explain
+            congklak, all are step sequences that fail if reordered.
+      - kind: example
+        text:
+          id: >-
+            Bandingkan dua penjelasan ini. Yang pertama: ambil biji, jatuhkan
+            satu per satu, pilih lubang. Yang kedua: pilih lubang, ambil biji,
+            jatuhkan satu per satu. Langkahnya sama persis, katanya sama persis,
+            tetapi hanya yang kedua bisa dikerjakan. Yang pertama menyuruhmu
+            mengambil sebelum tahu dari mana.
+          en: >-
+            Compare two explanations. First: take the seeds, drop them one at a
+            time, choose a hole. Second: choose a hole, take the seeds, drop them
+            one at a time. The steps are identical, the words are identical, and
+            only the second can be carried out. The first tells you to take
+            before you know from where.
+        caption:
+          id: Langkah yang sama, urutan berbeda, satu di antaranya mustahil.
+          en: Same steps, different order, one of them impossible.
+      - kind: text
+        text:
+          id: >-
+            Komputer tidak bisa memperbaiki urutan yang salah. Kalau kamu
+            menyuruhnya mengambil sebelum memilih, ia akan mencoba, gagal, dan
+            berhenti, atau lebih buruk lagi mengambil dari tempat sembarang.
+            Manusia biasanya menebak maksudmu; komputer tidak pernah. Itu
+            sebabnya menulis urutan dengan tepat adalah keterampilan tersendiri.
+          en: >-
+            A computer cannot repair a wrong order. If you tell it to take before
+            choosing, it will try, fail, and stop, or worse, take from somewhere
+            arbitrary. People usually guess what you meant; computers never do.
+            That is why writing an order precisely is a skill of its own.
+      - kind: gameLink
+        mission: congklak.m01
+        label:
+          id: Perhatikan urutannya di misi Sebar Pertama
+          en: Watch the order in First Sowing
+    check:
+      passMark: 0.7
+      weights: { algo.sequencing: 1.0 }
+      items:
+        - kind: order
+          prompt:
+            id: >-
+              Susun langkah satu giliran congklak dalam urutan yang benar.
+            en: >-
+              Put the steps of one congklak turn into the correct order.
+          fragments:
+            - id: Ambil semua biji dari lubang itu
+              en: Take all the seeds from that hole
+            - id: Jatuhkan biji satu per satu ke lubang berikutnya
+              en: Drop the seeds one at a time into the following holes
+            - id: Pilih satu lubang di barisanmu
+              en: Choose a hole in your own row
+          answer: [2, 0, 1]
+          explain:
+            id: >-
+              Setiap langkah memakai hasil langkah sebelumnya: kamu tidak bisa
+              mengambil dari lubang yang belum dipilih, dan tidak bisa menjatuhkan
+              biji yang belum ada di tanganmu. Urutan yang salah bukan sekadar
+              tidak rapi, melainkan tidak bisa dikerjakan sama sekali.
+            en: >-
+              Each step uses the result of the one before: you cannot take from a
+              hole not yet chosen, nor drop seeds not yet in your hand. A wrong
+              order is not merely untidy, it cannot be carried out at all.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa yang dilakukan komputer kalau kamu memberikan urutan langkah
+              yang tidak masuk akal?
+            en: >-
+              What does a computer do if you give it a sequence that makes no
+              sense?
+          options:
+            - id: Menebak maksudmu dan memperbaikinya sendiri
+              en: Guess what you meant and fix it
+            - id: Menjalankannya apa adanya, lalu gagal atau memberi hasil yang salah
+              en: Run it as given, then fail or produce a wrong result
+            - id: Menolak menjalankan apa pun sampai kamu memperbaikinya
+              en: Refuse to run anything until you fix it
+          answer: 1
+          explain:
+            id: >-
+              Komputer menjalankan apa yang tertulis, bukan apa yang dimaksudkan.
+              Kadang ia berhenti dengan pesan kesalahan, tetapi sering kali ia
+              tetap berjalan dan memberi jawaban yang salah tanpa memberitahu
+              siapa pun.
+            en: >-
+              A computer runs what is written, not what was meant. Sometimes it
+              stops with an error, but often it keeps going and produces a wrong
+              answer without telling anyone.
+
+  - id: l02
+    readingMinutes: 3
+    title:
+      id: Kalau Begini, Maka Begitu
+      en: If This, Then That
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Tidak semua langkah selalu dikerjakan. Di congklak ada aturan yang
+            berbunyi: kalau biji terakhirmu berhenti di lumbungmu, kamu jalan
+            lagi. Kata "kalau" itu mengubah segalanya. Langkah berikutnya tidak
+            tetap; ia tergantung pada apa yang baru saja terjadi.
+          en: >-
+            Not every step is always taken. Congklak has a rule that says: if
+            your last seed stops in your store, you go again. That word "if"
+            changes everything. The next step is not fixed; it depends on what
+            just happened.
+      - kind: text
+        text:
+          id: >-
+            Langkah bersyarat punya tiga bagian: sesuatu yang diperiksa, apa yang
+            dilakukan kalau benar, dan apa yang dilakukan kalau tidak. Aturan
+            giliran tambahan lengkapnya berbunyi: periksa di mana biji terakhir
+            berhenti; kalau di lumbungmu, jalan lagi; kalau tidak, giliran
+            berpindah ke lawan. Ketiganya harus ada, karena kalau bagian
+            terakhirnya hilang, tidak ada yang tahu apa yang terjadi berikutnya.
+          en: >-
+            A conditional step has three parts: something checked, what happens
+            if it is true, and what happens if it is not. The extra-turn rule in
+            full reads: check where the last seed stopped; if in your store, go
+            again; if not, the turn passes to your opponent. All three are needed,
+            because without the last part nobody knows what happens next.
+      - kind: example
+        text:
+          id: >-
+            Biji terakhirmu berhenti di lubang keempat barisan lawan. Periksa:
+            apakah itu lumbungmu? Bukan. Maka giliran berpindah. Sekarang biji
+            terakhirmu berhenti di lumbungmu. Periksa: apakah itu lumbungmu?
+            Ya. Maka kamu jalan lagi. Pemeriksaan yang sama, jawaban berbeda,
+            akibat berbeda.
+          en: >-
+            Your last seed stops in the opponent's fourth hole. Check: is that
+            your store? No. So the turn passes. Now your last seed stops in your
+            store. Check: is that your store? Yes. So you go again. The same
+            check, a different answer, a different consequence.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau kamu bingung kenapa sebuah aturan kadang berlaku dan kadang
+            tidak, cari kata "kalau" di dalamnya. Hampir selalu ada, dan yang
+            diperiksa itulah yang sebenarnya perlu kamu perhatikan.
+          en: >-
+            When a rule confuses you by applying sometimes and not others, look
+            for the "if" inside it. There almost always is one, and what it
+            checks is what you actually need to watch.
+    check:
+      passMark: 0.7
+      weights: { algo.branching: 0.75, algo.sequencing: 0.25 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Aturan berbunyi "kalau biji terakhir berhenti di lumbungmu, jalan
+              lagi", tetapi tidak mengatakan apa yang terjadi kalau tidak. Apa
+              masalahnya?
+            en: >-
+              A rule says "if the last seed stops in your store, go again" but
+              says nothing about what happens otherwise. What is the problem?
+          options:
+            - id: Tidak ada masalah, karena yang tidak disebut berarti tidak terjadi apa-apa
+              en: "No problem: what is not mentioned means nothing happens"
+            - id: Tidak ada yang tahu apa yang terjadi pada kasus yang tidak disebut
+              en: Nobody knows what happens in the case that was left out
+            - id: Aturannya jadi terlalu panjang untuk diingat
+              en: The rule becomes too long to remember
+          answer: 1
+          explain:
+            id: >-
+              Kasus yang tidak disebut tetap terjadi di papan, jadi seseorang
+              harus memutuskan apa artinya, dan setiap orang bisa memutuskan
+              berbeda. Aturan yang lengkap menyebut kedua kemungkinan, bukan
+              hanya yang menarik.
+            en: >-
+              The unmentioned case still happens on the board, so somebody has to
+              decide what it means, and different people decide differently. A
+              complete rule names both outcomes, not only the interesting one.
+        - kind: choice
+          prompt:
+            id: >-
+              Bagian mana dari aturan giliran tambahan yang merupakan
+              pemeriksaannya?
+            en: >-
+              Which part of the extra-turn rule is the thing being checked?
+          options:
+            - id: Kamu mendapat giliran lagi
+              en: You get another turn
+            - id: Di mana biji terakhirmu berhenti
+              en: Where your last seed stopped
+            - id: Giliran berpindah ke lawan
+              en: The turn passes to your opponent
+          answer: 1
+          explain:
+            id: >-
+              Dua pilihan lainnya adalah akibat, bukan pemeriksaan. Membedakan
+              apa yang diperiksa dari apa yang terjadi setelahnya adalah cara
+              membaca aturan apa pun dengan benar.
+            en: >-
+              The other two are consequences, not checks. Telling what is
+              examined apart from what follows is how any rule is read correctly.
+
+  - id: l03
+    readingMinutes: 4
+    title:
+      id: Menulis Aturan yang Tidak Bisa Salah Paham
+      en: Writing Rules Nobody Can Misread
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Ada satu ujian yang jujur untuk sebuah aturan: berikan kepada orang
+            yang belum pernah main, dan lihat apakah mereka bisa mengikutinya
+            tanpa bertanya. Hampir semua aturan gagal ujian ini pada percobaan
+            pertama, dan yang gagal biasanya karena satu kata yang punya lebih
+            dari satu arti.
+          en: >-
+            There is an honest test for a rule: hand it to someone who has never
+            played and see whether they can follow it without asking. Almost
+            every rule fails this the first time, and usually because of one word
+            that means more than one thing.
+      - kind: example
+        text:
+          id: >-
+            "Ambil biji dari lubang dan sebar ke lubang berikutnya." Lubang
+            berikutnya yang mana? Ke kanan atau ke kiri? Termasuk lumbung lawan
+            atau tidak? Semua bijinya ke satu lubang, atau satu-satu ke beberapa
+            lubang? Kalimat yang terdengar jelas ternyata punya empat cara
+            dibaca.
+          en: >-
+            "Take the seeds from a hole and sow them into the next hole." Which
+            next hole? Left or right? Including the opponent's store or not? All
+            the seeds into one hole, or one each into several? A sentence that
+            sounded clear turns out to have four readings.
+        caption:
+          id: Satu kalimat, empat permainan yang berbeda.
+          en: One sentence, four different games.
+      - kind: text
+        text:
+          id: >-
+            Cara memperbaikinya bukan menulis lebih panjang, melainkan menulis
+            lebih tepat. "Ambil semua biji dari lubang yang dipilih. Jatuhkan
+            satu biji ke setiap lubang berikutnya searah jarum jam, termasuk
+            lumbungmu sendiri, tetapi lewati lumbung lawan." Kalimat ini lebih
+            panjang, tetapi tidak ada lagi yang perlu ditebak.
+          en: >-
+            The fix is not writing more but writing more precisely. "Take all the
+            seeds from the chosen hole. Drop one seed into each following hole
+            clockwise, including your own store, but skip your opponent's store."
+            Longer, but there is nothing left to guess.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Hati-hati dengan kata seperti "biasanya", "kira-kira", dan "sesuai
+            kesepakatan" di dalam aturan. Kata-kata itu memindahkan keputusan ke
+            orang yang membaca, dan dua pembaca akan memutuskan berbeda tepat
+            pada saat perbedaan itu paling merugikan.
+          en: >-
+            Beware of words like "usually", "roughly", and "as agreed" inside a
+            rule. They move the decision to whoever is reading, and two readers
+            will decide differently at exactly the moment it costs most.
+    check:
+      passMark: 0.7
+      weights: { algo.sequencing: 0.7, algo.branching: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Aturan mana yang paling kecil kemungkinannya disalahpahami?
+            en: >-
+              Which rule is least likely to be misread?
+          options:
+            - id: Sebar bijinya ke lubang-lubang berikutnya
+              en: Sow the seeds into the following holes
+            - id: Jatuhkan satu biji ke setiap lubang berikutnya searah jarum jam, lewati lumbung lawan
+              en: Drop one seed into each following hole clockwise, skipping the opponent's store
+            - id: Bagikan bijinya secara adil seperti biasa
+              en: Share the seeds out fairly as usual
+          answer: 1
+          explain:
+            id: >-
+              Aturan yang jelas menyebutkan berapa banyak per lubang, ke arah
+              mana, dan apa yang dikecualikan. Dua pilihan lainnya menyerahkan
+              ketiga hal itu kepada pembaca, dan pembaca yang berbeda akan
+              memilih berbeda.
+            en: >-
+              A clear rule states how many per hole, in which direction, and what
+              is excluded. The other two leave all three to the reader, and
+              different readers choose differently.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa menguji aturan pada orang yang belum pernah main lebih
+              berguna daripada membacanya sendiri berulang kali?
+            en: >-
+              Why is testing a rule on someone who has never played more useful
+              than rereading it yourself?
+          options:
+            - id: Karena kamu sudah tahu maksudmu sendiri, jadi kamu mengisi bagian yang hilang tanpa sadar
+              en: Because you already know what you meant, so you fill the gaps without noticing
+            - id: Karena pemula selalu lebih teliti daripada pemain lama
+              en: Because beginners are always more careful than experienced players
+            - id: Karena aturan hanya berlaku untuk pemula
+              en: Because rules only apply to beginners
+          answer: 0
+          explain:
+            id: >-
+              Pengetahuanmu sendiri menutupi lubang di dalam tulisanmu, sehingga
+              kalimat yang tidak lengkap tetap terbaca lengkap olehmu. Orang lain
+              tidak punya penutup itu, dan di situlah lubangnya kelihatan.
+            en: >-
+              Your own knowledge patches the holes in your writing, so an
+              incomplete sentence still reads as complete to you. Someone else
+              has no such patch, and that is where the hole shows.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Ketika Ada Lebih dari Dua Kemungkinan
+      en: When There Are More Than Two Possibilities
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Beberapa aturan memeriksa lebih dari satu hal. Di congklak, apa yang
+            terjadi setelah biji terakhir mendarat tergantung pada tiga
+            kemungkinan: ia jatuh di lumbungmu, di lubang kosong milikmu, atau di
+            lubang berisi. Masing-masing punya akibat yang berbeda, dan hanya
+            satu yang berlaku.
+          en: >-
+            Some rules check more than one thing. In congklak, what follows the
+            last seed depends on three possibilities: it lands in your store, in
+            an empty hole of yours, or in a hole with seeds already in it. Each
+            has a different consequence, and only one applies.
+      - kind: text
+        text:
+          id: >-
+            Kemungkinan-kemungkinan itu harus saling meniadakan dan harus
+            mencakup semuanya. Saling meniadakan berarti tidak mungkin dua
+            berlaku sekaligus; mencakup semuanya berarti tidak ada keadaan yang
+            tidak tertangani. Kalau salah satu syarat itu tidak terpenuhi, akan
+            ada giliran yang tidak ada yang tahu apa hasilnya.
+          en: >-
+            Those possibilities must exclude each other and must cover
+            everything. Excluding each other means two can never apply at once;
+            covering everything means no situation is left unhandled. If either
+            fails, some turn will have an outcome nobody can name.
+      - kind: example
+        text:
+          id: >-
+            Biji terakhir jatuh di lumbungmu, jalan lagi. Jatuh di lubang
+            kosongmu, kamu menembak seberangnya. Jatuh di lubang berisi, sebaran
+            lanjut dari situ. Tidak ada keadaan keempat, dan tidak ada satu pun
+            dari ketiganya yang bisa terjadi bersamaan, karena satu biji hanya
+            mendarat di satu tempat.
+          en: >-
+            The last seed lands in your store: go again. In an empty hole of
+            yours: capture the one opposite. In a hole with seeds: sowing
+            continues from there. There is no fourth case, and no two can happen
+            at once, because one seed lands in one place.
+      - kind: gameLink
+        mission: congklak.m10
+        label:
+          id: Lihat ketiganya di misi Tembakan Pertama
+          en: See all three in First Capture
+    check:
+      passMark: 0.7
+      weights: { algo.branching: 0.8, algo.sequencing: 0.2 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa ketiga kemungkinan setelah biji terakhir mendarat tidak
+              mungkin berlaku bersamaan?
+            en: >-
+              Why can the three possibilities after the last seed lands never
+              apply at once?
+          options:
+            - id: Karena aturannya melarang dua akibat sekaligus
+              en: Because the rules forbid two consequences at once
+            - id: Karena satu biji hanya mendarat di satu tempat
+              en: Because one seed lands in only one place
+            - id: Karena pemain hanya boleh memilih satu akibat
+              en: Because the player may only choose one consequence
+          answer: 1
+          explain:
+            id: >-
+              Yang membuat ketiganya saling meniadakan bukan larangan dalam
+              aturan, melainkan kenyataan di papan: satu tempat pendaratan hanya
+              cocok dengan satu keterangan. Aturan yang baik mencerminkan
+              kenyataan itu, bukan menciptakannya.
+            en: >-
+              What makes them exclusive is not a prohibition in the rules but a
+              fact about the board: one landing place fits only one description.
+              A good rule reflects that fact rather than inventing it.
+        - kind: choice
+          prompt:
+            id: >-
+              Sebuah aturan menyebut dua kemungkinan, tetapi ada keadaan di papan
+              yang tidak cocok dengan keduanya. Apa akibatnya?
+            en: >-
+              A rule names two possibilities, but a board situation matches
+              neither. What is the consequence?
+          options:
+            - id: Permainan berhenti karena tidak ada yang tahu langkah berikutnya
+              en: Play stalls because nobody knows what happens next
+            - id: Kemungkinan pertama otomatis berlaku
+              en: The first possibility automatically applies
+            - id: Pemain boleh memilih kemungkinan yang paling menguntungkan
+              en: The player may pick whichever possibility suits them
+          answer: 0
+          explain:
+            id: >-
+              Keadaan yang tidak tercakup tetap terjadi, jadi seseorang harus
+              memutuskan tanpa dasar, dan itu adalah sumber pertengkaran di
+              permainan sekaligus sumber kesalahan di program.
+            en: >-
+              An uncovered situation still happens, so somebody has to decide
+              with nothing to go on, which is the source of arguments in games
+              and of bugs in programs alike.
+
+  - id: l05
+    readingMinutes: 3
+    title:
+      id: Mengikuti Aturan Orang Lain
+      en: Following Someone Else's Rules
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Sejauh ini kamu menulis aturan. Sekarang kebalikannya: diberi
+            serangkaian langkah yang belum pernah kamu lihat, bisakah kamu
+            mengikutinya dengan tepat? Ini keterampilan yang berbeda, dan
+            ternyata lebih sulit, karena godaan untuk melompat ke apa yang kamu
+            kira dimaksud sangat besar.
+          en: >-
+            So far you have been writing rules. Now the reverse: given a sequence
+            of steps you have never seen, can you follow it exactly? This is a
+            different skill and turns out to be harder, because the temptation to
+            jump to what you assume was meant is strong.
+      - kind: text
+        text:
+          id: >-
+            Cara mengikuti langkah dengan benar adalah dengan tidak melihat ke
+            depan. Kerjakan langkah pertama sampai selesai, tulis keadaannya,
+            baru baca langkah kedua. Kedengarannya lambat, dan memang lambat.
+            Tetapi hampir semua kesalahan dalam mengikuti aturan berasal dari
+            mengerjakan dua langkah sekaligus di kepala.
+          en: >-
+            The way to follow steps correctly is to refuse to look ahead. Do the
+            first step completely, write down the state, then read the second.
+            It sounds slow, and it is. But nearly every mistake in following a
+            procedure comes from doing two steps at once in your head.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau langkahnya banyak, tulis keadaan papan setelah setiap langkah.
+            Kertas itu bukan tanda kamu lambat berpikir; itu cara memastikan
+            kesalahan di langkah ketiga tidak menyamar sebagai kesalahan di
+            langkah ketujuh.
+          en: >-
+            When there are many steps, write the board state after each one. That
+            paper is not a sign of slow thinking; it is how you stop a mistake at
+            step three from disguising itself as a mistake at step seven.
+      - kind: text
+        text:
+          id: >-
+            Menjalankan langkah orang lain persis seperti tertulis adalah apa
+            yang dilakukan komputer setiap detik. Kalau kamu bisa melakukannya
+            dengan sabar, kamu bisa memeriksa pekerjaan komputer, dan menemukan
+            di langkah mana ia keliru. Itulah yang disebut menelusuri sebuah
+            program.
+          en: >-
+            Running someone else's steps exactly as written is what a computer
+            does every second. If you can do it patiently, you can check a
+            computer's work and find which step went wrong. That is what tracing
+            a program means.
+    check:
+      passMark: 0.7
+      weights: { algo.sequencing: 0.65, algo.branching: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kamu mengikuti tujuh langkah dan hasil akhirnya salah. Cara tercepat
+              menemukan di mana letak kesalahannya?
+            en: >-
+              You follow seven steps and the final result is wrong. What is the
+              fastest way to find where it went wrong?
+          options:
+            - id: Ulangi seluruh tujuh langkah lebih cepat
+              en: Repeat all seven steps faster
+            - id: Bandingkan keadaan setelah setiap langkah dengan yang seharusnya
+              en: Compare the state after each step against what it should be
+            - id: Mulai dari langkah terakhir dan tebak mana yang paling mungkin
+              en: Start at the last step and guess which is most likely
+          answer: 1
+          explain:
+            id: >-
+              Kesalahan pertama mengubah semua keadaan sesudahnya, jadi langkah
+              terakhir yang benar menunjukkan batasnya. Mengulang lebih cepat
+              hanya menghasilkan kesalahan yang sama dengan lebih sedikit
+              kesempatan untuk melihatnya.
+            en: >-
+              The first mistake corrupts every state after it, so the last
+              correct step marks the boundary. Repeating faster only reproduces
+              the same mistake with less chance of seeing it.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa mengerjakan dua langkah sekaligus di kepala sering membuat
+              hasilnya salah?
+            en: >-
+              Why does doing two steps at once in your head so often go wrong?
+          options:
+            - id: Karena langkah kedua mungkin bergantung pada hasil langkah pertama yang belum kamu tetapkan
+              en: Because the second step may depend on a result from the first that you have not yet fixed
+            - id: Karena otak manusia tidak bisa mengingat dua hal sekaligus
+              en: Because the human brain cannot hold two things at once
+            - id: Karena aturan melarang mengerjakan dua langkah bersamaan
+              en: Because the rules forbid doing two steps together
+          answer: 0
+          explain:
+            id: >-
+              Langkah yang berurutan biasanya saling bergantung, sehingga
+              mengerjakan yang kedua sebelum yang pertama selesai berarti memakai
+              angka yang belum pasti. Masalahnya bukan daya ingat, melainkan
+              ketergantungan.
+            en: >-
+              Sequential steps usually depend on each other, so doing the second
+              before the first is finished means using a number that is not
+              settled. The problem is dependency, not memory.

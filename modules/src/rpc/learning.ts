@@ -2,8 +2,8 @@
  * Recommendations, progress, and course checks.
  */
 
-import type { GameId, SkillNodeId } from '@lenterra/core';
-import { bandOf, isGameId } from '@lenterra/core';
+import type { CheckAnswer, CheckAnswerKey, GameId, SkillNodeId } from '@lenterra/core';
+import { bandOf, gradeAgainstKey, isGameId } from '@lenterra/core';
 
 import { invalidArgument, notFound } from '../lib/errors';
 import { optionalString, requireArray, requireInt, requireString, type Ctx } from '../lib/ctx';
@@ -188,18 +188,18 @@ export interface CheckSubmitReq {
   playedOffline?: boolean;
 }
 
-export interface CheckDefinition {
-  items: { itemId: string; correct: unknown; explainKey: string }[];
-  passMark: number;
-  skillWeights: Partial<Record<SkillNodeId, number>>;
-}
-
 /**
  * Grade a course check server-side.
  *
- * The client's provisional grade is never persisted (PRD-CRS-004): the answer
- * key is not shipped to the device, so a student cannot read it out of the
- * bundle, and the recorded score is the one the server computed.
+ * The client's provisional grade is never persisted (PRD-CRS-004). The device
+ * grades against a digest so an offline student sees a result and an
+ * explanation immediately; this is the grade that counts, computed from the
+ * answer key in a catalog part `v1.catalog.pull` refuses to serve.
+ *
+ * The scoring itself comes from the core, so the provisional and authoritative
+ * grades agree whenever the client is honest — a second implementation here
+ * would eventually disagree, and the student would watch a correct answer turn
+ * wrong on sync with nothing to explain it.
  */
 export function checkSubmit(c: Ctx, req: CheckSubmitReq) {
   const idempotencyKey = requireString(req.idempotencyKey, 'idempotencyKey', 128);
@@ -207,7 +207,7 @@ export function checkSubmit(c: Ctx, req: CheckSubmitReq) {
   const courseId = requireString(req.courseId, 'courseId', 128);
   const lessonId = requireString(req.lessonId, 'lessonId', 128);
   const catalogVersion = requireString(req.catalogVersion, 'catalogVersion', 128);
-  const answers = requireArray<{ itemId: string; answer: unknown }>(req.answers, 'answers', 100);
+  const answers = requireArray<CheckAnswer>(req.answers, 'answers', 100);
 
   const existing = c.nk.sqlQuery(Q.checkByKey, [idempotencyKey]);
   if (existing.length > 0) {
@@ -223,24 +223,10 @@ export function checkSubmit(c: Ctx, req: CheckSubmitReq) {
   }
 
   const definition = loadCheck(c, catalogVersion, checkId);
-
-  let correctCount = 0;
-  const itemResults: { itemId: string; correct: boolean; explainKey: string }[] = [];
-
-  for (let i = 0; i < definition.items.length; i++) {
-    const item = definition.items[i] as CheckDefinition['items'][number];
-    let given: unknown = undefined;
-    for (let j = 0; j < answers.length; j++) {
-      const answer = answers[j] as { itemId: string; answer: unknown };
-      if (answer.itemId === item.itemId) given = answer.answer;
-    }
-    const correct = JSON.stringify(given) === JSON.stringify(item.correct);
-    if (correct) correctCount++;
-    itemResults.push({ itemId: item.itemId, correct, explainKey: item.explainKey });
-  }
-
-  const score = definition.items.length === 0 ? 0 : correctCount / definition.items.length;
-  const passed = score >= definition.passMark;
+  const graded = gradeAgainstKey(definition, answers);
+  const score = graded.score;
+  const passed = graded.passed;
+  const itemResults = graded.items;
 
   const numberRows = c.nk.sqlQuery(Q.checkAttemptNumber, [c.userId, checkId]);
   const attemptNumber = numberRows.length > 0 ? Number((numberRows[0] as { n: number }).n) : 1;
@@ -300,13 +286,13 @@ export function checkSubmit(c: Ctx, req: CheckSubmitReq) {
  * Checks live in the `checks.*` catalog parts, which the client is never served
  * — the manifest lists them but `v1.catalog.pull` refuses them.
  */
-function loadCheck(c: Ctx, catalogVersion: string, checkId: string): CheckDefinition {
+function loadCheck(c: Ctx, catalogVersion: string, checkId: string): CheckAnswerKey {
   const rows = c.nk.sqlQuery(Q.catalogPull, [catalogVersion, ['checks.answers']]) as {
-    body: Record<string, CheckDefinition>;
+    body: Record<string, CheckAnswerKey>;
   }[];
   if (rows.length === 0) throw notFound('Check definitions are not published');
 
-  const body = (rows[0] as { body: Record<string, CheckDefinition> }).body ?? {};
+  const body = (rows[0] as { body: Record<string, CheckAnswerKey> }).body ?? {};
   const definition = body[checkId];
   if (!definition) throw notFound('Unknown check');
   return definition;

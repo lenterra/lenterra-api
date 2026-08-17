@@ -1,0 +1,546 @@
+id: comp.cycles
+domain: computation
+contentVersion: 1
+entitlement: free
+prerequisites: [comp.numbers]
+skillNodes: [comp.modular, comp.estimation]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: subject-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Pola Berulang dan Siklus
+  en: Repeating Patterns and Cycles
+summary:
+  id: >-
+    Papan congklak itu bulat: kalau kamu terus menyebar, kamu akan kembali ke
+    tempat kamu mulai. Kursus ini tentang berhitung di atas sesuatu yang
+    melingkar, dan tentang menebak dengan tepat sebelum menghitung.
+  en: >-
+    A congklak board is a circle: keep sowing and you come back to where you
+    started. This course is about counting on something that loops, and about
+    estimating well before you count.
+
+lessons:
+  - id: l01
+    readingMinutes: 4
+    title:
+      id: Papan yang Tidak Punya Ujung
+      en: The Board With No End
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Waktu kamu menyebar biji dan sampai di lubang terakhir barisanmu,
+            biji berikutnya tidak berhenti. Ia masuk ke lumbungmu, lalu lanjut ke
+            barisan lawan, lalu kembali lagi ke barisanmu. Papan congklak tidak
+            punya ujung. Ia melingkar, dan kalau bijimu cukup banyak kamu bisa
+            berputar melewati tempat kamu mulai.
+          en: >-
+            When you sow and reach the last hole of your row, the next seed does
+            not stop. It drops into your store, then into the opponent's row,
+            then back into yours. A congklak board has no end. It loops, and with
+            enough seeds you can pass the hole you started from.
+      - kind: text
+        text:
+          id: >-
+            Berhitung di atas sesuatu yang melingkar terasa aneh pada awalnya.
+            Di papan dua belas tempat, menyebar dua belas biji membawamu tepat
+            kembali ke titik awal. Menyebar tiga belas membawamu satu langkah
+            lewat. Menyebar dua puluh empat membawamu kembali lagi ke awal.
+            Yang penting bukan berapa banyak bijimu, melainkan berapa sisanya
+            setelah putaran penuh dibuang.
+          en: >-
+            Counting on something circular feels odd at first. On a board of
+            twelve places, sowing twelve seeds brings you exactly back to where
+            you started. Sowing thirteen puts you one step past. Sowing
+            twenty-four brings you back again. What matters is not how many seeds
+            you have but what is left once whole laps are discarded.
+      - kind: example
+        text:
+          id: >-
+            Kamu punya lima belas biji di papan dua belas tempat. Satu putaran
+            penuh memakai dua belas, jadi sisanya tiga. Artinya biji terakhirmu
+            mendarat tiga langkah dari tempat kamu mulai, persis sama seperti
+            kalau kamu hanya punya tiga biji. Lima belas dan tiga berakhir di
+            tempat yang sama.
+          en: >-
+            You have fifteen seeds on a board of twelve places. A full lap uses
+            twelve, leaving three. So your last seed lands three steps from where
+            you began, exactly as if you had only three seeds. Fifteen and three
+            end in the same place.
+        caption:
+          id: Buang putaran penuhnya, dan yang tersisa itulah jawabannya.
+          en: Throw away the whole laps, and what remains is the answer.
+      - kind: text
+        text:
+          id: >-
+            Ini bukan trik congklak. Ini cara kerja segala sesuatu yang berulang.
+            Jam dinding melakukan hal yang sama: pukul sepuluh ditambah lima jam
+            bukan pukul lima belas, melainkan pukul tiga, karena jam berputar
+            setiap dua belas. Hari dalam seminggu juga: dua puluh hari dari
+            Senin jatuh di hari yang sama dengan enam hari dari Senin.
+          en: >-
+            This is not a congklak trick. It is how anything that repeats works.
+            A clock does the same: ten o'clock plus five hours is not fifteen
+            o'clock but three, because a clock wraps every twelve. Days of the
+            week too: twenty days from Monday is the same weekday as six days
+            from Monday.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau bijimu banyak, jangan hitung satu per satu sampai habis.
+            Buang putaran penuhnya dulu, baru hitung sisanya. Menghitung tiga
+            langkah jauh lebih mudah daripada menghitung lima belas, dan
+            jawabannya sama persis.
+          en: >-
+            When you have many seeds, do not count them out one at a time. Throw
+            away the whole laps first, then count the remainder. Counting three
+            steps is far easier than counting fifteen, and the answer is exactly
+            the same.
+      - kind: gameLink
+        mission: congklak.m04
+        label:
+          id: Rasakan di misi Putar Papan
+          en: Feel it in Around the Board
+    check:
+      passMark: 0.7
+      weights: { comp.modular: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Di papan dua belas tempat, kamu menyebar dua puluh enam biji. Berapa
+              langkah dari titik awal biji terakhirmu mendarat?
+            en: >-
+              On a board of twelve places you sow twenty-six seeds. How many
+              steps from your starting point does the last seed land?
+          options:
+            - id: Dua langkah
+              en: Two steps
+            - id: Empat belas langkah
+              en: Fourteen steps
+            - id: Dua puluh enam langkah
+              en: Twenty-six steps
+          answer: 0
+          explain:
+            id: >-
+              Dua putaran penuh memakai dua puluh empat biji dan mengembalikanmu
+              ke titik yang sama, jadi hanya dua biji terakhir yang benar-benar
+              memindahkanmu. Kesalahan yang paling sering terjadi adalah membuang
+              satu putaran saja padahal muat dua.
+            en: >-
+              Two full laps use twenty-four seeds and return you to the same
+              point, so only the final two actually move you. The commonest slip
+              is discarding one lap when two fit.
+        - kind: choice
+          prompt:
+            id: >-
+              Sekarang pukul sembilan. Berapa jam lagi jarum menunjuk pukul dua?
+            en: >-
+              It is nine o'clock. In how many hours will the hand point to two?
+          options:
+            - id: Lima jam
+              en: Five hours
+            - id: Tujuh jam
+              en: Seven hours
+            - id: Sebelas jam
+              en: Eleven hours
+          answer: 0
+          explain:
+            id: >-
+              Sesudah pukul dua belas, jam kembali ke satu, jadi jaraknya bukan
+              selisih angka biasa. Menghitung mundur dari sembilan ke dua memberi
+              tujuh, tetapi arah maju melewati dua belas hanya butuh lima.
+            en: >-
+              After twelve the clock returns to one, so the distance is not an
+              ordinary subtraction. Counting backwards from nine to two gives
+              seven, but going forwards past twelve takes only five.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa lima belas biji dan tiga biji berakhir di lubang yang sama
+              pada papan dua belas tempat?
+            en: >-
+              Why do fifteen seeds and three seeds end in the same hole on a
+              board of twelve places?
+          options:
+            - id: Karena selisih keduanya adalah satu putaran penuh
+              en: Because their difference is exactly one full lap
+            - id: Karena lima belas dan tiga sama-sama ganjil
+              en: Because fifteen and three are both odd
+            - id: Karena papan congklak hanya punya tiga posisi berbeda
+              en: Because a congklak board has only three distinct positions
+          answer: 0
+          explain:
+            id: >-
+              Satu putaran penuh mengembalikanmu ke titik yang sama, jadi
+              menambahkannya tidak mengubah tempat mendarat sama sekali. Dua
+              angka yang selisihnya kelipatan panjang putaran selalu berakhir di
+              tempat yang sama.
+            en: >-
+              A full lap returns you to the same point, so adding one changes the
+              landing place not at all. Two numbers whose difference is a
+              multiple of the lap length always finish in the same place.
+
+  - id: l02
+    readingMinutes: 3
+    title:
+      id: Menebak Sebelum Menghitung
+      en: Estimating Before Counting
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Pemain congklak yang cepat tidak menghitung setiap kemungkinan. Ia
+            melihat papan, menebak dua atau tiga lubang yang mungkin bagus, lalu
+            baru menghitung yang itu saja. Menebak dulu bukan malas. Itu cara
+            menghemat pekerjaan untuk bagian yang benar-benar perlu ketelitian.
+          en: >-
+            Fast congklak players do not count every possibility. They look at
+            the board, guess two or three holes that might be good, and only then
+            count those. Estimating first is not laziness. It is how you save
+            precision for the part that needs it.
+      - kind: text
+        text:
+          id: >-
+            Tebakan yang baik punya ciri: ia hampir benar, dan kamu tahu seberapa
+            hampir. Kalau kamu bilang sebuah lubang berisi kira-kira sepuluh biji
+            dan ternyata sebelas, tebakanmu berguna. Kalau ternyata dua, tebakanmu
+            bukan tebakan, melainkan tembakan gelap. Yang membedakan keduanya
+            adalah apakah kamu benar-benar melihat papan sebelum menebak.
+          en: >-
+            A good estimate has a signature: it is nearly right, and you know how
+            nearly. If you say a hole has roughly ten seeds and it has eleven,
+            the estimate was useful. If it has two, that was not an estimate but
+            a shot in the dark. What separates them is whether you actually
+            looked at the board first.
+      - kind: example
+        text:
+          id: >-
+            Barisan lawan terlihat penuh di dua lubang pertama dan hampir kosong
+            di sisanya. Tanpa menghitung apa pun, kamu sudah tahu bahwa menembak
+            ke arah dua lubang itu lebih berharga daripada ke arah lainnya.
+            Sekarang hitung dua lubang itu saja, bukan sepuluh.
+          en: >-
+            Your opponent's row looks full in the first two holes and nearly
+            empty in the rest. Without counting anything you already know that
+            capturing towards those two is worth more than towards the others.
+            Now count just those two, not all ten.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Tebakan berguna untuk memilih apa yang dihitung, bukan untuk
+            menggantikan hitungan. Menyebar biji berdasarkan tebakan adalah cara
+            paling cepat kehilangan giliran, karena biji terakhir mendarat di
+            tempat yang tidak kamu maksud.
+          en: >-
+            An estimate is for choosing what to count, not for replacing the
+            count. Sowing on an estimate is the fastest way to lose a turn,
+            because the last seed lands somewhere you did not intend.
+    check:
+      passMark: 0.7
+      weights: { comp.estimation: 0.8, comp.modular: 0.2 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kapan tebakan kasar sudah cukup, dan kapan kamu harus menghitung
+              tepat?
+            en: >-
+              When is a rough estimate enough, and when must you count exactly?
+          options:
+            - id: Tebakan untuk memilih lubang mana yang layak dilihat, hitungan tepat sebelum menyebar
+              en: Estimate to choose which holes are worth a look; count exactly before sowing
+            - id: Tebakan selalu cukup, karena congklak permainan cepat
+              en: An estimate is always enough, because congklak is a fast game
+            - id: Hitungan tepat selalu wajib untuk setiap lubang di papan
+              en: An exact count is always required for every hole on the board
+          answer: 0
+          explain:
+            id: >-
+              Menghitung seluruh papan setiap giliran memakan waktu yang tidak
+              kamu punya, sedangkan menyebar tanpa hitungan membuat biji terakhir
+              mendarat di tempat yang tidak kamu maksud. Ketelitian dipakai di
+              tempat yang menentukan hasil, bukan di mana-mana.
+            en: >-
+              Counting the whole board every turn costs time you do not have,
+              while sowing without counting lands your last seed somewhere you
+              did not intend. Precision goes where it decides the outcome, not
+              everywhere.
+        - kind: choice
+          prompt:
+            id: >-
+              Kamu menebak sebuah lubang berisi sekitar delapan biji, ternyata
+              tiga belas. Apa pelajarannya?
+            en: >-
+              You estimate a hole holds about eight seeds; it holds thirteen.
+              What is the lesson?
+          options:
+            - id: Menebak memang tidak pernah bisa diandalkan
+              en: Estimating simply cannot be relied on
+            - id: Tebakanmu meleset cukup jauh untuk mengubah pilihan, jadi perlu dilihat lebih teliti
+              en: The estimate was far enough off to change your choice, so look more carefully
+            - id: Tiga belas dan delapan cukup dekat untuk tujuan apa pun
+              en: Thirteen and eight are close enough for any purpose
+          answer: 1
+          explain:
+            id: >-
+              Yang menentukan bukan besar selisihnya, melainkan apakah selisih itu
+              mengubah keputusanmu. Meleset lima biji tidak berarti apa-apa kalau
+              kamu tetap memilih lubang yang sama, tetapi berarti banyak kalau
+              lubang lain jadi lebih baik.
+            en: >-
+              What matters is not the size of the error but whether it changes
+              your decision. Being five out means nothing if you would pick the
+              same hole anyway, and a great deal if another hole is now better.
+
+  - id: l03
+    readingMinutes: 4
+    title:
+      id: Jarak yang Pas ke Lumbung
+      en: The Exact Distance to the Store
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Aturan yang paling berharga di congklak adalah ini: kalau biji
+            terakhirmu berhenti tepat di lumbungmu, kamu dapat giliran lagi.
+            Bukan hampir di lumbung. Tepat. Artinya kamu perlu lubang yang jumlah
+            bijinya sama persis dengan jaraknya ke lumbung, dan itu pertanyaan
+            berhitung, bukan pertanyaan keberuntungan.
+          en: >-
+            The most valuable rule in congklak is this: if your last seed stops
+            exactly in your store, you get another turn. Not nearly in the store.
+            Exactly. So you need a hole whose seed count equals its distance to
+            the store, and that is an arithmetic question, not a matter of luck.
+      - kind: example
+        text:
+          id: >-
+            Lubang terdekat ke lumbungmu berjarak satu langkah, jadi ia butuh
+            tepat satu biji. Lubang berikutnya berjarak dua, jadi butuh tepat
+            dua. Yang paling jauh di barisanmu berjarak lima, jadi butuh tepat
+            lima. Lihat barisanmu: apakah ada lubang yang isinya sama dengan
+            jaraknya?
+          en: >-
+            The hole nearest your store is one step away, so it needs exactly one
+            seed. The next is two away, so it needs exactly two. The furthest in
+            your row is five away, so it needs exactly five. Look at your row: is
+            any hole holding exactly its own distance?
+        caption:
+          id: Isi sama dengan jarak. Itu saja syaratnya.
+          en: Contents equal distance. That is the whole condition.
+      - kind: text
+        text:
+          id: >-
+            Yang membuat ini menarik adalah bahwa jaraknya tetap sementara isinya
+            berubah setiap giliran. Lubang yang tadinya berisi tiga sekarang
+            berisi empat karena kena sebaran lawan. Lubang yang kemarin pas hari
+            ini tidak lagi. Jadi kamu tidak menghafal lubang mana yang bagus;
+            kamu memeriksa ulang setiap giliran, dan pemeriksaan itu cepat karena
+            kamu tahu persis apa yang dicari.
+          en: >-
+            What makes this interesting is that the distances stay fixed while
+            the contents change every turn. A hole that held three now holds four
+            because a sowing passed through. A hole that fitted yesterday does
+            not today. So you do not memorise which holes are good; you re-check
+            each turn, and the check is fast because you know exactly what you
+            are looking for.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau ada dua lubang yang sama-sama pas, pilih yang lebih jauh dari
+            lumbung. Yang lebih dekat akan tetap pas di giliran berikutnya kalau
+            tidak ada yang menyentuhnya, sedangkan kesempatan yang jauh lebih
+            mudah hilang.
+          en: >-
+            If two holes both fit, take the further one. The nearer one will
+            still fit next turn if nothing disturbs it, while the further chance
+            is the easier one to lose.
+      - kind: gameLink
+        mission: congklak.m03
+        label:
+          id: Cari lubangnya di misi Giliran Lagi
+          en: Find the hole in Another Turn
+    check:
+      passMark: 0.7
+      weights: { comp.modular: 0.65, comp.estimation: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Barisanmu, dari yang terjauh ke yang terdekat dengan lumbung,
+              berisi lima, satu, empat, dua, satu. Lubang mana yang mendaratkan
+              biji terakhir tepat di lumbung?
+            en: >-
+              Your row, from furthest to nearest the store, holds five, one,
+              four, two, one. Which hole lands its last seed exactly in the
+              store?
+          options:
+            - id: Yang terjauh, berisi lima
+              en: The furthest, holding five
+            - id: Yang berisi empat
+              en: The one holding four
+            - id: Tidak ada yang pas
+              en: None of them fits
+          answer: 0
+          explain:
+            id: >-
+              Lubang terjauh berjarak lima langkah dan berisi lima biji, jadi
+              biji kelimanya jatuh tepat di lumbung. Lubang berisi empat itu
+              berjarak tiga, sehingga bijinya justru melewati lumbung dan masuk
+              ke barisan lawan.
+            en: >-
+              The furthest hole is five steps away and holds five seeds, so its
+              fifth seed drops exactly into the store. The hole holding four is
+              three steps away, so its seeds overshoot the store into the
+              opponent's row.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa kamu harus memeriksa ulang lubang mana yang pas di setiap
+              giliran?
+            en: >-
+              Why must you re-check which hole fits on every turn?
+          options:
+            - id: Karena jarak ke lumbung berubah setiap giliran
+              en: Because the distance to the store changes each turn
+            - id: Karena isi lubang berubah setiap kali ada sebaran yang lewat
+              en: Because a hole's contents change whenever a sowing passes through
+            - id: Karena aturan giliran tambahan berlaku bergantian
+              en: Because the extra-turn rule applies only on alternate turns
+          answer: 1
+          explain:
+            id: >-
+              Jarak sebuah lubang ke lumbung tidak pernah berubah karena posisinya
+              tetap; yang berubah adalah isinya. Menghafal lubang yang kemarin pas
+              adalah cara paling umum kehilangan giliran tambahan.
+            en: >-
+              A hole's distance to the store never changes because its position is
+              fixed; what changes is what is in it. Memorising the hole that
+              fitted yesterday is the commonest way to lose an extra turn.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Ketika Papannya Berbeda Ukuran
+      en: When the Board Is a Different Size
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Semua yang kamu pelajari di papan lima lubang tetap berlaku di papan
+            tujuh lubang, dengan satu perubahan: panjang putarannya. Papan lima
+            lubang per sisi punya dua belas tempat termasuk lumbung. Papan tujuh
+            lubang punya enam belas. Angka itu yang kamu buang setiap putaran
+            penuh, dan mengganti angkanya mengganti seluruh perhitungan.
+          en: >-
+            Everything you learned on a five-hole board still holds on a
+            seven-hole board, with one change: the lap length. Five holes a side
+            makes twelve places including the stores. Seven holes makes sixteen.
+            That is the number you discard each full lap, and changing it changes
+            every calculation.
+      - kind: text
+        text:
+          id: >-
+            Perhatikan apa yang tidak berubah. Aturan bahwa isi harus sama dengan
+            jarak untuk mendapat giliran tambahan tetap sama. Aturan bahwa lumbung
+            lawan dilewati tetap sama. Cara membuang putaran penuh tetap sama.
+            Yang berubah hanya satu angka, dan sisanya adalah ide yang sama.
+          en: >-
+            Notice what does not change. The rule that contents must equal
+            distance for an extra turn is the same. The rule that the opponent's
+            store is skipped is the same. Discarding whole laps works the same
+            way. Only one number changed, and the rest is the same idea.
+      - kind: callout
+        tone: culture
+        text:
+          id: >-
+            Di berbagai daerah di Indonesia, jumlah lubang congklak berbeda-beda
+            dan sebagian aturannya juga. Ada yang tidak memakai aturan giliran
+            tambahan sama sekali. Kalau kamu main dengan orang dari daerah lain,
+            tanyakan aturannya sebelum mulai, bukan setelah ada yang merasa
+            dicurangi.
+          en: >-
+            Across Indonesia congklak boards have different hole counts, and some
+            rules differ too. In some places there is no extra-turn rule at all.
+            If you play with someone from elsewhere, ask about the rules before
+            you start, not after somebody feels cheated.
+      - kind: text
+        text:
+          id: >-
+            Ini kebiasaan berpikir yang berguna jauh di luar congklak: pisahkan
+            aturan dari angkanya. Kalau kamu hafal jawaban untuk papan lima
+            lubang, kamu harus belajar ulang di papan tujuh. Kalau kamu paham
+            aturannya, kamu tinggal mengganti satu angka dan semuanya bekerja
+            lagi.
+          en: >-
+            This is a habit of thought useful well beyond congklak: separate the
+            rule from the number. If you memorised answers for a five-hole board,
+            you must relearn them on a seven. If you understood the rule, you
+            swap one number and everything works again.
+      - kind: gameLink
+        mission: congklak.m16
+        label:
+          id: Coba di misi Papan Besar
+          en: Try it in Bigger Board
+    check:
+      passMark: 0.7
+      weights: { comp.estimation: 0.65, comp.modular: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Di papan tujuh lubang per sisi, ada enam belas tempat. Kamu menyebar
+              delapan belas biji. Berapa langkah dari titik awal biji terakhirmu
+              mendarat?
+            en: >-
+              On a seven-hole board there are sixteen places. You sow eighteen
+              seeds. How many steps from the start does the last seed land?
+          options:
+            - id: Dua langkah
+              en: Two steps
+            - id: Enam langkah
+              en: Six steps
+            - id: Delapan belas langkah
+              en: Eighteen steps
+          answer: 0
+          explain:
+            id: >-
+              Satu putaran penuh di papan ini memakai enam belas, menyisakan dua.
+              Kesalahan yang biasa terjadi adalah tetap memakai dua belas, yaitu
+              panjang putaran papan yang lebih kecil.
+            en: >-
+              A full lap on this board uses sixteen, leaving two. The usual slip
+              is to keep using twelve, which is the lap length of the smaller
+              board.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa yang berubah dan apa yang tetap ketika kamu pindah dari papan
+              lima lubang ke papan tujuh lubang?
+            en: >-
+              What changes and what stays the same when you move from a five-hole
+              board to a seven-hole board?
+          options:
+            - id: Aturannya berubah, panjang putarannya tetap
+              en: The rules change; the lap length stays
+            - id: Panjang putarannya berubah, aturannya tetap
+              en: The lap length changes; the rules stay
+            - id: Keduanya berubah dan harus dipelajari dari awal
+              en: Both change and must be learned from scratch
+          answer: 1
+          explain:
+            id: >-
+              Yang berbeda hanya berapa tempat dalam satu putaran. Menganggap
+              seluruh permainan berbeda memaksamu belajar ulang sesuatu yang
+              sebenarnya sudah kamu kuasai.
+            en: >-
+              The only difference is how many places make a lap. Treating the
+              whole game as different forces you to relearn something you already
+              know.

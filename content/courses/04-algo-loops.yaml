@@ -1,0 +1,620 @@
+id: algo.loops
+domain: algorithms
+contentVersion: 1
+entitlement: free
+prerequisites: [algo.steps]
+skillNodes: [algo.iteration, algo.sequencing]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: subject-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Perulangan
+  en: Loops
+summary:
+  id: >-
+    Menyebar biji satu per satu sampai habis adalah perulangan. Rantai sebaran
+    yang menyambung berkali-kali juga. Kursus ini memberi nama pada sesuatu yang
+    sudah kamu lakukan setiap giliran.
+  en: >-
+    Sowing seeds one at a time until they run out is a loop. So is a chain of
+    sowings that keeps continuing. This course names something you already do
+    every turn.
+
+lessons:
+  - id: l01
+    readingMinutes: 4
+    title:
+      id: Mengerjakan Hal yang Sama Berkali-kali
+      en: Doing the Same Thing Again and Again
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Ambil tujuh biji, lalu jatuhkan satu ke lubang berikutnya. Lalu satu
+            lagi ke lubang berikutnya. Lalu satu lagi. Kamu tidak menghafal tujuh
+            perintah yang berbeda; kamu mengerjakan satu perintah tujuh kali.
+            Itulah perulangan, dan kamu sudah menguasainya sebelum ada yang
+            memberi tahu namanya.
+          en: >-
+            Take seven seeds and drop one into the next hole. Then another into
+            the next. Then another. You are not memorising seven different
+            instructions; you are doing one instruction seven times. That is a
+            loop, and you mastered it before anyone told you its name.
+      - kind: text
+        text:
+          id: >-
+            Setiap perulangan punya tiga bagian. Ada yang dikerjakan berulang,
+            yaitu menjatuhkan satu biji dan bergeser ke lubang berikutnya. Ada
+            yang berubah setiap kali, yaitu lubang mana yang sedang dituju dan
+            berapa biji yang tersisa di tangan. Dan ada alasan untuk berhenti,
+            yaitu tangan yang sudah kosong.
+          en: >-
+            Every loop has three parts. Something repeated: drop one seed and
+            move to the next hole. Something that changes each time: which hole
+            you are at and how many seeds remain in your hand. And a reason to
+            stop: an empty hand.
+      - kind: example
+        text:
+          id: >-
+            Tujuh biji di tangan. Jatuhkan satu, tersisa enam. Jatuhkan satu,
+            tersisa lima. Terus sampai tersisa nol, lalu berhenti. Kalau kamu
+            tulis semua langkahnya, ada tujuh baris yang hampir sama persis.
+            Kalau kamu tulis perulangannya, ada satu baris dan satu alasan
+            berhenti.
+          en: >-
+            Seven seeds in hand. Drop one, six left. Drop one, five left. Continue
+            until none are left, then stop. Written out step by step it is seven
+            nearly identical lines. Written as a loop it is one line and one
+            stopping condition.
+        caption:
+          id: Tujuh baris menjadi satu, tanpa kehilangan apa pun.
+          en: Seven lines become one, losing nothing.
+      - kind: text
+        text:
+          id: >-
+            Kenapa ini penting? Karena kamu tidak selalu tahu berapa bijinya.
+            Kalau kamu menulis tujuh langkah, aturanmu hanya berlaku untuk tujuh
+            biji. Kalau kamu menulis perulangan, aturanmu berlaku untuk berapa
+            pun jumlahnya, termasuk jumlah yang belum pernah kamu temui.
+          en: >-
+            Why does this matter? Because you do not always know how many seeds
+            there are. Write seven steps and your rule only works for seven
+            seeds. Write a loop and it works for any number, including ones you
+            have never met.
+      - kind: gameLink
+        mission: congklak.m01
+        label:
+          id: Hitung langkah perulangannya di misi Sebar Pertama
+          en: Count the loop steps in First Sowing
+    check:
+      passMark: 0.7
+      weights: { algo.iteration: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Apa yang menjadi alasan berhenti dalam perulangan menyebar biji?
+            en: >-
+              What is the stopping condition in the seed-sowing loop?
+          options:
+            - id: Ketika biji terakhir jatuh di lumbung
+              en: When the last seed lands in a store
+            - id: Ketika tangan sudah kosong
+              en: When your hand is empty
+            - id: Ketika kamu sudah melewati seluruh papan
+              en: When you have gone all the way round the board
+          answer: 1
+          explain:
+            id: >-
+              Perulangan berhenti karena kehabisan bahan, bukan karena sampai di
+              tempat tertentu. Sebaran bisa berhenti di mana saja di papan, dan
+              bisa berputar lebih dari sekali kalau bijinya banyak.
+            en: >-
+              The loop stops because it runs out of material, not because it
+              reaches a place. A sowing can end anywhere on the board, and can go
+              round more than once if there are enough seeds.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa menulis perulangan lebih berguna daripada menulis tujuh
+              langkah yang hampir sama?
+            en: >-
+              Why is writing a loop more useful than writing seven nearly
+              identical steps?
+          options:
+            - id: Karena perulangan berlaku untuk jumlah berapa pun, bukan hanya tujuh
+              en: Because a loop works for any number, not just seven
+            - id: Karena tujuh langkah terlalu banyak untuk dibaca
+              en: Because seven steps is too many to read
+            - id: Karena perulangan berjalan lebih cepat di papan
+              en: Because a loop runs faster on the board
+          answer: 0
+          explain:
+            id: >-
+              Tujuh langkah yang ditulis lengkap terikat pada angka tujuh, jadi
+              lubang berisi delapan biji butuh aturan baru. Perulangan tidak
+              menyebut angkanya sama sekali, dan justru itu yang membuatnya
+              berlaku di mana-mana.
+            en: >-
+              Seven steps written out are tied to the number seven, so a hole
+              with eight seeds needs a new rule. A loop never names the number at
+              all, and that is exactly what makes it work everywhere.
+        - kind: order
+          prompt:
+            id: >-
+              Susun tiga bagian sebuah perulangan sesuai urutan yang biasa
+              ditulis.
+            en: >-
+              Put the three parts of a loop in the order they are usually
+              written.
+          fragments:
+            - id: Kerjakan langkah yang berulang
+              en: Do the repeated step
+            - id: Periksa apakah alasan berhenti sudah terpenuhi
+              en: Check whether the stopping condition is met
+            - id: Perbarui hal yang berubah setiap putaran
+              en: Update what changes each time round
+          answer: [1, 0, 2]
+          explain:
+            id: >-
+              Pemeriksaan datang lebih dulu karena perulangan bisa saja tidak
+              berjalan sama sekali, misalnya ketika lubangnya kosong dari awal.
+              Perulangan yang mengerjakan langkahnya dulu selalu berjalan minimal
+              satu kali, dan itu perilaku yang berbeda.
+            en: >-
+              The check comes first because a loop may need to run zero times, as
+              when the hole is empty to begin with. A loop that acts before
+              checking always runs at least once, which is different behaviour.
+
+  - id: l02
+    readingMinutes: 4
+    title:
+      id: Perulangan yang Melahirkan Perulangan
+      en: The Loop That Starts Another Loop
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Di congklak ada aturan yang membuat perulangan menjadi menarik.
+            Kalau biji terakhirmu mendarat di lubang yang sudah berisi, kamu
+            ambil semua isi lubang itu dan menyebar lagi dari sana. Sebaran
+            selesai, lalu sebaran baru dimulai. Ini disebut rantai, dan rantai
+            adalah perulangan yang isinya perulangan.
+          en: >-
+            Congklak has a rule that makes loops interesting. If your last seed
+            lands in a hole that already has seeds, you pick up everything in it
+            and sow again from there. One sowing ends, another begins. This is
+            called a chain, and a chain is a loop whose body is a loop.
+      - kind: text
+        text:
+          id: >-
+            Perhatikan bahwa kamu tidak tahu berapa panjang rantainya sebelum
+            kamu menjalankannya. Sebaran pertama mungkin berakhir di lubang
+            kosong dan rantainya putus di situ. Atau ia berakhir di lubang berisi
+            enam, yang membawamu enam langkah lagi, yang mungkin berakhir di
+            lubang berisi tiga. Panjangnya ditentukan oleh papan, bukan olehmu.
+          en: >-
+            Notice that you cannot know how long a chain will be before running
+            it. The first sowing may end in an empty hole and the chain breaks
+            there. Or it ends in a hole holding six, which carries you six more
+            steps, which may end in a hole holding three. The length is decided
+            by the board, not by you.
+      - kind: example
+        text:
+          id: >-
+            Kamu menyebar tiga biji. Yang terakhir mendarat di lubang berisi
+            empat. Ambil kelimanya, sebar lagi. Yang terakhir mendarat di lubang
+            berisi satu. Ambil keduanya, sebar lagi. Yang terakhir mendarat di
+            lubang kosong. Berhenti. Rantai sepanjang tiga sambungan, dari satu
+            pilihan awal.
+          en: >-
+            You sow three seeds. The last lands in a hole holding four. Take all
+            five, sow again. The last lands in a hole holding one. Take both, sow
+            again. The last lands in an empty hole. Stop. A chain of three links,
+            from one initial choice.
+        caption:
+          id: Satu pilihan, tiga sebaran, dan kamu tidak tahu itu sebelum mencoba.
+          en: One choice, three sowings, and you did not know that in advance.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Perulangan yang panjangnya tidak diketahui punya bahaya khusus di
+            komputer: kalau alasan berhentinya tidak pernah terpenuhi, program
+            berjalan selamanya. Di congklak bahayanya tidak ada, karena setiap
+            sambungan pada akhirnya menemui lubang kosong. Tapi memeriksa apakah
+            perulangan pasti berhenti adalah kebiasaan yang perlu.
+          en: >-
+            Loops of unknown length have a particular danger in computing. If the
+            stopping condition is never met, the program runs forever. Congklak
+            is safe because every link eventually meets an empty hole. But
+            checking that a loop must stop is a habit worth having.
+      - kind: gameLink
+        mission: congklak.m06
+        label:
+          id: Buat rantaimu sendiri di misi Rantai Dua
+          en: Build your own chain in Chain of Two
+    check:
+      passMark: 0.7
+      weights: { algo.iteration: 0.75, algo.sequencing: 0.25 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa kamu tidak bisa tahu panjang rantai sebelum menjalankannya?
+            en: >-
+              Why can you not know a chain's length before running it?
+          options:
+            - id: Karena panjangnya ditentukan oleh isi lubang yang belum kamu lihat
+              en: Because the length is set by hole contents you have not looked at yet
+            - id: Karena aturan rantai berbeda-beda setiap giliran
+              en: Because the chain rule changes from turn to turn
+            - id: Karena rantai selalu berhenti setelah tiga sambungan
+              en: Because a chain always stops after three links
+          answer: 0
+          explain:
+            id: >-
+              Setiap sambungan berikutnya ditentukan oleh lubang tempat sebaran
+              sebelumnya berhenti, dan lubang itu berubah selama sebaran berjalan.
+              Kamu bisa menghitungnya kalau mau teliti, tetapi tidak bisa
+              melihatnya sekilas.
+            en: >-
+              Each link is decided by the hole where the previous sowing stopped,
+              and that hole changes as the sowing runs. You could work it out
+              carefully, but you cannot see it at a glance.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa yang terjadi pada sebuah program kalau alasan berhentinya tidak
+              pernah terpenuhi?
+            en: >-
+              What happens to a program whose stopping condition is never met?
+          options:
+            - id: Program berhenti sendiri setelah beberapa saat
+              en: The program stops itself after a while
+            - id: Program terus berjalan tanpa pernah selesai
+              en: The program keeps running and never finishes
+            - id: Program melewati perulangan itu dan lanjut ke bagian berikutnya
+              en: The program skips the loop and continues
+          answer: 1
+          explain:
+            id: >-
+              Tidak ada yang menghentikan perulangan selain alasan berhentinya
+              sendiri, jadi kalau alasan itu tidak pernah tercapai tidak ada
+              bagian program lain yang akan menyelamatkannya.
+            en: >-
+              Nothing stops a loop except its own stopping condition, so if that
+              is never reached, no other part of the program will rescue it.
+
+  - id: l03
+    readingMinutes: 3
+    title:
+      id: Menghitung Berapa Kali Terjadi
+      en: Counting How Many Times It Happened
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Beberapa misi memintamu membuat rantai sepanjang empat sambungan.
+            Untuk tahu apakah kamu berhasil, sesuatu harus menghitung berapa kali
+            sambungan terjadi. Itu berarti ada satu angka yang dimulai dari nol
+            dan bertambah satu setiap kali perulangan berputar.
+          en: >-
+            Some missions ask you for a chain of four links. To know whether you
+            succeeded, something must count how many links happened. That means
+            one number that starts at zero and grows by one each time round the
+            loop.
+      - kind: text
+        text:
+          id: >-
+            Angka penghitung itu hidup di luar perulangan, bukan di dalamnya.
+            Kalau ia diatur ulang ke nol setiap putaran, ia tidak akan pernah
+            lebih dari satu. Ini kesalahan yang sangat umum, dan akibatnya selalu
+            sama: hasil akhirnya nol atau satu, tidak pernah angka yang
+            sebenarnya.
+          en: >-
+            That counter lives outside the loop, not inside it. If it is reset to
+            zero on every pass it will never exceed one. This is a very common
+            mistake, and the symptom is always the same: the final answer is zero
+            or one, never the real number.
+      - kind: example
+        text:
+          id: >-
+            Mulai dengan sambungan sama dengan nol. Sebaran pertama selesai di
+            lubang berisi, jadi sambungan menjadi satu. Sebaran kedua juga, jadi
+            sambungan menjadi dua. Sebaran ketiga selesai di lubang kosong, jadi
+            perulangan berhenti dan sambungan tetap dua. Rantaimu punya dua
+            sambungan.
+          en: >-
+            Start with links equal to zero. The first sowing ends in a filled
+            hole, so links becomes one. The second does too, so links becomes
+            two. The third ends in an empty hole, so the loop stops and links
+            stays at two. Your chain has two links.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau sebuah program memberimu angka nol padahal kamu yakin
+            kejadiannya ada, periksa di mana penghitungnya dimulai. Hampir selalu
+            ia dimulai di tempat yang salah, bukan menghitung dengan cara yang
+            salah.
+          en: >-
+            When a program reports zero and you are sure something happened,
+            check where the counter starts. It is nearly always started in the
+            wrong place rather than counting the wrong way.
+    check:
+      passMark: 0.7
+      weights: { algo.iteration: 0.7, algo.sequencing: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Sebuah penghitung rantai selalu berakhir di angka satu, padahal
+              rantainya jelas lebih panjang. Apa penyebab yang paling mungkin?
+            en: >-
+              A chain counter always ends at one, though the chain is clearly
+              longer. What is the likeliest cause?
+          options:
+            - id: Penghitungnya diatur ulang ke nol di dalam perulangan
+              en: The counter is reset to zero inside the loop
+            - id: Rantainya memang selalu sepanjang satu sambungan
+              en: The chain really is only ever one link long
+            - id: Perulangannya berhenti terlalu cepat
+              en: The loop stops too early
+          answer: 0
+          explain:
+            id: >-
+              Kalau perulangannya berhenti terlalu cepat, angkanya akan berbeda-
+              beda, bukan selalu satu. Hasil yang selalu sama persis menunjukkan
+              sesuatu yang terjadi setiap putaran, dan pengaturan ulang di dalam
+              perulangan tepat seperti itu.
+            en: >-
+              If the loop stopped early the number would vary, not always be one.
+              A result that is always exactly the same points to something
+              happening every pass, which is what an inside-the-loop reset is.
+        - kind: choice
+          prompt:
+            id: >-
+              Rantaimu menyambung tiga kali lalu berhenti di lubang kosong.
+              Berapa nilai akhir penghitung sambungan?
+            en: >-
+              Your chain links three times, then stops in an empty hole. What is
+              the final value of the link counter?
+          options:
+            - id: Tiga
+              en: Three
+            - id: Empat
+              en: Four
+            - id: Dua
+              en: Two
+          answer: 0
+          explain:
+            id: >-
+              Sebaran yang berhenti di lubang kosong mengakhiri rantai tanpa
+              menambah sambungan, karena tidak ada sebaran baru yang lahir
+              darinya. Menghitungnya sebagai sambungan adalah cara paling umum
+              kelebihan satu.
+            en: >-
+              A sowing that ends in an empty hole finishes the chain without
+              adding a link, because no new sowing is born from it. Counting it
+              as a link is the commonest way to be one too many.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Perulangan di Dalam Perulangan
+      en: A Loop Inside a Loop
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Bayangkan kamu ingin memeriksa seluruh papan untuk mencari lubang
+            yang isinya sama dengan jaraknya ke lumbung. Kamu memeriksa lubang
+            pertama, lalu kedua, sampai kelima. Itu satu perulangan. Sekarang
+            bayangkan kamu ingin melakukan itu untuk kedua sisi papan. Itu
+            perulangan di dalam perulangan.
+          en: >-
+            Suppose you want to scan the whole board for a hole whose contents
+            equal its distance to the store. You check the first hole, then the
+            second, up to the fifth. That is one loop. Now suppose you want to do
+            that for both sides of the board. That is a loop inside a loop.
+      - kind: text
+        text:
+          id: >-
+            Perulangan di dalam berjalan sampai selesai untuk setiap satu putaran
+            perulangan di luar. Dua sisi dikali lima lubang berarti sepuluh
+            pemeriksaan. Angkanya berkembang cepat: kalau kamu memeriksa
+            pasangan lubang, sepuluh lubang menjadi seratus pasangan, dan
+            perbedaan antara sepuluh dan seratus itu nyata ketika kamu
+            mengerjakannya dengan tangan.
+          en: >-
+            The inner loop runs to completion for each single pass of the outer
+            one. Two sides times five holes is ten checks. The numbers grow
+            quickly: if you check pairs of holes, ten holes becomes a hundred
+            pairs, and the difference between ten and a hundred is real when you
+            are doing it by hand.
+      - kind: example
+        text:
+          id: >-
+            Untuk setiap sisi papan, untuk setiap lubang di sisi itu, periksa
+            apakah isinya sama dengan jaraknya. Baca kalimat itu pelan-pelan.
+            Kata "untuk setiap" muncul dua kali, dan yang kedua selesai seluruhnya
+            sebelum yang pertama berpindah ke sisi berikutnya.
+          en: >-
+            For each side of the board, for each hole on that side, check whether
+            its contents equal its distance. Read that slowly. The words "for
+            each" appear twice, and the second finishes completely before the
+            first moves to the next side.
+    check:
+      passMark: 0.7
+      weights: { algo.iteration: 0.65, algo.sequencing: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Perulangan luar berjalan tiga kali dan perulangan dalam empat kali.
+              Berapa kali langkah terdalam dikerjakan?
+            en: >-
+              An outer loop runs three times and an inner loop four. How many
+              times does the innermost step run?
+          options:
+            - id: Tujuh kali
+              en: Seven times
+            - id: Dua belas kali
+              en: Twelve times
+            - id: Empat kali
+              en: Four times
+          answer: 1
+          explain:
+            id: >-
+              Perulangan dalam berjalan penuh untuk setiap satu putaran
+              perulangan luar, jadi jumlahnya dikalikan, bukan dijumlahkan.
+              Menjumlahkan keduanya adalah kesalahan yang membuat perkiraan
+              waktumu jauh terlalu kecil.
+            en: >-
+              The inner loop runs in full for each pass of the outer one, so the
+              counts multiply rather than add. Adding them is the mistake that
+              makes time estimates far too small.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa memeriksa setiap pasangan lubang jauh lebih mahal daripada
+              memeriksa setiap lubang?
+            en: >-
+              Why is checking every pair of holes far more expensive than
+              checking every hole?
+          options:
+            - id: Karena jumlah pasangan tumbuh jauh lebih cepat daripada jumlah lubang
+              en: Because the number of pairs grows far faster than the number of holes
+            - id: Karena memeriksa pasangan membutuhkan aturan yang lebih rumit
+              en: Because checking a pair needs a more complicated rule
+            - id: Karena pasangan harus diperiksa dua kali masing-masing
+              en: Because each pair must be checked twice
+          answer: 0
+          explain:
+            id: >-
+              Menambah satu lubang menambah satu pemeriksaan pada cara pertama,
+              tetapi menambah selusin pada cara kedua. Yang menentukan biaya
+              bukan rumitnya satu pemeriksaan, melainkan berapa banyak yang harus
+              dilakukan.
+            en: >-
+              Adding one hole adds one check the first way and adds a dozen the
+              second. What sets the cost is not how complicated one check is but
+              how many there are.
+
+  - id: l05
+    readingMinutes: 3
+    title:
+      id: Ketika Perulangan Tidak Berjalan Sama Sekali
+      en: When a Loop Runs Zero Times
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Perulangan yang berjalan nol kali terdengar seperti kesalahan, tetapi
+            sering kali justru jawaban yang benar. Kalau kamu memilih lubang yang
+            kosong, tidak ada biji untuk disebar, jadi tidak ada langkah yang
+            dikerjakan. Aturan yang baik menangani keadaan ini tanpa perlu aturan
+            tambahan.
+          en: >-
+            A loop that runs zero times sounds like a bug, but is often the right
+            answer. If you choose an empty hole there are no seeds to sow, so no
+            step runs. A good rule handles this without needing a special case.
+      - kind: text
+        text:
+          id: >-
+            Inilah kenapa pemeriksaan berhenti diletakkan di awal, bukan di
+            akhir. Perulangan yang memeriksa lebih dulu bisa berjalan nol kali
+            dengan wajar. Perulangan yang mengerjakan langkahnya dulu selalu
+            berjalan minimal sekali, dan pada lubang kosong ia akan mencoba
+            menjatuhkan biji yang tidak ada.
+          en: >-
+            This is why the stopping check goes at the start rather than the end.
+            A loop that checks first can naturally run zero times. A loop that
+            acts first always runs at least once, and on an empty hole it will
+            try to drop a seed that does not exist.
+      - kind: example
+        text:
+          id: >-
+            Lubang yang kamu pilih berisi nol biji. Periksa: apakah masih ada
+            biji di tangan? Tidak. Maka perulangan selesai tanpa mengerjakan apa
+            pun, dan papan tidak berubah sedikit pun. Tidak ada kesalahan, tidak
+            ada pengecualian, hanya perulangan yang berjalan nol kali.
+          en: >-
+            The hole you chose holds zero seeds. Check: are there seeds in hand?
+            No. So the loop finishes without doing anything and the board is
+            unchanged. No error, no special case, just a loop that ran zero times.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Ketika kamu menguji sesuatu, mulailah dari kasus yang paling kecil:
+            nol biji, satu biji, lubang kosong, papan yang hampir habis. Kesalahan
+            paling banyak bersembunyi di ujung-ujung seperti itu, bukan di tengah
+            yang biasa-biasa saja.
+          en: >-
+            When you test something, start with the smallest cases: zero seeds,
+            one seed, an empty hole, a nearly finished board. Most mistakes hide
+            at the edges, not in the ordinary middle.
+      - kind: gameLink
+        mission: congklak.m11
+        label:
+          id: Manfaatkan lubang kosong di misi Siapkan Lubang
+          en: Use an empty hole in Prepare the Pit
+    check:
+      passMark: 0.7
+      weights: { algo.sequencing: 0.7, algo.iteration: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa pemeriksaan berhenti sebaiknya diletakkan sebelum langkah
+              yang berulang, bukan sesudahnya?
+            en: >-
+              Why is the stopping check better placed before the repeated step
+              than after it?
+          options:
+            - id: Supaya perulangan bisa berjalan nol kali ketika memang tidak ada yang dikerjakan
+              en: So the loop can run zero times when there is nothing to do
+            - id: Supaya perulangan berjalan lebih cepat
+              en: So the loop runs faster
+            - id: Supaya penghitungnya lebih mudah dibaca
+              en: So the counter is easier to read
+          answer: 0
+          explain:
+            id: >-
+              Perulangan yang mengerjakan langkahnya dulu selalu berjalan minimal
+              sekali, dan pada masukan kosong itu berarti mengerjakan sesuatu yang
+              tidak ada bahannya. Letak pemeriksaan menentukan perilaku, bukan
+              kecepatan.
+            en: >-
+              A loop that acts first always runs at least once, and on empty
+              input that means acting on material that is not there. Where the
+              check sits decides behaviour, not speed.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa kasus yang paling kecil adalah tempat terbaik memulai
+              pengujian?
+            en: >-
+              Why are the smallest cases the best place to start testing?
+          options:
+            - id: Karena kasus kecil paling jarang terjadi dalam permainan nyata
+              en: Because small cases happen least often in real play
+            - id: Karena aturan sering ditulis dengan membayangkan kasus yang biasa saja
+              en: Because rules are usually written imagining the ordinary case
+            - id: Karena kasus kecil lebih cepat dikerjakan
+              en: Because small cases are quicker to work through
+          answer: 1
+          explain:
+            id: >-
+              Penulis aturan membayangkan lubang berisi beberapa biji, bukan
+              lubang kosong, sehingga bagian yang tidak terpikirkan berkumpul di
+              ujung. Kecepatan mengerjakannya hanya keuntungan tambahan.
+            en: >-
+              Whoever writes a rule pictures a hole with a few seeds in it, not an
+              empty one, so the unconsidered parts collect at the edges. Being
+              quick to work through is only a bonus.

@@ -1,0 +1,635 @@
+id: algo.choices
+domain: algorithms
+contentVersion: 1
+entitlement: free
+prerequisites: [algo.steps]
+skillNodes: [algo.state-eval, algo.greedy, algo.lookahead]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: subject-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Memilih Langkah Terbaik
+  en: Choosing the Best Move
+summary:
+  id: >-
+    Lubang yang paling penuh hampir selalu terlihat paling menggoda, dan cukup
+    sering menjadi langkah yang salah. Kursus ini tentang menilai posisi,
+    tentang godaan mengambil yang terbesar, dan tentang melihat satu langkah
+    lebih jauh.
+  en: >-
+    The fullest hole almost always looks the most tempting, and often enough it
+    is the wrong move. This course is about judging a position, about the pull
+    of taking the biggest thing, and about looking one move further.
+
+lessons:
+  - id: l01
+    readingMinutes: 4
+    title:
+      id: Membaca Posisi, Bukan Hanya Langkah
+      en: Reading a Position, Not Just a Move
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Sebelum memilih langkah, pemain yang baik bertanya sesuatu yang lebih
+            dulu: seberapa bagus posisiku sekarang? Pertanyaan itu terdengar
+            kabur sampai kamu memecahnya. Berapa isi lumbungku dibanding lawan?
+            Berapa banyak lubangku yang terbuka untuk ditembak? Apakah ada lubang
+            yang jaraknya pas ke lumbung?
+          en: >-
+            Before choosing a move, good players ask something prior: how good is
+            my position right now? That sounds vague until you break it apart.
+            How does my store compare with theirs? How many of my holes are open
+            to capture? Is any hole exactly the right distance from the store?
+      - kind: text
+        text:
+          id: >-
+            Setiap pertanyaan itu punya jawaban berupa angka, dan angka-angka itu
+            bisa digabung menjadi satu penilaian. Posisi dengan selisih lumbung
+            plus tiga, tanpa lubang terbuka, dan satu lubang yang pas ke lumbung
+            adalah posisi yang bagus. Posisi dengan selisih nol, tiga lubang
+            terbuka, dan tidak ada yang pas adalah posisi yang buruk, meskipun
+            jumlah bijimu sama.
+          en: >-
+            Each of those questions has a numeric answer, and the numbers combine
+            into one judgement. A position with a store lead of three, no exposed
+            holes, and one hole that fits the store is a good position. One with
+            no lead, three exposed holes, and nothing that fits is a bad one, even
+            with the same number of seeds.
+      - kind: example
+        text:
+          id: >-
+            Dua posisi, sama-sama dua belas biji di lumbungmu. Di posisi pertama,
+            lawan punya sepuluh dan barisanmu rapat. Di posisi kedua, lawan punya
+            sepuluh tetapi kamu punya lubang berisi delapan yang seberangnya
+            kosong. Posisi kedua terlihat sama di lumbung dan jauh lebih buruk di
+            papan, karena delapan biji itu bisa hilang dalam satu langkah.
+          en: >-
+            Two positions, both with twelve seeds in your store. In the first,
+            your opponent has ten and your row is tight. In the second they have
+            ten but you hold a hole of eight whose opposite is empty. The second
+            looks equal in the store and is far worse on the board, because those
+            eight seeds can vanish in one move.
+        caption:
+          id: Angka lumbung yang sama tidak berarti posisi yang sama.
+          en: The same store count does not mean the same position.
+      - kind: text
+        text:
+          id: >-
+            Menilai posisi adalah apa yang dilakukan lawan mesin di permainan ini
+            sebelum setiap langkahnya. Ia tidak menebak. Ia memberi angka pada
+            setiap posisi yang mungkin dan memilih yang angkanya paling tinggi.
+            Kalau kamu tahu apa yang ia hitung, kamu bisa memperkirakan apa yang
+            akan ia lakukan.
+          en: >-
+            Judging a position is what the machine opponent in this game does
+            before every move. It does not guess. It scores every reachable
+            position and picks the highest. If you know what it counts, you can
+            predict what it will do.
+      - kind: gameLink
+        mission: congklak.m13
+        label:
+          id: Jaga posisimu di misi Jangan Tertembak
+          en: Hold your position in Stay Covered
+    check:
+      passMark: 0.7
+      weights: { algo.state-eval: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Dua posisi punya jumlah biji lumbung yang sama. Apa yang paling
+              berguna untuk membedakan mana yang lebih baik?
+            en: >-
+              Two positions have the same store count. What is most useful for
+              telling which is better?
+          options:
+            - id: Berapa lubangmu yang terbuka untuk ditembak lawan
+              en: How many of your holes are open to capture
+            - id: Berapa jumlah seluruh biji di papan
+              en: How many seeds are on the board in total
+            - id: Sudah berapa giliran berjalan
+              en: How many turns have been played
+          answer: 0
+          explain:
+            id: >-
+              Isi lumbung sudah aman dan tidak bisa direbut, sedangkan biji di
+              papan masih bisa berpindah. Yang membedakan dua posisi dengan
+              lumbung sama adalah seberapa besar yang masih bisa hilang.
+            en: >-
+              What is in a store is safe and cannot be taken, while seeds on the
+              board can still move. What separates two positions with equal
+              stores is how much can still be lost.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa mengetahui apa yang dihitung lawan mesin berguna bagimu?
+            en: >-
+              Why does knowing what the machine opponent counts help you?
+          options:
+            - id: Karena kamu bisa memperkirakan langkahnya dan bersiap
+              en: Because you can predict its move and prepare
+            - id: Karena kamu bisa mengubah cara ia menghitung
+              en: Because you can change how it counts
+            - id: Karena ia akan berhenti menghitung kalau kamu tahu
+              en: Because it stops counting once you know
+          answer: 0
+          explain:
+            id: >-
+              Lawan yang menghitung dengan cara yang tetap akan selalu memilih
+              langkah yang sama pada posisi yang sama. Ketetapan itu bisa
+              diramalkan, dan yang bisa diramalkan bisa dipancing.
+            en: >-
+              An opponent that scores in a fixed way always makes the same move
+              in the same position. That consistency can be predicted, and what
+              can be predicted can be baited.
+
+  - id: l02
+    readingMinutes: 4
+    title:
+      id: Godaan Mengambil yang Terbesar
+      en: The Pull of Taking the Biggest
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Ada satu cara memilih yang paling mudah dijelaskan dan paling sering
+            dipakai orang tanpa sadar: ambil yang paling banyak sekarang. Lubang
+            mana yang paling penuh? Ambil itu. Tembakan mana yang paling besar?
+            Ambil itu. Cara ini punya nama dalam ilmu komputer, yaitu cara
+            serakah, dan ia berhasil jauh lebih sering daripada yang kamu duga.
+          en: >-
+            There is one way of choosing that is easiest to explain and that most
+            people use without noticing: take the most available now. Which hole
+            is fullest? Take it. Which capture is biggest? Take it. This has a
+            name in computing, the greedy method, and it works far more often
+            than you would expect.
+      - kind: text
+        text:
+          id: >-
+            Tetapi tidak selalu. Cara serakah hanya melihat langkah sekarang, dan
+            di congklak langkah sekarang mengubah apa yang bisa dilakukan lawan
+            berikutnya. Mengosongkan lubang yang paling penuh berarti menyebar
+            biji ke seluruh papan, termasuk ke barisan lawan, dan kadang justru
+            memberi mereka sebaran yang mereka butuhkan.
+          en: >-
+            But not always. The greedy method looks only at the move in front of
+            it, and in congklak the move in front of you changes what your
+            opponent can do next. Emptying the fullest hole spreads seeds across
+            the whole board, including into their row, and sometimes hands them
+            exactly the sowing they needed.
+      - kind: example
+        text:
+          id: >-
+            Lubang paling penuh di barisanmu berisi sembilan biji. Kamu ambil,
+            dan sembilan biji itu tersebar, empat di antaranya masuk ke barisan
+            lawan. Sekarang salah satu lubang mereka berisi tepat sejauh jaraknya
+            ke lumbung, dan mereka dapat giliran tambahan. Kamu mendapat empat
+            biji; mereka mendapat dua giliran.
+          en: >-
+            The fullest hole in your row holds nine seeds. You take it, and those
+            nine spread out, four of them landing in your opponent's row. Now one
+            of their holes sits exactly its own distance from their store, and
+            they get an extra turn. You gained four seeds; they gained two turns.
+        caption:
+          id: Langkah terbesar sekarang, kerugian terbesar sesudahnya.
+          en: The biggest move now, the biggest loss after it.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Cara serakah tidak salah; ia hanya buta terhadap akibat. Kalau
+            akibatnya kecil, cara serakah cepat dan cukup baik. Kalau akibatnya
+            besar, cara serakah adalah cara tercepat kalah dengan yakin.
+          en: >-
+            The greedy method is not wrong; it is blind to consequences. When
+            consequences are small it is fast and good enough. When they are
+            large it is the quickest way to lose with confidence.
+      - kind: gameLink
+        mission: congklak.m15
+        label:
+          id: Rasakan jebakannya di misi Jangan Serakah
+          en: Feel the trap in Do Not Be Greedy
+    check:
+      passMark: 0.7
+      weights: { algo.greedy: 0.8, algo.state-eval: 0.2 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Apa arti memilih dengan cara serakah?
+            en: >-
+              What does choosing greedily mean?
+          options:
+            - id: Memilih langkah yang memberi paling banyak sekarang, tanpa melihat akibatnya
+              en: Picking the move that gives most now, without looking at what follows
+            - id: Memilih langkah yang merugikan lawan sebanyak mungkin
+              en: Picking the move that harms the opponent most
+            - id: Memilih langkah tanpa berpikir sama sekali
+              en: Picking a move without thinking at all
+          answer: 0
+          explain:
+            id: >-
+              Cara serakah tetap berpikir dan tetap membandingkan pilihan; yang
+              tidak dilakukannya adalah melihat apa yang terjadi setelah
+              langkahnya. Menyamakannya dengan asal pilih membuat kelemahan
+              sebenarnya jadi tidak terlihat.
+            en: >-
+              The greedy method does think and does compare options; what it does
+              not do is look at what happens after its move. Equating it with
+              picking at random hides where the real weakness is.
+        - kind: choice
+          prompt:
+            id: >-
+              Kapan cara serakah adalah pilihan yang masuk akal?
+            en: >-
+              When is the greedy method a sensible choice?
+          options:
+            - id: Ketika langkahmu hampir tidak mengubah pilihan lawan berikutnya
+              en: When your move barely changes what your opponent can do next
+            - id: Ketika kamu sedang tertinggal jauh
+              en: When you are far behind
+            - id: Tidak pernah, karena selalu ada langkah yang lebih baik
+              en: Never, because there is always a better move
+          answer: 0
+          explain:
+            id: >-
+              Yang membuat cara serakah gagal adalah akibat yang tidak
+              diperhitungkannya. Kalau akibatnya memang kecil, tidak ada yang
+              hilang, dan cara serakah jauh lebih cepat daripada memeriksa semua
+              kemungkinan.
+            en: >-
+              What makes the greedy method fail is the consequence it ignores. If
+              the consequence really is small, nothing is lost, and it is far
+              faster than examining every possibility.
+        - kind: choice
+          prompt:
+            id: >-
+              Mengambil lubang paling penuh memberimu enam biji, tetapi memberi
+              lawan dua giliran tambahan. Bagaimana kamu menilainya?
+            en: >-
+              Taking the fullest hole gains you six seeds but hands your opponent
+              two extra turns. How do you judge it?
+          options:
+            - id: Bagus, karena enam biji adalah keuntungan yang pasti
+              en: Good, because six seeds is a certain gain
+            - id: Tergantung berapa yang bisa mereka kumpulkan dalam dua giliran itu
+              en: It depends how much they can collect in those two turns
+            - id: Buruk, karena memberi giliran kepada lawan selalu salah
+              en: Bad, because giving your opponent turns is always wrong
+          answer: 1
+          explain:
+            id: >-
+              Menilai sebuah langkah berarti membandingkan yang kamu dapat dengan
+              yang mereka dapat, bukan melihat salah satunya saja. Enam biji bisa
+              jadi murah atau mahal, dan yang menentukan adalah apa yang terjadi
+              di dua giliran itu.
+            en: >-
+              Judging a move means comparing what you gain against what they
+              gain, not looking at one side alone. Six seeds may be cheap or
+              expensive, and what settles it is what happens in those two turns.
+
+  - id: l03
+    readingMinutes: 4
+    title:
+      id: Melihat Satu Langkah Lebih Jauh
+      en: Looking One Move Further
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Obat untuk kebutaan cara serakah sederhana untuk dikatakan dan mahal
+            untuk dikerjakan: sebelum memilih, bayangkan papan setelah langkahmu,
+            lalu bayangkan langkah terbaik lawan dari sana. Nilai langkahmu bukan
+            dari posisi sesudah kamu bergerak, melainkan dari posisi sesudah
+            mereka membalas.
+          en: >-
+            The cure for greedy blindness is simple to state and expensive to do:
+            before choosing, picture the board after your move, then picture your
+            opponent's best reply from there. Judge your move not by the position
+            after you move, but by the position after they answer.
+      - kind: text
+        text:
+          id: >-
+            Perhatikan kata "terbaik" di situ. Membayangkan lawan melakukan
+            langkah yang buruk tidak ada gunanya, karena mereka tidak akan
+            melakukannya. Kamu harus membayangkan langkah terbaik mereka, bahkan
+            ketika itu langkah yang paling tidak kamu sukai. Menilai dengan
+            mengandaikan lawan ceroboh adalah cara paling halus untuk menipu diri
+            sendiri.
+          en: >-
+            Note the word "best" there. Imagining your opponent playing badly is
+            useless, because they will not. You must imagine their best reply,
+            even when it is the one you least want. Judging on the assumption that
+            your opponent is careless is the subtlest way to fool yourself.
+      - kind: example
+        text:
+          id: >-
+            Langkah A memberimu tiga biji, dan setelah balasan terbaik lawan kamu
+            unggul satu. Langkah B memberimu enam biji, dan setelah balasan
+            terbaik lawan kamu tertinggal dua. Langkah A lebih baik, meskipun
+            angka langsungnya setengah dari langkah B. Yang dibandingkan adalah
+            posisi setelah dua langkah, bukan setelah satu.
+          en: >-
+            Move A gains three seeds, and after their best reply you are one
+            ahead. Move B gains six, and after their best reply you are two
+            behind. A is the better move, though its immediate number is half of
+            B's. What is compared is the position after two moves, not one.
+        caption:
+          id: Tiga mengalahkan enam, karena yang dihitung adalah sesudahnya.
+          en: Three beats six, because what counts is what comes after.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kamu tidak perlu memeriksa semua langkah sedalam ini. Pilih dua atau
+            tiga yang paling menjanjikan, lalu periksa hanya yang itu. Melihat ke
+            depan itu mahal, jadi belanjakan hanya di tempat yang mungkin
+            mengubah pilihanmu.
+          en: >-
+            You do not need to examine every move this deeply. Pick the two or
+            three most promising, and look only at those. Looking ahead is
+            expensive, so spend it only where it might change your choice.
+      - kind: gameLink
+        mission: congklak.m17
+        label:
+          id: Bandingkan dua langkah di misi Dua Pilihan
+          en: Compare two moves in Two Options
+    check:
+      passMark: 0.7
+      weights: { algo.lookahead: 0.75, algo.state-eval: 0.25 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa kamu harus membayangkan langkah terbaik lawan, bukan langkah
+              yang paling mungkin mereka lewatkan?
+            en: >-
+              Why must you imagine your opponent's best reply rather than one you
+              hope they miss?
+          options:
+            - id: Karena kalau mereka menemukannya, penilaianmu berdasarkan sesuatu yang tidak terjadi
+              en: Because if they find it, your judgement rested on something that did not happen
+            - id: Karena langkah terbaik selalu lebih mudah dibayangkan
+              en: Because the best reply is always easier to imagine
+            - id: Karena aturan mengharuskan lawan bermain sebaik mungkin
+              en: Because the rules require opponents to play their best
+          answer: 0
+          explain:
+            id: >-
+              Penilaian yang bergantung pada kesalahan lawan hanya benar selama
+              lawan keliru. Menghitung balasan terbaik memberimu angka yang tetap
+              berlaku ketika mereka bermain bagus, yaitu saat kamu paling
+              membutuhkannya.
+            en: >-
+              A judgement that depends on an opponent's mistake is only right
+              while they keep making it. Costing their best reply gives you a
+              number that still holds when they play well, which is when you need
+              it most.
+        - kind: choice
+          prompt:
+            id: >-
+              Langkah A menghasilkan dua biji dan posisi aman. Langkah B
+              menghasilkan tujuh biji dan membuka lubang berisi sembilan untuk
+              ditembak. Mana yang lebih baik?
+            en: >-
+              Move A gains two seeds and a safe position. Move B gains seven and
+              exposes a hole of nine to capture. Which is better?
+          options:
+            - id: Langkah A, karena kehilangan sembilan lebih besar daripada selisih lima
+              en: Move A, because losing nine outweighs the five-seed difference
+            - id: Langkah B, karena tujuh lebih banyak daripada dua
+              en: Move B, because seven is more than two
+            - id: Keduanya sama karena sama-sama menambah biji
+              en: They are equal because both add seeds
+          answer: 0
+          explain:
+            id: >-
+              Selisih langsungnya lima biji, sedangkan yang dipertaruhkan
+              sembilan. Membandingkan hanya angka yang didapat, tanpa angka yang
+              bisa hilang, adalah bentuk kebutaan yang sama dengan cara serakah.
+            en: >-
+              The immediate difference is five seeds while nine are at risk.
+              Comparing only what is gained, without what can be lost, is the
+              same blindness as the greedy method.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Ketika Melihat ke Depan Terlalu Mahal
+      en: When Looking Ahead Costs Too Much
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Kalau melihat satu langkah ke depan lebih baik, kenapa tidak dua,
+            atau lima, atau semuanya sampai akhir permainan? Karena jumlah
+            kemungkinan berlipat setiap langkah. Lima pilihanmu dikali lima
+            balasan lawan adalah dua puluh lima posisi. Satu langkah lagi menjadi
+            seratus dua puluh lima. Enam langkah sudah lebih dari lima belas
+            ribu.
+          en: >-
+            If looking one move ahead is better, why not two, or five, or all the
+            way to the end? Because the possibilities multiply at every step.
+            Your five options times their five replies is twenty-five positions.
+            One more move is a hundred and twenty-five. Six moves is over fifteen
+            thousand.
+      - kind: text
+        text:
+          id: >-
+            Karena itu pemain sungguhan, dan program sungguhan, melihat ke depan
+            hanya sedikit dan menutupi sisanya dengan penilaian posisi. Dua
+            langkah ke depan lalu nilai posisinya jauh lebih murah daripada
+            sepuluh langkah, dan pada praktiknya hampir sama baiknya.
+          en: >-
+            So real players, and real programs, look ahead only a little and
+            cover the rest with position judgement. Two moves ahead then score
+            the position is far cheaper than ten, and in practice nearly as good.
+      - kind: example
+        text:
+          id: >-
+            Lawan mesin di tingkat mudah hanya menilai posisi setelah langkahnya
+            sendiri. Di tingkat sedang ia melihat balasanmu juga. Di tingkat sulit
+            ia melihat balasanmu dan balasannya lagi. Setiap tingkat lebih mahal,
+            dan perbedaan antara tingkat sedang dan sulit terasa jauh lebih besar
+            daripada antara mudah dan sedang.
+          en: >-
+            The machine opponent on easy only scores the position after its own
+            move. On medium it sees your reply as well. On hard it sees your reply
+            and its answer to that. Each level costs more, and the gap between
+            medium and hard feels far larger than between easy and medium.
+    check:
+      passMark: 0.7
+      weights: { algo.lookahead: 0.65, algo.greedy: 0.35 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kalau setiap posisi punya lima langkah yang mungkin, berapa posisi
+              yang harus diperiksa untuk melihat tiga langkah ke depan?
+            en: >-
+              If every position has five possible moves, how many positions must
+              you examine to look three moves ahead?
+          options:
+            - id: Lima belas
+              en: Fifteen
+            - id: Seratus dua puluh lima
+              en: One hundred and twenty-five
+            - id: Delapan
+              en: Eight
+          answer: 1
+          explain:
+            id: >-
+              Setiap langkah mengalikan jumlah posisi dengan lima, bukan
+              menambahnya. Menjumlahkan tiga kali lima adalah kesalahan yang
+              membuat biaya melihat ke depan terlihat jauh lebih murah daripada
+              kenyataannya.
+            en: >-
+              Each move multiplies the count by five rather than adding to it.
+              Adding five three times is the mistake that makes looking ahead
+              seem far cheaper than it is.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa program yang kuat tetap memakai penilaian posisi meskipun
+              bisa melihat ke depan?
+            en: >-
+              Why do strong programs still use position judgement even though
+              they can look ahead?
+          options:
+            - id: Karena melihat sampai akhir permainan terlalu mahal, jadi sisanya harus dinilai
+              en: Because looking to the end of the game is too expensive, so the rest must be judged
+            - id: Karena penilaian posisi selalu lebih tepat daripada melihat ke depan
+              en: Because position judgement is always more accurate than looking ahead
+            - id: Karena melihat ke depan hanya boleh dipakai di akhir permainan
+              en: Because looking ahead is only allowed near the end
+          answer: 0
+          explain:
+            id: >-
+              Penilaian posisi adalah cara berhenti melihat ke depan tanpa
+              kehilangan seluruh informasi. Ia kurang tepat daripada melihat
+              sampai akhir, tetapi melihat sampai akhir bukan pilihan yang
+              tersedia.
+            en: >-
+              Position judgement is how you stop looking ahead without losing all
+              the information. It is less accurate than searching to the end, but
+              searching to the end is not an option that exists.
+
+  - id: l05
+    readingMinutes: 3
+    title:
+      id: Menyiapkan Langkah Sebelum Dibutuhkan
+      en: Setting Up a Move Before You Need It
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Beberapa langkah terbaik di congklak tidak terlihat bagus sama sekali
+            ketika dimainkan. Mengosongkan lubang tidak memberimu biji dan tidak
+            merugikan lawan. Tetapi giliran berikutnya lubang kosong itu adalah
+            tempat kamu menembak, dan tembakan itu hanya mungkin karena langkah
+            yang kelihatan sia-sia tadi.
+          en: >-
+            Some of the best congklak moves look like nothing at all when played.
+            Emptying a hole gains you no seeds and costs your opponent nothing.
+            But next turn that empty hole is where you capture, and the capture is
+            only possible because of the move that looked wasted.
+      - kind: text
+        text:
+          id: >-
+            Langkah persiapan sulit dinilai karena nilainya ada di masa depan.
+            Cara serakah selalu menolaknya, karena angka langsungnya nol. Melihat
+            satu langkah ke depan menemukannya, karena posisi setelah dua langkah
+            jauh lebih baik daripada posisi setelah satu.
+          en: >-
+            Preparation moves are hard to judge because their value lies in the
+            future. The greedy method always refuses them, because the immediate
+            number is zero. Looking one move ahead finds them, because the
+            position after two moves is much better than after one.
+      - kind: example
+        text:
+          id: >-
+            Lubang ketigamu berisi satu biji, dan seberangnya berisi delapan.
+            Kamu sebar satu biji itu, mengosongkan lubang ketiga. Kelihatannya
+            tidak terjadi apa-apa. Giliran berikutnya kamu sebar dari lubang yang
+            biji terakhirnya mendarat tepat di lubang ketiga yang kosong itu, dan
+            delapan biji lawan berpindah ke lumbungmu.
+          en: >-
+            Your third hole holds one seed, and the hole opposite holds eight. You
+            sow that single seed, emptying the third. Apparently nothing happened.
+            Next turn you sow from a hole whose last seed lands exactly in that
+            empty third, and eight of your opponent's seeds move into your store.
+        caption:
+          id: Langkah yang tidak menghasilkan apa-apa, lalu delapan biji.
+          en: A move that gained nothing, then eight seeds.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau kamu menyiapkan sesuatu, lawan punya satu giliran untuk
+            merusaknya. Persiapan yang baik adalah persiapan yang tidak terlihat
+            seperti persiapan, atau yang tetap berguna kalau rencananya gagal.
+          en: >-
+            When you prepare something, your opponent has one turn to spoil it.
+            Good preparation either does not look like preparation, or is still
+            useful when the plan fails.
+      - kind: gameLink
+        mission: congklak.m11
+        label:
+          id: Siapkan tembakanmu di misi Siapkan Lubang
+          en: Set up your capture in Prepare the Pit
+    check:
+      passMark: 0.7
+      weights: { algo.lookahead: 0.7, algo.greedy: 0.3 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa cara serakah tidak pernah memilih langkah persiapan?
+            en: >-
+              Why does the greedy method never choose a preparation move?
+          options:
+            - id: Karena keuntungan langsungnya nol, dan hanya itu yang dilihatnya
+              en: Because its immediate gain is zero, and that is all it looks at
+            - id: Karena langkah persiapan melanggar aturan permainan
+              en: Because preparation moves break the rules of the game
+            - id: Karena langkah persiapan terlalu sulit dihitung
+              en: Because preparation moves are too hard to calculate
+          answer: 0
+          explain:
+            id: >-
+              Nilai persiapan seluruhnya ada di giliran berikutnya, dan cara
+              serakah tidak pernah sampai ke sana. Kesulitan menghitung bukan
+              masalahnya; ia bahkan tidak mencoba.
+            en: >-
+              A preparation move's value is entirely in the following turn, and
+              the greedy method never gets there. Difficulty is not the issue; it
+              does not even try.
+        - kind: choice
+          prompt:
+            id: >-
+              Apa risiko terbesar dari langkah persiapan?
+            en: >-
+              What is the biggest risk of a preparation move?
+          options:
+            - id: Lawan punya satu giliran untuk merusak rencanamu
+              en: Your opponent has one turn to spoil the plan
+            - id: Kamu bisa lupa apa yang kamu siapkan
+              en: You might forget what you were preparing
+            - id: Persiapan selalu memberi biji kepada lawan
+              en: Preparation always gives seeds to your opponent
+          answer: 0
+          explain:
+            id: >-
+              Rencana dua langkah melewati giliran lawan, dan apa pun yang
+              melewati giliran lawan bisa dibatalkan oleh mereka. Karena itu
+              persiapan yang tetap berguna kalau gagal jauh lebih berharga
+              daripada yang tidak.
+            en: >-
+              A two-move plan passes through your opponent's turn, and anything
+              that does can be undone by them. This is why preparation that stays
+              useful when it fails is worth much more than preparation that does
+              not.

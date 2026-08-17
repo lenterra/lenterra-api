@@ -1,0 +1,475 @@
+id: algo.search
+domain: algorithms
+contentVersion: 1
+entitlement: free
+prerequisites: [algo.choices]
+skillNodes: [algo.optimization]
+author: pedagogy-lead
+review:
+  pedagogy: { by: teacher-reviewer, on: "2026-08-17" }
+  factual: { by: subject-reviewer, on: "2026-08-17" }
+  language: { by: language-reviewer, on: "2026-08-17" }
+
+title:
+  id: Mencari yang Optimal
+  en: Searching for the Best
+summary:
+  id: >-
+    Menemukan langkah yang bagus itu mudah. Membuktikan bahwa tidak ada yang
+    lebih bagus adalah pekerjaan yang berbeda, dan biasanya jauh lebih mahal.
+    Kursus ini tentang selisih antara keduanya.
+  en: >-
+    Finding a good move is easy. Proving no better one exists is a different
+    job, and usually a much more expensive one. This course is about the gap
+    between the two.
+
+lessons:
+  - id: l01
+    readingMinutes: 3
+    title:
+      id: Bagus, Lebih Bagus, dan Paling Bagus
+      en: Good, Better, and Best
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Kamu menemukan langkah yang memberimu lima biji. Bagus. Tetapi
+            apakah itu langkah terbaik? Untuk menjawabnya kamu harus tahu apa
+            yang dihasilkan setiap langkah lain, dan itu berarti memeriksa
+            semuanya, bukan berhenti begitu menemukan yang memuaskan.
+          en: >-
+            You find a move that gains five seeds. Good. But is it the best move?
+            To answer that you must know what every other move gains, which means
+            examining all of them rather than stopping at the first satisfying
+            one.
+      - kind: text
+        text:
+          id: >-
+            Ini perbedaan yang sering dikaburkan. Mencari sesuatu yang cukup
+            baik berhenti begitu ketemu. Mencari yang terbaik tidak bisa berhenti
+            sampai semuanya diperiksa, karena yang belum diperiksa mungkin lebih
+            baik. Yang pertama cepat dan tidak pasti; yang kedua lambat dan
+            pasti.
+          en: >-
+            This is a distinction that often gets blurred. Searching for
+            something good enough stops as soon as it is found. Searching for the
+            best cannot stop until everything has been examined, because the
+            unexamined might be better. The first is fast and uncertain; the
+            second is slow and certain.
+      - kind: example
+        text:
+          id: >-
+            Barisanmu punya lima lubang, jadi ada lima langkah yang mungkin. Kamu
+            memeriksa lubang pertama dan mendapat tiga biji. Lubang kedua
+            memberi lima. Kamu berhenti dan memainkannya. Tetapi lubang keempat
+            akan memberi delapan, dan kamu tidak akan pernah tahu, karena kamu
+            berhenti terlalu cepat.
+          en: >-
+            Your row has five holes, so there are five possible moves. You check
+            the first and it gains three seeds. The second gains five. You stop
+            and play it. But the fourth would have gained eight, and you will
+            never know, because you stopped too early.
+        caption:
+          id: Berhenti di yang memuaskan berarti tidak pernah tahu apa yang dilewatkan.
+          en: Stopping at good enough means never knowing what you passed over.
+      - kind: text
+        text:
+          id: >-
+            Menemukan yang terbaik dari sekumpulan pilihan disebut optimasi.
+            Kuncinya sederhana: simpan yang terbaik sejauh ini, bandingkan setiap
+            calon baru dengannya, dan ganti kalau lebih baik. Di akhir pemeriksaan
+            yang tersimpan adalah yang terbaik, dan kamu tahu itu karena tidak ada
+            yang belum dibandingkan.
+          en: >-
+            Finding the best from a set of options is called optimisation. The
+            method is simple: keep the best so far, compare each new candidate to
+            it, and replace it when the candidate is better. At the end what you
+            hold is the best, and you know it because nothing was left
+            uncompared.
+      - kind: gameLink
+        mission: congklak.m18
+        label:
+          id: Cari yang terbaik di misi Langkah Terbaik
+          en: Search for it in The Best Move
+    check:
+      passMark: 0.7
+      weights: { algo.optimization: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa mencari yang terbaik tidak bisa berhenti di tengah jalan?
+            en: >-
+              Why can a search for the best not stop partway?
+          options:
+            - id: Karena pilihan yang belum diperiksa mungkin lebih baik dari yang sudah
+              en: Because an unexamined option might be better than any so far
+            - id: Karena pilihan terbaik biasanya ada di urutan terakhir
+              en: Because the best option is usually last in the list
+            - id: Karena berhenti di tengah melanggar aturan permainan
+              en: Because stopping partway breaks the rules of the game
+          answer: 0
+          explain:
+            id: >-
+              Keyakinan bahwa sesuatu adalah yang terbaik datang seluruhnya dari
+              tidak ada yang tersisa untuk dibandingkan. Letak pilihan terbaik di
+              dalam daftar tidak bisa diketahui sebelum daftarnya habis
+              diperiksa.
+            en: >-
+              Confidence that something is best comes entirely from having nothing
+              left to compare it against. Where the best option sits in the list
+              cannot be known before the list has been worked through.
+        - kind: order
+          prompt:
+            id: >-
+              Susun langkah mencari pilihan terbaik dari sebuah daftar.
+            en: >-
+              Put the steps of finding the best option in a list into order.
+          fragments:
+            - id: Bandingkan calon berikutnya dengan yang tersimpan
+              en: Compare the next candidate against the one you hold
+            - id: Simpan pilihan pertama sebagai yang terbaik sejauh ini
+              en: Keep the first option as the best so far
+            - id: Ganti yang tersimpan kalau calonnya lebih baik
+              en: Replace what you hold if the candidate is better
+          answer: [1, 0, 2]
+          explain:
+            id: >-
+              Tanpa sesuatu yang tersimpan lebih dulu, tidak ada yang bisa
+              dibandingkan, jadi langkah membandingkan tidak mungkin didahulukan.
+              Ini pola yang sama dengan menjaga jumlah berjalan, hanya saja yang
+              disimpan adalah yang terbaik, bukan totalnya.
+            en: >-
+              With nothing held first there is nothing to compare against, so
+              comparing cannot come first. This is the same shape as keeping a
+              running total, except that what is kept is the best rather than the
+              sum.
+
+  - id: l02
+    readingMinutes: 3
+    title:
+      id: Membandingkan Berdasarkan Apa
+      en: Comparing on What
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Sebelum bisa mencari yang terbaik, kamu harus tahu apa artinya lebih
+            baik. Terdengar sepele, tetapi ini bagian yang paling sering
+            terlewat. Langkah dengan biji terbanyak? Langkah dengan risiko
+            terkecil? Langkah yang memberi giliran tambahan? Ketiganya masuk
+            akal, dan ketiganya bisa menunjuk ke langkah yang berbeda.
+          en: >-
+            Before you can search for the best, you must know what better means.
+            It sounds obvious, and it is the part most often skipped. The move
+            with the most seeds? The lowest risk? The one granting an extra turn?
+            All three are reasonable, and all three can point at different moves.
+      - kind: text
+        text:
+          id: >-
+            Karena itu ukuran harus dipilih dulu dan disebutkan jelas. Kalau
+            ukurannya berubah di tengah pencarian, hasilnya tidak berarti apa-apa:
+            kamu membandingkan sebagian pilihan dengan satu ukuran dan sisanya
+            dengan ukuran lain. Itu bukan pencarian, melainkan campuran dari dua
+            pencarian yang tidak selesai.
+          en: >-
+            So the measure must be chosen first and stated plainly. If it changes
+            partway through a search the result means nothing: you compared some
+            options by one measure and the rest by another. That is not a search
+            but a mixture of two unfinished ones.
+      - kind: example
+        text:
+          id: >-
+            Kalau ukuranmu adalah biji terbanyak, langkah yang memberi delapan
+            biji menang. Kalau ukuranmu adalah selisih setelah balasan lawan,
+            langkah yang memberi tiga biji bisa saja menang, karena delapan biji
+            tadi membuka lubang yang langsung ditembak balik.
+          en: >-
+            If your measure is most seeds, the move gaining eight wins. If your
+            measure is the lead after your opponent's reply, the move gaining
+            three can win, because those eight seeds opened a hole that is
+            captured straight back.
+      - kind: callout
+        tone: tip
+        text:
+          id: >-
+            Kalau dua orang berdebat tentang langkah mana yang terbaik dan tidak
+            ada yang mengalah, sering kali mereka memakai ukuran yang berbeda
+            tanpa menyadarinya. Menyebutkan ukuran masing-masing biasanya
+            mengakhiri perdebatan lebih cepat daripada mengulangi alasan.
+          en: >-
+            When two people argue about the best move and neither gives ground,
+            they are often using different measures without realising. Naming
+            each measure usually ends the argument faster than repeating the
+            reasons.
+    check:
+      passMark: 0.7
+      weights: { algo.optimization: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa ukuran "lebih baik" harus ditetapkan sebelum pencarian
+              dimulai?
+            en: >-
+              Why must the measure of "better" be fixed before a search begins?
+          options:
+            - id: Karena mengubahnya di tengah membuat perbandingannya tidak setara
+              en: Because changing it partway makes the comparisons unequal
+            - id: Karena ukuran tidak boleh diubah setelah permainan dimulai
+              en: Because a measure may not be changed once a game has started
+            - id: Karena hanya ada satu ukuran yang benar
+              en: Because there is only one correct measure
+          answer: 0
+          explain:
+            id: >-
+              Ada banyak ukuran yang sama-sama masuk akal, dan memilih salah
+              satunya bukan kesalahan. Yang menghasilkan jawaban tak berarti
+              adalah menilai sebagian pilihan dengan ukuran yang berbeda dari
+              sisanya.
+            en: >-
+              Many measures are equally reasonable, and choosing one is not a
+              mistake. What produces a meaningless answer is judging some options
+              by a different measure from the rest.
+        - kind: choice
+          prompt:
+            id: >-
+              Dua pemain tidak setuju tentang langkah terbaik dan keduanya
+              menghitung dengan benar. Apa yang paling mungkin?
+            en: >-
+              Two players disagree about the best move and both calculate
+              correctly. What is most likely?
+          options:
+            - id: Mereka memakai ukuran yang berbeda tentang apa itu lebih baik
+              en: They are using different measures of what better means
+            - id: Salah satu pasti keliru menghitung
+              en: One of them must have miscalculated
+            - id: Tidak ada langkah terbaik pada posisi itu
+              en: There is no best move in that position
+          answer: 0
+          explain:
+            id: >-
+              Hitungan yang benar dengan ukuran berbeda memang seharusnya
+              menghasilkan jawaban berbeda. Mencari kesalahan hitung di situ akan
+              memakan waktu tanpa menemukan apa-apa.
+            en: >-
+              Correct calculations under different measures should produce
+              different answers. Hunting for an arithmetic error there costs time
+              and finds nothing.
+
+  - id: l03
+    readingMinutes: 4
+    title:
+      id: Berhenti Memeriksa Cabang yang Sudah Kalah
+      en: Abandoning a Branch That Has Already Lost
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Memeriksa semua kemungkinan itu mahal, tetapi ada satu cara menghemat
+            yang tidak mengurangi kepastian sama sekali. Kalau kamu sudah tahu
+            sebuah cabang tidak mungkin menang, kamu boleh berhenti memeriksanya,
+            dan hasil akhirnya tetap sama persis.
+          en: >-
+            Examining every possibility is expensive, but there is one saving
+            that costs no certainty at all. If you already know a branch cannot
+            win, you may stop examining it, and the final answer is exactly the
+            same.
+      - kind: text
+        text:
+          id: >-
+            Contohnya begini. Langkah terbaik yang sudah kamu temukan memberi
+            enam biji. Sekarang kamu memeriksa langkah lain, dan setelah balasan
+            pertama lawan, langkah itu sudah hanya menyisakan dua biji bagimu,
+            dan lawan masih bisa membalas lagi. Kamu tidak perlu memeriksa
+            sisanya. Cabang itu sudah kalah dari enam, dan memeriksa lebih dalam
+            hanya bisa membuatnya lebih buruk.
+          en: >-
+            It works like this. The best move you have found gains six seeds. Now
+            you examine another, and after your opponent's first reply it already
+            leaves you only two, with further replies still to come. You need not
+            examine the rest. That branch has already lost to six, and going
+            deeper can only make it worse.
+      - kind: example
+        text:
+          id: >-
+            Lima langkah untuk diperiksa. Yang pertama memberi enam. Yang kedua
+            sudah turun ke dua setelah satu balasan, jadi dibuang. Yang ketiga
+            memberi tujuh, jadi menjadi yang terbaik. Yang keempat sudah turun ke
+            empat, dibuang. Yang kelima memberi tiga. Jawabannya adalah yang
+            ketiga, dan kamu hanya memeriksa penuh tiga dari lima.
+          en: >-
+            Five moves to examine. The first gains six. The second is already down
+            to two after one reply, so it is dropped. The third gains seven, so it
+            becomes the best. The fourth is already down to four, dropped. The
+            fifth gains three. The answer is the third, and you fully examined
+            only three of the five.
+        caption:
+          id: Jawaban yang sama persis, dengan pekerjaan yang jauh lebih sedikit.
+          en: Exactly the same answer, for far less work.
+      - kind: callout
+        tone: warning
+        text:
+          id: >-
+            Cara ini hanya aman kalau kamu yakin cabangnya benar-benar tidak bisa
+            membaik. Membuang cabang karena terlihat kurang menjanjikan itu
+            berbeda, dan bisa membuatmu melewatkan jawaban terbaik. Yang pertama
+            menghemat tanpa biaya; yang kedua menukar kepastian dengan kecepatan.
+          en: >-
+            This is only safe when you are sure the branch truly cannot improve.
+            Dropping a branch because it looks unpromising is a different thing,
+            and can make you miss the best answer. The first saves work for free;
+            the second trades certainty for speed.
+    check:
+      passMark: 0.7
+      weights: { algo.optimization: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kapan kamu boleh berhenti memeriksa sebuah cabang tanpa kehilangan
+              kepastian?
+            en: >-
+              When may you abandon a branch without losing certainty?
+          options:
+            - id: Ketika cabang itu sudah pasti tidak bisa melampaui yang terbaik sejauh ini
+              en: When the branch already cannot beat the best found so far
+            - id: Ketika cabang itu terlihat kurang menjanjikan
+              en: When the branch looks unpromising
+            - id: Ketika kamu sudah memeriksa separuh dari seluruh cabang
+              en: When you have examined half of all branches
+          answer: 0
+          explain:
+            id: >-
+              Kepastian bertahan hanya kalau yang dibuang memang tidak mungkin
+              menjadi jawaban. Membuang berdasarkan penampilan adalah tebakan,
+              dan tebakan yang salah menghapus jawaban terbaik tanpa jejak.
+            en: >-
+              Certainty survives only if what you drop genuinely cannot be the
+              answer. Dropping on appearance is a guess, and a wrong guess erases
+              the best answer without a trace.
+        - kind: choice
+          prompt:
+            id: >-
+              Kenapa membuang cabang yang sudah kalah tidak mengubah jawaban
+              akhir?
+            en: >-
+              Why does dropping a losing branch not change the final answer?
+          options:
+            - id: Karena jawaban akhir hanya bisa datang dari cabang yang masih bisa menang
+              en: Because the final answer can only come from a branch that can still win
+            - id: Karena cabang yang dibuang biasanya jarang terjadi
+              en: Because dropped branches rarely occur in real play
+            - id: Karena jawaban akhir selalu ditemukan di cabang pertama
+              en: Because the answer is always found in the first branch
+          answer: 0
+          explain:
+            id: >-
+              Yang dicari adalah yang terbaik, jadi cabang yang sudah pasti
+              kalah tidak bisa menjadi jawaban apa pun isinya. Seberapa sering ia
+              terjadi tidak ada hubungannya.
+            en: >-
+              What is sought is the best, so a branch already certain to lose
+              cannot be the answer whatever it contains. How often it occurs is
+              beside the point.
+
+  - id: l04
+    readingMinutes: 3
+    title:
+      id: Cukup Baik Sudah Cukup
+      en: When Good Enough Is Enough
+    blocks:
+      - kind: text
+        text:
+          id: >-
+            Setelah semua ini, ada kesimpulan yang mungkin mengejutkan: sering
+            kali kamu tidak boleh mencari yang terbaik. Kalau memeriksa semuanya
+            butuh sepuluh menit dan permainannya butuh lima, mencari yang terbaik
+            berarti kalah karena waktu habis, meskipun langkahmu benar.
+          en: >-
+            After all that, there is a conclusion that may surprise: often you
+            should not search for the best. If examining everything takes ten
+            minutes and the game allows five, searching for the best means losing
+            on time with the right move in hand.
+      - kind: text
+        text:
+          id: >-
+            Jadi pertanyaan yang sebenarnya bukan "apa langkah terbaik", melainkan
+            "seberapa banyak usaha yang pantas untuk keputusan ini". Keputusan
+            besar layak dicari sampai tuntas. Keputusan kecil layak diselesaikan
+            dengan langkah pertama yang masuk akal, dan waktunya disimpan untuk
+            keputusan yang besar.
+          en: >-
+            So the real question is not "what is the best move" but "how much
+            effort does this decision deserve". Big decisions are worth searching
+            out fully. Small ones deserve the first reasonable answer, with the
+            time saved for the big ones.
+      - kind: callout
+        tone: culture
+        text:
+          id: >-
+            Dalam permainan congklak di kampung, orang jarang berpikir lama untuk
+            satu langkah, dan permainannya tetap tajam. Bukan karena mereka tidak
+            berhitung, melainkan karena pengalaman memberi tahu langkah mana yang
+            layak dipikirkan lama dan mana yang tidak.
+          en: >-
+            In village congklak nobody thinks long about a single move, and the
+            play is still sharp. Not because they are not calculating, but
+            because experience tells them which moves deserve long thought and
+            which do not.
+      - kind: gameLink
+        mission: congklak.m20
+        label:
+          id: Uji penilaianmu di misi Juara Papan
+          en: Test your judgement in Board Champion
+    check:
+      passMark: 0.7
+      weights: { algo.optimization: 1.0 }
+      items:
+        - kind: choice
+          prompt:
+            id: >-
+              Kapan mencari langkah terbaik justru merugikan?
+            en: >-
+              When does searching for the best move actually cost you?
+          options:
+            - id: Ketika biaya pencariannya lebih besar daripada selisih hasilnya
+              en: When the search costs more than the difference in outcome is worth
+            - id: Ketika kamu sedang unggul
+              en: When you are ahead
+            - id: Ketika lawan bermain lebih cepat darimu
+              en: When your opponent plays faster than you
+          answer: 0
+          explain:
+            id: >-
+              Pencarian punya harga, dan harga itu dibandingkan dengan seberapa
+              besar bedanya jawaban terbaik dengan jawaban yang cukup baik. Kalau
+              bedanya satu biji dan harganya satu giliran, pencariannya rugi.
+            en: >-
+              A search has a price, and that price is weighed against how much
+              better the best answer is than a good enough one. If the difference
+              is one seed and the price is one turn, the search loses money.
+        - kind: choice
+          prompt:
+            id: >-
+              Bagaimana pemain berpengalaman memutuskan langkah mana yang layak
+              dipikirkan lama?
+            en: >-
+              How do experienced players decide which moves deserve long thought?
+          options:
+            - id: Dengan mengenali posisi di mana pilihan yang berbeda berakibat sangat berbeda
+              en: By recognising positions where different choices lead to very different results
+            - id: Dengan berpikir lama pada setiap langkah tanpa kecuali
+              en: By thinking long about every move without exception
+            - id: Dengan mengikuti giliran keberapa permainan sedang berjalan
+              en: By following which turn number the game is on
+          answer: 0
+          explain:
+            id: >-
+              Usaha berpikir dibelanjakan di tempat yang akibatnya besar, bukan
+              dibagi rata. Posisi di mana semua langkah berujung sama tidak
+              membutuhkan pemikiran lama sekalipun terlihat rumit.
+            en: >-
+              Thinking is spent where the consequences are large, not shared out
+              evenly. A position where every move leads to the same place needs no
+              long thought however complicated it looks.
