@@ -6,11 +6,15 @@
  * harmful product (10-03).
  */
 
+import { checkCertificate, type NodeEvidence, type SkillNodeId } from '@lenterra/core';
+
 import { conflict, forbidden, invalidArgument, notFound } from '../lib/errors';
 import { optionalString, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
 import { Q } from '../db/queries';
 import { balance } from '../domain/ledger';
 import { loadProfile } from '../domain/profile';
+import { readMastery } from '../domain/mastery';
+import { CERTIFICATES, type CertificateEvidence } from '../domain/certificates';
 
 // ---------------------------------------------------------------------------
 // Points
@@ -123,7 +127,7 @@ export function certificateList(c: Ctx) {
     id: string;
     definition_id: string;
     issued_ms: number;
-    evidence: { nodes?: string[]; attempts?: number; periodDays?: number };
+    evidence: CertificateEvidence | null;
     onchain_status: string;
     public_verifiable: boolean;
   }[];
@@ -131,24 +135,88 @@ export function certificateList(c: Ctx) {
   const earned = [];
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i] as (typeof rows)[number];
-    const evidence = row.evidence ?? {};
+    const evidence = row.evidence;
+
+    // Read from the stored snapshot rather than recomputed. A certificate has
+    // to keep saying what it said when it was issued, even after mastery has
+    // moved on (PRD-RWD-013) — recomputing would quietly restate the claim.
+    const nodes: string[] = [];
+    if (evidence) {
+      for (let n = 0; n < evidence.nodes.length; n++) {
+        nodes.push((evidence.nodes[n] as { skillNodeId: string }).skillNodeId);
+      }
+    }
+
     earned.push({
       id: row.id,
       definitionId: row.definition_id,
       issuedAt: toIso(Number(row.issued_ms)),
       evidenceSummary: {
-        nodes: evidence.nodes ?? [],
-        attempts: evidence.attempts ?? 0,
-        periodDays: evidence.periodDays ?? 0,
+        nodes,
+        attempts: evidence ? evidence.totalValidatedAttempts : 0,
+        periodDays: evidence ? daysBetween(evidence.earliestEvidenceMs, evidence.latestEvidenceMs) : 0,
       },
-      // A certificate is meaningful off-chain from the day it is issued.
-      // On-chain anchoring is an R3 addition, not a precondition (ADR-009).
+      // Meaningful off-chain from the day it is issued. On-chain anchoring is
+      // an R3 addition, not a precondition (ADR-009).
       verifiable: true,
       publicVerifiable: row.public_verifiable,
     });
   }
 
-  return { earned, progress: [] };
+  // --- what is left to earn ------------------------------------------------
+  // An empty certificates tab that says only "none yet" tells a student
+  // nothing about how to change that (PRD-APP-055). This is the same predicate
+  // that issues them, read for its refusals instead of its verdict.
+  const held: Record<string, boolean> = {};
+  for (let i = 0; i < earned.length; i++) {
+    held[(earned[i] as { definitionId: string }).definitionId] = true;
+  }
+
+  const snapshot = readMastery(c, c.userId);
+  const progress = [];
+
+  for (let i = 0; i < CERTIFICATES.length; i++) {
+    const definition = CERTIFICATES[i] as (typeof CERTIFICATES)[number];
+    if (held[definition.id]) continue;
+
+    const evidence: Partial<Record<SkillNodeId, NodeEvidence>> = {};
+    for (let n = 0; n < definition.requiredNodes.length; n++) {
+      const node = definition.requiredNodes[n] as SkillNodeId;
+      const state = snapshot.state[node];
+      if (!state) continue;
+      evidence[node] = {
+        mastery: state.value,
+        evidenceCount: state.evidenceCount,
+        distinctSources: state.distinctSources,
+        // Not queried here: the day spread costs a query per certificate and
+        // this is a "what is left" list, not the issuing decision. Assuming it
+        // holds means the list never blames a student for a condition they
+        // cannot see, and issuance still checks it for real.
+        distinctDays: definition.minDistinctDays,
+      };
+    }
+
+    const check = checkCertificate(definition, evidence);
+    const remaining = [];
+    for (let b = 0; b < check.blockedBy.length; b++) {
+      const blocker = check.blockedBy[b] as { skillNodeId: string; reason: string };
+      remaining.push({ skillNodeId: blocker.skillNodeId, reason: blocker.reason });
+    }
+
+    progress.push({
+      definitionId: definition.id,
+      requiredNodes: definition.requiredNodes,
+      nodesRemaining: remaining.length,
+      remaining,
+    });
+  }
+
+  return { earned, progress };
+}
+
+function daysBetween(fromMs: number, toMs: number): number {
+  if (fromMs <= 0 || toMs <= 0) return 0;
+  return Math.max(1, Math.round((toMs - fromMs) / 86_400_000));
 }
 
 export interface CertificateVisibilityReq {
