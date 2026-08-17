@@ -13,6 +13,20 @@ import { Q } from '../db/queries';
 
 export type Role = 'student' | 'teacher' | 'school_admin' | 'staff';
 
+/**
+ * What the student is wearing.
+ *
+ * Each slot holds a redeemed item id or null. Resolving an id to a colour or a
+ * word is the client's job, against the catalogue it already has — the server
+ * stores the choice, not its rendering, so a restyle is a content change rather
+ * than a migration.
+ */
+export interface Equipped {
+  avatarColor: string | null;
+  boardSkin: string | null;
+  title: string | null;
+}
+
 export interface Profile {
   userId: string;
   role: Role;
@@ -24,6 +38,7 @@ export interface Profile {
   onboarded: boolean;
   /** False for a class-code account that has not yet added an email. */
   hasWallet: boolean;
+  equipped: Equipped;
 }
 
 export function loadProfile(c: Ctx, userId?: string): Profile {
@@ -40,6 +55,9 @@ export function loadProfile(c: Ctx, userId?: string): Profile {
     auth_strategy: string;
     onboarded: boolean;
     has_wallet: boolean;
+    equipped_avatar_color: string | null;
+    equipped_board_skin: string | null;
+    equipped_title: string | null;
   };
 
   return {
@@ -52,6 +70,14 @@ export function loadProfile(c: Ctx, userId?: string): Profile {
     authStrategy: row.auth_strategy,
     onboarded: row.onboarded,
     hasWallet: row.has_wallet === true,
+    equipped: {
+      // `?? null` rather than a bare read: a profile row written before 0010
+      // has no such property at all under goja, and `undefined` would serialise
+      // the field out of the response instead of sending an empty slot.
+      avatarColor: row.equipped_avatar_color ?? null,
+      boardSkin: row.equipped_board_skin ?? null,
+      title: row.equipped_title ?? null,
+    },
   };
 }
 

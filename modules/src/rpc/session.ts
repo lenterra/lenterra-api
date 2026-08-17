@@ -58,6 +58,15 @@ export interface BootstrapRes {
      * the thirty-day window was a promise the product could not keep.
      */
     deletionScheduledFor: string | null;
+    /**
+     * What this student is wearing, as redeemed item ids.
+     *
+     * Sent on the bootstrap rather than fetched by the shop, because the avatar
+     * and the board are drawn on screens a student reaches without ever opening
+     * the shop — and a colour that only appears after visiting a shop tab is a
+     * colour that looks broken.
+     */
+    equipped: { avatarColor: string | null; boardSkin: string | null; title: string | null };
   };
   class: { id: string; name: string; leaderboardEnabled: boolean } | null;
   entitlements: string[];
@@ -109,6 +118,7 @@ export function sessionBootstrap(c: Ctx, req: BootstrapReq): BootstrapRes {
       authStrategy: profile.authStrategy,
       hasWallet: profile.hasWallet,
       deletionScheduledFor,
+      equipped: profile.equipped,
     },
     class: klass,
     entitlements,

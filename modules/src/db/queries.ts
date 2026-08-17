@@ -25,7 +25,8 @@ export const Q = {
   profileByUser: `
     SELECT p.user_id, p.role, p.display_name, p.friend_code, p.school_id, p.locale,
            p.auth_strategy, p.onboarded_at IS NOT NULL AS onboarded,
-           p.wallet_address IS NOT NULL AS has_wallet
+           p.wallet_address IS NOT NULL AS has_wallet,
+           p.equipped_avatar_color, p.equipped_board_skin, p.equipped_title
     FROM lenterra_account_profile p
     WHERE p.user_id = $1`,
 
@@ -677,6 +678,58 @@ export const Q = {
   /** What this student already owns, so the shop does not offer it twice. */
   redemptionsForUser: `
     SELECT item_id FROM lenterra_redemption WHERE user_id = $1 ORDER BY created_at`,
+
+  // --- what is being worn --------------------------------------------------
+
+  /**
+   * One statement per slot, rather than one with a column chosen at runtime.
+   *
+   * The alternative is interpolating a column name, which is the one place in
+   * this file where a string would reach SQL unparameterised. Three named
+   * constants cost three lines and remove the question entirely.
+   *
+   * `$2` is the redeemed item id, or NULL to take the item off. The ownership
+   * check happens in the handler; this statement trusts its caller, in the same
+   * way every other write here does.
+   */
+  equipAvatarColor: `
+    UPDATE lenterra_account_profile
+    SET equipped_avatar_color = $2, updated_at = now()
+    WHERE user_id = $1
+    RETURNING equipped_avatar_color, equipped_board_skin, equipped_title`,
+
+  equipBoardSkin: `
+    UPDATE lenterra_account_profile
+    SET equipped_board_skin = $2, updated_at = now()
+    WHERE user_id = $1
+    RETURNING equipped_avatar_color, equipped_board_skin, equipped_title`,
+
+  equipTitle: `
+    UPDATE lenterra_account_profile
+    SET equipped_title = $2, updated_at = now()
+    WHERE user_id = $1
+    RETURNING equipped_avatar_color, equipped_board_skin, equipped_title`,
+
+  /**
+   * What a set of students are wearing, for a board or a roster.
+   *
+   * Board skins are deliberately not selected: a skin is what *you* see on your
+   * own board, and shipping other people's to every client would be a payload
+   * that no screen reads.
+   */
+  equippedForUsers: `
+    SELECT user_id, equipped_avatar_color, equipped_title
+    FROM lenterra_account_profile
+    WHERE user_id = ANY($1::uuid[])`,
+
+  /** Take off anything the student no longer owns. Used after a reversal. */
+  unequipItem: `
+    UPDATE lenterra_account_profile
+    SET equipped_avatar_color = NULLIF(equipped_avatar_color, $2),
+        equipped_board_skin   = NULLIF(equipped_board_skin, $2),
+        equipped_title        = NULLIF(equipped_title, $2),
+        updated_at            = now()
+    WHERE user_id = $1`,
 
   // --- certificates --------------------------------------------------------
 

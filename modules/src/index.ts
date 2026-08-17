@@ -36,6 +36,7 @@ import {
   leaderboardList,
   classGoalGet,
   pointsHistory,
+  rewardEquip,
   rewardRedeem,
 } from './rpc/social';
 import {
@@ -130,6 +131,7 @@ function InitModule(
   // --- rpc: rewards and social -------------------------------------------
   initializer.registerRpc('v1.points.history', rpc('v1.points.history', pointsHistory));
   initializer.registerRpc('v1.reward.redeem', rpc('v1.reward.redeem', rewardRedeem));
+  initializer.registerRpc('v1.reward.equip', rpc('v1.reward.equip', rewardEquip));
   initializer.registerRpc('v1.certificate.list', rpc('v1.certificate.list', certificateList));
   initializer.registerRpc(
     'v1.certificate.visibility',

@@ -414,6 +414,62 @@ describe('constraints', () => {
     assert.notEqual(rows[0].removed_at, null);
   });
 
+  test('what a student wears survives a catalogue that stops offering it', async (t) => {
+    if (!available) return t.skip('no database');
+
+    // The equipped columns hold a redeemed item id and nothing joins them to a
+    // catalogue, deliberately. A republish that drops an item must leave the
+    // row alone — the client resolves the id and renders nothing when it no
+    // longer exists, which is a student losing a colour rather than a student
+    // whose profile will not load.
+    const userId = await newUser();
+    await client.query(
+      `INSERT INTO lenterra_account_profile
+         (user_id, role, display_name, friend_code, wallet_address, auth_strategy)
+       VALUES ($1,'student','Rina',$2,$3,'class_code')`,
+      [userId, `FC${randomUUID().slice(0, 6)}`, `0x${randomUUID().replace(/-/g, '')}`],
+    );
+
+    await client.query(
+      `UPDATE lenterra_account_profile
+       SET equipped_avatar_color = 'avatar.color.laut',
+           equipped_title        = 'title.pemikir'
+       WHERE user_id = $1`,
+      [userId],
+    );
+
+    const { rows } = await client.query(
+      `SELECT equipped_avatar_color, equipped_board_skin, equipped_title
+       FROM lenterra_account_profile WHERE user_id = $1`,
+      [userId],
+    );
+
+    assert.equal(rows[0].equipped_avatar_color, 'avatar.color.laut');
+    assert.equal(rows[0].equipped_title, 'title.pemikir');
+    assert.equal(rows[0].equipped_board_skin, null, 'an untouched slot stays empty');
+  });
+
+  test('deleting an account takes what it was wearing with it', async (t) => {
+    if (!available) return t.skip('no database');
+
+    const userId = await newUser();
+    await client.query(
+      `INSERT INTO lenterra_account_profile
+         (user_id, role, display_name, friend_code, wallet_address, auth_strategy,
+          equipped_title)
+       VALUES ($1,'student','Rina',$2,$3,'class_code','title.rajin')`,
+      [userId, `FC${randomUUID().slice(0, 6)}`, `0x${randomUUID().replace(/-/g, '')}`],
+    );
+
+    await client.query('DELETE FROM users WHERE id = $1', [userId]);
+
+    const { rows } = await client.query(
+      'SELECT 1 FROM lenterra_account_profile WHERE user_id = $1',
+      [userId],
+    );
+    assert.equal(rows.length, 0);
+  });
+
   test('the class heatmap query runs on the intended indexes', async (t) => {
     if (!available) return t.skip('no database');
 

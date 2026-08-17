@@ -119,20 +119,98 @@ export function rewardRedeem(c: Ctx, req: RedeemReq) {
   return { itemId, newBalance: balance(c, c.userId) };
 }
 
-function catalogItem(c: Ctx, itemId: string): { cost: number } {
+interface CatalogItem {
+  cost: number;
+  kind: string;
+  value: string;
+}
+
+function catalogItem(c: Ctx, itemId: string): CatalogItem {
   const rows = c.nk.sqlQuery(Q.currentCatalog, []);
   if (rows.length === 0) throw notFound('No catalog published');
   const version = (rows[0] as { version: string }).version;
 
   const parts = c.nk.sqlQuery(Q.catalogPull, [version, ['rewards.catalog']]) as {
-    body: Record<string, { cost: number }>;
+    body: Record<string, CatalogItem>;
   }[];
   if (parts.length === 0) throw notFound('No reward catalogue published');
 
-  const body = (parts[0] as { body: Record<string, { cost: number }> }).body ?? {};
+  const body = (parts[0] as { body: Record<string, CatalogItem> }).body ?? {};
   const item = body[itemId];
   if (!item || typeof item.cost !== 'number') throw notFound('Unknown reward');
   return item;
+}
+
+// ---------------------------------------------------------------------------
+// v1.reward.equip
+// ---------------------------------------------------------------------------
+
+export interface EquipReq {
+  /** Which slot. Must match the item's own kind. */
+  kind: string;
+  /** A redeemed item id, or null to take the slot off. */
+  itemId?: string | null;
+}
+
+/**
+ * Wear something already owned, or take it off.
+ *
+ * Redeeming and wearing are separate on purpose. A student who owns four
+ * colours wears one, and switching between them must not cost points a second
+ * time — so this handler never touches the ledger, and calling it repeatedly is
+ * free and idempotent.
+ *
+ * Two checks stand between a request and a slot, and they are different
+ * questions. Ownership is asked of `lenterra_redemption`, which is the record
+ * of what was paid for. Kind is asked of the catalogue, because an item id
+ * carries no type and a client that could put `title.pemikir` in the colour
+ * slot would render a word where a hex value is expected on every classmate's
+ * board.
+ */
+export function rewardEquip(c: Ctx, req: EquipReq) {
+  const kind = requireString(req.kind, 'kind', 32);
+
+  const statement =
+    kind === 'avatar_color'
+      ? Q.equipAvatarColor
+      : kind === 'board_skin'
+        ? Q.equipBoardSkin
+        : kind === 'title'
+          ? Q.equipTitle
+          : null;
+  if (statement === null) {
+    throw invalidArgument('kind must be avatar_color, board_skin, or title');
+  }
+
+  const itemId = optionalString(req.itemId, 'itemId', 128);
+
+  if (itemId !== null) {
+    if (c.nk.sqlQuery(Q.redemptionExists, [c.userId, itemId]).length === 0) {
+      throw forbidden('You do not own that');
+    }
+    // Read after the ownership check, so an unowned id cannot be used to ask
+    // whether an item exists in the catalogue.
+    const item = catalogItem(c, itemId);
+    if (item.kind !== kind) {
+      throw invalidArgument('That item cannot go in that slot');
+    }
+  }
+
+  const rows = c.nk.sqlQuery(statement, [c.userId, itemId]) as {
+    equipped_avatar_color: string | null;
+    equipped_board_skin: string | null;
+    equipped_title: string | null;
+  }[];
+  if (rows.length === 0) throw notFound('Profile not found');
+
+  const row = rows[0] as (typeof rows)[number];
+  return {
+    equipped: {
+      avatarColor: row.equipped_avatar_color ?? null,
+      boardSkin: row.equipped_board_skin ?? null,
+      title: row.equipped_title ?? null,
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -297,16 +375,32 @@ export function leaderboardList(c: Ctx, req: LeaderboardReq) {
     return { scope, period, generatedAt: toIso(c.now), entries: [], self: null, cursor: null };
   }
 
-  const entries = [];
   const list = records.records ?? [];
+
+  // What everybody on this page is wearing, in one query rather than one per
+  // row. A board of 25 is 25 round trips otherwise, and the leaderboard is the
+  // most-refreshed screen in the app.
+  const owners = [];
+  for (let i = 0; i < list.length; i++) {
+    owners.push((list[i] as nkruntime.LeaderboardRecord).ownerId);
+  }
+  const worn = wornBy(c, owners);
+
+  const entries = [];
   for (let i = 0; i < list.length; i++) {
     const record = list[i] as nkruntime.LeaderboardRecord;
+    const own = worn[record.ownerId];
     entries.push({
       rank: Number(record.rank),
       userId: record.ownerId,
       displayName: record.username ?? 'Siswa',
       points: Number(record.score),
       isSelf: record.ownerId === c.userId,
+      // A cosmetic a classmate bought is only worth buying if a classmate can
+      // see it. Null where nothing is worn, so the client keeps its own default
+      // rather than being handed one.
+      avatarColor: own ? own.avatarColor : null,
+      title: own ? own.title : null,
     });
   }
 
@@ -319,6 +413,36 @@ export function leaderboardList(c: Ctx, req: LeaderboardReq) {
     self: null,
     cursor: records.nextCursor ?? null,
   };
+}
+
+/**
+ * What a set of students are wearing, keyed by user id.
+ *
+ * Returns an empty map for an empty list rather than issuing `= ANY('{}')`,
+ * which is a valid query with a guaranteed-empty result — a round trip to learn
+ * something already known.
+ */
+export function wornBy(
+  c: Ctx,
+  userIds: string[],
+): Record<string, { avatarColor: string | null; title: string | null }> {
+  const worn: Record<string, { avatarColor: string | null; title: string | null }> = {};
+  if (userIds.length === 0) return worn;
+
+  const rows = c.nk.sqlQuery(Q.equippedForUsers, [userIds]) as {
+    user_id: string;
+    equipped_avatar_color: string | null;
+    equipped_title: string | null;
+  }[];
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i] as (typeof rows)[number];
+    worn[row.user_id] = {
+      avatarColor: row.equipped_avatar_color ?? null,
+      title: row.equipped_title ?? null,
+    };
+  }
+  return worn;
 }
 
 // ---------------------------------------------------------------------------
