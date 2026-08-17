@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 
 import {
   answerHashFor,
+  canonicalJson,
   gradeAgainstKey,
   gradeLocally,
+  sha256,
   validateCourseSet,
   hasErrors,
 } from '../dist/index.js';
@@ -202,4 +204,30 @@ test('a gameLink to a mission that does not exist is an error', () => {
   });
   const issues = validateCourseSet(input as never);
   assert.ok(issues.some((issue) => issue.message.indexOf('congklak.m99') >= 0));
+});
+
+// ---------------------------------------------------------------------------
+// The answer-hash separator
+// ---------------------------------------------------------------------------
+
+test('the field separator is a NUL, and stays one', () => {
+  // It was a *raw* NUL byte in the source, which made the file read as binary
+  // to grep and to diff tools and — the part that matters — put it one editor,
+  // one copy-paste, or one encoding normalisation away from being silently
+  // dropped. If that happened, every published `answerHash` would stop matching
+  // what the device computes, and every check a student submitted would come
+  // back wrong with nothing to explain why.
+  //
+  // Pinned as a value rather than as a property of the source, so the escape
+  // cannot be "tidied" into a space by someone who does not know what it is for.
+  const separator = String.fromCharCode(0);
+  const expected = sha256(`chk${separator}item${separator}${canonicalJson('x')}`);
+
+  assert.equal(answerHashFor('chk', 'item', 'x'), expected);
+});
+
+test('ids that would run together still hash differently', () => {
+  // Without a separator, check `a1` item `b` and check `a` item `1b` produce
+  // the same digest — so one item's answer would grade another item correct.
+  assert.notEqual(answerHashFor('a1', 'b', 'x'), answerHashFor('a', '1b', 'x'));
 });

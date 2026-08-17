@@ -152,7 +152,38 @@ export const congklakEngine: GameEngine<CongklakState, CongklakMove> = {
   },
 };
 
-export * from './state';
-export * from './moves';
-export * from './outcome';
-export * from './ai';
+// Named rather than `export *`, for the same reason the package barrel is:
+// what leaves this module is a decision, and the wildcard compiles to
+// `__exportStar` helpers that cannot run under a CJS consumer and therefore
+// counted forever as uncovered branches.
+export {
+  DEFAULT_PITS_PER_SIDE,
+  DEFAULT_SEEDS_PER_PIT,
+  pitsPerSide,
+  storeOf,
+  isStore,
+  rowOf,
+  ownsPit,
+  oppositePit,
+  seedsInRow,
+  scoreOf,
+  otherSide,
+  sideIndex,
+  cloneState,
+  standardBoard,
+} from './state';
+export type { CongklakState } from './state';
+
+export {
+  MAX_CHAIN_LINKS,
+  legalMoves,
+  isLegal,
+  applyMove,
+  finishGame,
+  hasExposedPit,
+  greedyPit,
+} from './moves';
+export type { CongklakMove } from './moves';
+
+export { evaluateGoal } from './outcome';
+export { evaluate, aiMove, rankMove } from './ai';

@@ -220,7 +220,35 @@ export function unitFreshness(state: BentengState, unitId: string): number | nul
   return unit ? freshnessOf(state, unit) : null;
 }
 
-export * from './state';
-export * from './moves';
-export * from './outcome';
-export * from './ai';
+// Named rather than `export *`, for the same reason the package barrel is:
+// what leaves this module is a decision, and the wildcard compiles to
+// `__exportStar` helpers that cannot run under a CJS consumer and therefore
+// counted forever as uncovered branches.
+export {
+  otherTeam,
+  teamIndex,
+  baseOf,
+  freshnessOf,
+  unitAt,
+  unitById,
+  activeUnits,
+  inBounds,
+  isCapturable,
+  manhattan,
+  cloneState,
+} from './state';
+export type { Team, Pos, BentengUnit, BentengBase, BentengState } from './state';
+
+export {
+  legalMoves,
+  isLegal,
+  legalityOf,
+  applyMove,
+  advanceTurn,
+  gridIndex,
+  currentExposure,
+} from './moves';
+export type { BentengMove, FreshnessRejection } from './moves';
+
+export { evaluateGoal, playerStrength } from './outcome';
+export { evaluate, aiMove, rankMove } from './ai';

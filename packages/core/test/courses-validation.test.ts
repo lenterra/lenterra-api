@@ -431,3 +431,75 @@ test('an example caption is checked when present', () => {
   });
   assert.ok(has(input, 'strings'));
 });
+
+test('a block kind nothing knows how to render is caught', () => {
+  // Skipping it would render as a blank space in a lesson and the author would
+  // be told nothing — a mistake that survives review because it looks like a
+  // styling problem.
+  const input = fixture();
+  (input.lessons[0] as Lesson).blocks = [
+    { kind: 'text', textKey: 'x.body' },
+    { kind: 'hologram', textKey: 'x.body' } as never,
+  ];
+  assert.ok(has(input, 'schema'));
+});
+
+test('a gameLink into a mission that does not exist is caught', () => {
+  // The link renders, the student taps it, and nothing is there. Checked here
+  // because the mission ladder and the courses are authored separately and
+  // renumbering one does not touch the other.
+  const input = fixture();
+  (input.lessons[0] as Lesson).blocks.push({
+    kind: 'gameLink',
+    missionId: 'congklak.m99',
+    labelKey: 'x.title',
+  });
+  assert.ok(has(input, 'node_references'));
+});
+
+test('a check with too few or too many items is caught', () => {
+  // Too few is not a check; too many is a lesson that stops being a check and
+  // starts being an exam, in a product whose whole premise is short sessions on
+  // a borrowed phone.
+  const few = fixture();
+  (few.lessons[0] as Lesson).check!.items = [];
+  assert.ok(has(few, 'schema'));
+
+  const many = fixture();
+  const item = (many.lessons[0] as Lesson).check!.items[0]!;
+  (many.lessons[0] as Lesson).check!.items = new Array(30).fill(null).map((_, i) => ({
+    ...item,
+    id: `q${i}`,
+  }));
+  assert.ok(has(many, 'schema'));
+});
+
+test('an item kind nothing knows how to grade is caught', () => {
+  const input = fixture();
+  (input.lessons[0] as Lesson).check!.items[0] = {
+    ...(input.lessons[0] as Lesson).check!.items[0]!,
+    kind: 'essay' as never,
+  };
+  assert.ok(has(input, 'schema'));
+});
+
+test('a course that overruns a single session is flagged', () => {
+  // A warning rather than an error: 25 minutes is the target a student plans
+  // their borrowed-phone session around, not a rule about content.
+  const input = fixture();
+  for (const lesson of input.lessons) lesson.readingMinutes = 6;
+  for (const entry of (input.courses[0] as CourseSummary).lessons) entry.readingMinutes = 6;
+  input.courses[0]!.lessons = new Array(6).fill(null).map((_, i) => ({
+    id: `algo.loops.l0${i + 1}`,
+    titleKey: 'x.title',
+    readingMinutes: 6,
+    hasCheck: i === 0,
+  }));
+  input.lessons = new Array(6).fill(null).map((_, i) => ({
+    ...(input.lessons[i === 0 ? 0 : 1] as Lesson),
+    id: `algo.loops.l0${i + 1}`,
+    readingMinutes: 6,
+  }));
+
+  assert.ok(warns(input, 'reading_time'));
+});
