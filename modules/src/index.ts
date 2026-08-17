@@ -21,6 +21,13 @@ import { checkSubmit, missionRecommend, progressGet } from './rpc/learning';
 import { attemptSubmit } from './rpc/attempt';
 import { syncPull, syncPush } from './rpc/sync';
 import { classGrant, classJoin, classReclaimRequest } from './rpc/classes';
+import {
+  adminStaffInvite,
+  adminStaffInviteList,
+  adminStaffInviteRevoke,
+  staffGrant,
+  staffJoin,
+} from './rpc/staff';
 import { devConformance } from './rpc/dev';
 import {
   certificateList,
@@ -87,6 +94,17 @@ function InitModule(
     rpc('v1.class.join', classJoin, { rateLimit: LIMITS['v1.class.join'] }),
   );
   initializer.registerRpc('v1.class.reclaim.request', rpc('v1.class.reclaim.request', classReclaimRequest));
+  // The second handler reachable before an account exists, and the only other
+  // one there will be. Like `v1.class.grant` it writes nothing, and its limit is
+  // applied inside the handler because the caller has no user id to key on.
+  initializer.registerRpc(
+    'v1.staff.grant',
+    rpc('v1.staff.grant', staffGrant, { allowUnauthenticated: true }),
+  );
+  initializer.registerRpc(
+    'v1.staff.join',
+    rpc('v1.staff.join', staffJoin, { rateLimit: LIMITS['v1.staff.join'] }),
+  );
 
   // --- rpc: content -------------------------------------------------------
   initializer.registerRpc('v1.catalog.manifest', rpc('v1.catalog.manifest', catalogManifest));
@@ -196,6 +214,15 @@ function InitModule(
   initializer.registerRpc('v1.admin.catalog.publish', rpc('v1.admin.catalog.publish', adminCatalogPublish));
   initializer.registerRpc('v1.admin.role.grant', rpc('v1.admin.role.grant', adminRoleGrant));
   initializer.registerRpc('v1.admin.purge', rpc('v1.admin.purge', adminPurge));
+  initializer.registerRpc('v1.admin.staff.invite', rpc('v1.admin.staff.invite', adminStaffInvite));
+  initializer.registerRpc(
+    'v1.admin.staff.invite.list',
+    rpc('v1.admin.staff.invite.list', adminStaffInviteList),
+  );
+  initializer.registerRpc(
+    'v1.admin.staff.invite.revoke',
+    rpc('v1.admin.staff.invite.revoke', adminStaffInviteRevoke),
+  );
 
   // Refuse to run without the assertion secret rather than starting and
   // rejecting every sign-in with a confusing error.

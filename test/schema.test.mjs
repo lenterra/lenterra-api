@@ -123,6 +123,7 @@ describe('migrations', () => {
       'lenterra_mission',
       'lenterra_points_ledger',
       'lenterra_skill_mastery',
+      'lenterra_staff_invite',
       'lenterra_struggle_event',
     ]) {
       assert.ok(names.includes(expected), `missing table ${expected}`);
@@ -271,6 +272,84 @@ describe('constraints', () => {
       ),
       /check constraint/i,
     );
+  });
+
+  test('a staff invite can only be redeemed once', async (t) => {
+    if (!available) return t.skip('no database');
+
+    // The property the whole invite design rests on. Single-use is enforced by
+    // the `redeemed_at IS NULL` predicate inside the UPDATE rather than by
+    // reading first and writing after, so two devices racing on one code cannot
+    // both come away holding authority over the same school.
+    const school = randomUUID();
+    await client.query(
+      `INSERT INTO lenterra_school (id, name, district) VALUES ($1,'SMP Uji','Ende')`,
+      [school],
+    );
+
+    const first = await newUser();
+    const second = await newUser();
+    const code = `RACE${randomUUID().slice(0, 6).toUpperCase()}`;
+
+    await client.query(
+      `INSERT INTO lenterra_staff_invite (id, code, role, school_id, expires_at)
+       VALUES ($1, $2, 'teacher', $3, now() + interval '1 hour')`,
+      [randomUUID(), code, school],
+    );
+
+    const redeem = (userId) =>
+      client.query(
+        `UPDATE lenterra_staff_invite
+         SET redeemed_by = $2, redeemed_at = now()
+         WHERE code = $1 AND redeemed_at IS NULL AND revoked_at IS NULL AND expires_at > now()
+         RETURNING id`,
+        [code, userId],
+      );
+
+    assert.equal((await redeem(first)).rowCount, 1);
+    assert.equal((await redeem(second)).rowCount, 0, 'a spent code must yield nothing');
+  });
+
+  test('a teacher invite must name a school, a staff invite need not', async (t) => {
+    if (!available) return t.skip('no database');
+
+    // A role below platform staff is meaningless without a school, because
+    // every authorisation check beneath that level is scoped by one. An invite
+    // that conferred `teacher` over nothing would create an account that could
+    // not be reasoned about.
+    await assert.rejects(
+      client.query(
+        `INSERT INTO lenterra_staff_invite (id, code, role, school_id, expires_at)
+         VALUES ($1, $2, 'teacher', NULL, now() + interval '1 hour')`,
+        [randomUUID(), `NOSCHOOL${randomUUID().slice(0, 4).toUpperCase()}`],
+      ),
+      /lenterra_staff_invite_school_required/i,
+    );
+
+    const staffOnly = await client.query(
+      `INSERT INTO lenterra_staff_invite (id, code, role, school_id, expires_at)
+       VALUES ($1, $2, 'staff', NULL, now() + interval '1 hour') RETURNING id`,
+      [randomUUID(), `PLATFORM${randomUUID().slice(0, 4).toUpperCase()}`],
+    );
+    assert.equal(staffOnly.rowCount, 1);
+  });
+
+  test('an account can be created by a staff code, and profiles created by email survive', async (t) => {
+    if (!available) return t.skip('no database');
+
+    // Nothing issues `email` any more. Rows created under it still exist, and a
+    // migration that had narrowed the constraint instead of widening it would
+    // have failed on the first deploy against real data rather than here.
+    for (const strategy of ['staff_code', 'wallet', 'class_code', 'email', 'google']) {
+      const userId = await newUser();
+      const inserted = await client.query(
+        `INSERT INTO lenterra_account_profile
+           (user_id, role, display_name, friend_code, wallet_address, auth_strategy)
+         VALUES ($1,'teacher','Ibu Uji',$2,NULL,$3) RETURNING user_id`,
+        [userId, `FC${userId.slice(0, 6)}`, strategy],
+      );
+      assert.equal(inserted.rowCount, 1, `${strategy} must remain a legal strategy`);
+    }
   });
 
   test('deleting an account cascades its learning data', async (t) => {

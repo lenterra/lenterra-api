@@ -18,7 +18,14 @@ export const ASSERTION_TTL_SECONDS = 120;
 export const ISSUER = 'lenterra-verifier';
 export const AUDIENCE = 'lenterra-nakama';
 
-export type AuthStrategy = 'email' | 'google' | 'class_code';
+/**
+ * How an account proved who it is.
+ *
+ * `email` and `google` are no longer issued — nothing in this system reads a
+ * mailbox any more — but they remain in the type because profiles created under
+ * them exist and must keep signing in.
+ */
+export type AuthStrategy = 'email' | 'google' | 'class_code' | 'staff_code' | 'wallet';
 
 export interface AssertionClaims {
   sub: string;
@@ -113,14 +120,22 @@ export function verifyAssertion(
 }
 
 /**
- * Join grants for class-code onboarding (TRD-AUTH-004).
+ * Grants for code onboarding (TRD-AUTH-004).
  *
- * A grant names the class and carries a **server-generated** identity seed.
- * The seed must not be derived from the class code: every student in a class
- * would derive the same wallet, and any student could derive any classmate's.
+ * A grant is Nakama's signed statement that a code was presented and found
+ * valid. It names what the code was for and carries a **server-generated**
+ * identity seed. The seed must not be derived from the code: every student in a
+ * class would derive the same wallet, and any student could derive any
+ * classmate's.
+ *
+ * `kind` is absent on grants minted before staff codes existed, and those were
+ * all class grants — which is why the check below treats a missing kind as
+ * `class` rather than rejecting it.
  */
-export interface JoinGrant {
-  classId: string;
+export interface Grant {
+  kind?: 'class' | 'staff';
+  classId?: string;
+  inviteId?: string;
   seed: string;
   iat: number;
   exp: number;
@@ -129,11 +144,17 @@ export interface JoinGrant {
 
 export const JOIN_GRANT_TTL_SECONDS = 300;
 
-export function verifyJoinGrant(
+/**
+ * @param expectedKind Which endpoint is asking. A staff grant presented at the
+ *   class-code endpoint, or the reverse, is rejected here rather than being
+ *   allowed through to be sorted out downstream.
+ */
+export function verifyGrant(
   grant: string,
   secret: string,
   nowSeconds: number,
-): { valid: true; grant: JoinGrant } | { valid: false; reason: string } {
+  expectedKind: 'class' | 'staff' = 'class',
+): { valid: true; grant: Grant } | { valid: false; reason: string } {
   const parts = grant.split('.');
   if (parts.length !== 2) return { valid: false, reason: 'malformed' };
 
@@ -144,7 +165,7 @@ export function verifyJoinGrant(
     return { valid: false, reason: 'bad_signature' };
   }
 
-  let payload: JoinGrant;
+  let payload: Grant;
   try {
     payload = JSON.parse(Buffer.from(parts[0] as string, 'base64url').toString('utf8'));
   } catch {
@@ -152,5 +173,6 @@ export function verifyJoinGrant(
   }
 
   if (payload.exp < nowSeconds) return { valid: false, reason: 'expired' };
+  if ((payload.kind ?? 'class') !== expectedKind) return { valid: false, reason: 'wrong_kind' };
   return { valid: true, grant: payload };
 }

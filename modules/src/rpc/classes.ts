@@ -16,7 +16,7 @@ import {
   recordFailure,
   type RateLimit,
 } from '../lib/ratelimit';
-import { JOIN_GRANT_TTL_SECONDS, mintJoinGrant } from '../lib/assertion';
+import { JOIN_GRANT_TTL_SECONDS, mintGrant } from '../lib/assertion';
 import { Q } from '../db/queries';
 import { audit, maskName, validateDisplayName } from '../domain/profile';
 
@@ -104,7 +104,7 @@ export function classGrant(c: Ctx, req: ClassGrantReq): ClassGrantRes {
   const row = resolveClass(c, code, deviceId);
 
   return {
-    grant: mintJoinGrant(c.nk, secret, row.id, Math.floor(c.now / 1000)),
+    grant: mintGrant(c.nk, secret, { kind: 'class', classId: row.id }, Math.floor(c.now / 1000)),
     className: row.name,
     schoolName: row.school_name,
     expiresIn: JOIN_GRANT_TTL_SECONDS,

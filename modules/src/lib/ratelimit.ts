@@ -31,6 +31,12 @@ export const LIMITS: Record<string, RateLimit> = {
   // failures-only: an unauthenticated handler that only counts its failures
   // can be called without limit as long as the caller holds one valid code.
   'v1.class.grant': { limit: 20, windowSeconds: 600 },
+  // Tighter than the class limits in both directions. A staff code is longer
+  // and single-use, so a legitimate holder needs one or two attempts, while
+  // what is behind it is authority over a school's children rather than a seat
+  // in one class.
+  'v1.staff.join': { limit: 3, windowSeconds: 600, failuresOnly: true },
+  'v1.staff.grant': { limit: 10, windowSeconds: 600 },
   // Adding an email happens once per account. Anything beyond a handful of
   // attempts is somebody working through a list of addresses.
   'v1.account.upgrade': { limit: 5, windowSeconds: 3600 },

@@ -19,7 +19,7 @@ import {
   ASSERTION_TTL_SECONDS,
   buildClaims,
   signAssertion,
-  verifyJoinGrant,
+  verifyGrant,
   type AuthStrategy,
 } from './assertion.js';
 import { provisionerFromEnv } from './provision.js';
@@ -196,16 +196,16 @@ app.post('/session/class-code', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'missing_device_id' });
   }
 
-  const minted = await mintGrant(body.code, body.deviceId);
+  const minted = await mintGrant('v1.class.grant', body.code, body.deviceId);
   if (!minted.ok) {
     logAttempt('rejected', `grant_${minted.code}`);
     return res.status(minted.status).json({ error: minted.code });
   }
 
-  // Verified even though it arrived over a trusted channel. `verifyJoinGrant`
-  // stays the single gate, so a misconfigured NAKAMA_URL cannot become a way to
-  // inject identities into the system.
-  const verified = verifyJoinGrant(minted.grant, JOIN_GRANT_SECRET, nowSeconds());
+  // Verified even though it arrived over a trusted channel. `verifyGrant` stays
+  // the single gate, so a misconfigured NAKAMA_URL cannot become a way to inject
+  // identities into the system.
+  const verified = verifyGrant(minted.grant, JOIN_GRANT_SECRET, nowSeconds(), 'class');
   if (!verified.valid) {
     logAttempt('error', `grant_${verified.reason}`);
     return res.status(502).json({ error: 'invalid_grant' });
@@ -233,14 +233,77 @@ app.post('/session/class-code', async (req: Request, res: Response) => {
     customId: identity.customId,
     walletAddress: identity.walletAddress,
     classId: verified.grant.classId,
-    className: minted.className,
-    schoolName: minted.schoolName,
+    className: asText(minted.data.className),
+    schoolName: asText(minted.data.schoolName),
+    expiresIn: ASSERTION_TTL_SECONDS,
+  });
+});
+
+/**
+ * Staff-code sign-in.
+ *
+ * The same three steps as the class-code path, for the same reason: a teacher
+ * has no mailbox this system can reach either, and a second way of establishing
+ * an identity would be a second lock on the same door.
+ *
+ * What differs is only what the code is worth. A class code seats a child; this
+ * one confers authority over a school's records. That difference is enforced
+ * where it belongs — Nakama's invite table, its single-use redemption, and a
+ * tighter rate limit — and not here. This endpoint still attests an identity and
+ * nothing more, and it learns the role only to show it back to the person typing
+ * the code, never to grant it.
+ */
+app.post('/session/staff-code', async (req: Request, res: Response) => {
+  const body = req.body as { code?: unknown; deviceId?: unknown };
+
+  if (!JOIN_GRANT_SECRET || !NAKAMA_HTTP_KEY) {
+    logAttempt('unavailable', 'staff_code_not_configured');
+    return res.status(503).json({ error: 'verifier_not_configured' });
+  }
+  if (typeof body?.code !== 'string' || body.code.length === 0 || body.code.length > 32) {
+    logAttempt('rejected', 'missing_code');
+    return res.status(400).json({ error: 'missing_code' });
+  }
+  if (typeof body.deviceId !== 'string' || body.deviceId.length === 0) {
+    logAttempt('rejected', 'missing_device_id');
+    return res.status(400).json({ error: 'missing_device_id' });
+  }
+
+  const minted = await mintGrant('v1.staff.grant', body.code, body.deviceId);
+  if (!minted.ok) {
+    logAttempt('rejected', `grant_${minted.code}`);
+    return res.status(minted.status).json({ error: minted.code });
+  }
+
+  const verified = verifyGrant(minted.grant, JOIN_GRANT_SECRET, nowSeconds(), 'staff');
+  if (!verified.valid) {
+    logAttempt('error', `grant_${verified.reason}`);
+    return res.status(502).json({ error: 'invalid_grant' });
+  }
+
+  let identity;
+  try {
+    identity = await provisioner.provision(verified.grant.seed);
+  } catch (err) {
+    logAttempt('error', err instanceof Error ? err.message : 'provision_failed');
+    return res.status(503).json({ error: 'provisioning_failed' });
+  }
+
+  const claims = buildClaims(identity.customId, 'staff_code', nowSeconds(), verified.grant.jti);
+
+  logAttempt('issued', 'staff_code');
+  return res.json({
+    assertion: signAssertion(claims, HMAC_SECRET),
+    customId: identity.customId,
+    walletAddress: identity.walletAddress,
+    role: asText(minted.data.role),
+    schoolName: asText(minted.data.schoolName),
     expiresIn: ASSERTION_TTL_SECONDS,
   });
 });
 
 type MintResult =
-  | { ok: true; grant: string; className: string; schoolName: string }
+  | { ok: true; grant: string; data: Record<string, unknown> }
   | { ok: false; status: number; code: string };
 
 /**
@@ -251,11 +314,11 @@ type MintResult =
  * telling them apart would let someone enumerate which codes ever existed — and
  * relaying its text here would undo that.
  */
-async function mintGrant(code: string, deviceId: string): Promise<MintResult> {
+async function mintGrant(rpcName: string, code: string, deviceId: string): Promise<MintResult> {
   let response: globalThis.Response;
   try {
     response = await fetch(
-      `${NAKAMA_URL}/v2/rpc/v1.class.grant?http_key=${encodeURIComponent(NAKAMA_HTTP_KEY)}`,
+      `${NAKAMA_URL}/v2/rpc/${rpcName}?http_key=${encodeURIComponent(NAKAMA_HTTP_KEY)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -288,22 +351,22 @@ async function mintGrant(code: string, deviceId: string): Promise<MintResult> {
     return { ok: false, status: 503, code: 'grant_failed' };
   }
 
-  const data = envelope.data as { grant?: unknown; className?: unknown; schoolName?: unknown };
-  if (typeof data?.grant !== 'string') return { ok: false, status: 502, code: 'grant_failed' };
+  const data = (envelope.data ?? {}) as Record<string, unknown>;
+  if (typeof data.grant !== 'string') return { ok: false, status: 502, code: 'grant_failed' };
 
-  return {
-    ok: true,
-    grant: data.grant,
-    className: typeof data.className === 'string' ? data.className : '',
-    schoolName: typeof data.schoolName === 'string' ? data.schoolName : '',
-  };
+  return { ok: true, grant: data.grant, data };
+}
+
+function asText(value: unknown): string {
+  return typeof value === 'string' ? value : '';
 }
 
 app.get('/health', (_req: Request, res: Response) => {
   res.json({
     ok: true,
     thirdweb: auth !== null,
-    classCode: JOIN_GRANT_SECRET.length > 0 && NAKAMA_HTTP_KEY.length > 0,
+    // Both code paths need the same two values, so one flag answers for both.
+    codeSignIn: JOIN_GRANT_SECRET.length > 0 && NAKAMA_HTTP_KEY.length > 0,
     // Named rather than merely on/off: which mode is running decides whether a
     // class-code student has a wallet, and that is not something to discover by
     // reading a profile row.
@@ -323,8 +386,16 @@ app.listen(PORT, () => {
   );
 });
 
+/**
+ * The only strategy `/session` issues now is `wallet`.
+ *
+ * A signature over a server-chosen nonce is the same proof whichever wallet
+ * produced it, and there is no longer an email or Google path to distinguish it
+ * from. The older names are still accepted from a client that has not been
+ * updated, so an old build keeps working rather than failing at sign-in.
+ */
 function normaliseStrategy(value: unknown): AuthStrategy {
   if (value === 'google') return 'google';
-  if (value === 'class_code') return 'class_code';
-  return 'email';
+  if (value === 'email') return 'email';
+  return 'wallet';
 }

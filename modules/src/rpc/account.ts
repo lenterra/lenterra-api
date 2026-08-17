@@ -34,23 +34,23 @@ export interface UpgradeRes {
 }
 
 /**
- * Add an email or Google login to a class-code account (TRD-AUTH-005).
+ * Attach a wallet to a code-created account (TRD-AUTH-005).
  *
- * A class-code student has no email and no password, which is what makes the
- * path reachable at all and also what makes it fragile: lose the device and the
- * only recovery is a teacher approving a reclaim. This is how they stop being
- * in that position, and how they become able to hold a certificate.
+ * An account created from a class code or a staff invite has no password and no
+ * email, which is what makes it reachable by a child with neither — and also
+ * what makes it fragile: lose the device and the only recovery is a teacher
+ * approving a reclaim. This is how somebody stops being in that position, using
+ * a wallet they already control rather than an inbox this system would have to
+ * read.
  *
- * **The account is never forked.** The student is already signed in when they
- * do this, so there is nothing to merge — the same Nakama user id keeps its
- * progress, points, and mastery by construction, and the only thing that
- * changes is what they sign in with next time. Creating a second account and
- * copying rows between them would be the outcome PRD-ONB-004 exists to prevent.
+ * It is entirely optional. Nothing in the product requires it, certificates
+ * included, and no screen pushes a student toward it.
  *
- * What differs between the two provisioning modes is one line. In `deferred`
- * the account has no address yet, so the custom id is re-keyed to the new one.
- * In `thirdweb` the address was already the custom id and only the strategy
- * changes. Both refuse rather than fork when the address is already spoken for.
+ * **The account is never forked.** The caller is already signed in, so there is
+ * nothing to merge — the same Nakama user id keeps its progress, points, and
+ * mastery by construction, and the only thing that changes is what they can sign
+ * in with next time. Creating a second account and copying rows between them
+ * would be the outcome PRD-ONB-004 exists to prevent.
  */
 export function accountUpgrade(c: Ctx, req: UpgradeReq): UpgradeRes {
   const assertion = requireString(req.assertion, 'assertion', 4096);
@@ -73,13 +73,21 @@ export function accountUpgrade(c: Ctx, req: UpgradeReq): UpgradeRes {
 
   const address = verified.claims.sub.toLowerCase();
   if (address.indexOf('0x') !== 0) {
-    // A class-code assertion names an opaque id, not an address. Accepting one
-    // here would let a student "upgrade" to the identity they already have and
-    // record it as though a wallet existed.
+    // A code assertion names an opaque id, not an address. Accepting one here
+    // would let a caller "upgrade" to the identity they already have and record
+    // it as though a wallet existed.
     throw invalidArgument('That sign-in does not carry a wallet address');
   }
-  if (verified.strategy !== 'email' && verified.strategy !== 'google') {
-    throw invalidArgument('An upgrade needs an email or Google sign-in');
+  // `email` and `google` are no longer issued but are still accepted, so an
+  // assertion already in flight from an older client completes rather than
+  // failing at the last step. What all three have in common is the only thing
+  // that matters here: each is proof of control over the address named.
+  if (
+    verified.strategy !== 'wallet' &&
+    verified.strategy !== 'email' &&
+    verified.strategy !== 'google'
+  ) {
+    throw invalidArgument('That sign-in cannot be used to attach a wallet');
   }
 
   const burned = c.nk.sqlExec(Q.burnJti, [verified.claims.jti, verified.claims.exp]);

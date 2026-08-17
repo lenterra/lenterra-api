@@ -26,6 +26,7 @@
     "guard:bundle": "node scripts/bundle-guard.mjs",
     "migrate": "node scripts/migrate.mjs",
     "seed": "node scripts/seed.mjs",
+    "bootstrap:admin": "node scripts/bootstrap-admin.mjs",
     "dev:up": "node scripts/dev-up.mjs",
     "dev:down": "docker compose -f docker/docker-compose.yml down",
     "dev:logs": "docker compose -f docker/docker-compose.yml logs -f nakama",

@@ -95,6 +95,97 @@ export const Q = {
   setRole: `
     UPDATE lenterra_account_profile SET role = $2, updated_at = now() WHERE user_id = $1`,
 
+  // --- staff invites -------------------------------------------------------
+
+  staffInviteCreate: `
+    INSERT INTO lenterra_staff_invite
+      (id, code, role, school_id, issued_by, transfers_from, expires_at)
+    VALUES ($1, $2, $3, $4, $5, $6, now() + ($7 || ' hours')::interval)
+    RETURNING id, code, role, school_id, transfers_from, expires_at`,
+
+  staffInviteExists: `SELECT 1 FROM lenterra_staff_invite WHERE code = $1`,
+
+  staffInviteById: `SELECT id, school_id FROM lenterra_staff_invite WHERE id = $1`,
+
+  schoolById: `SELECT id, name FROM lenterra_school WHERE id = $1`,
+
+  /**
+   * The read on the grant path. Open invites only, and it deliberately cannot
+   * tell an unknown code from a spent, revoked, or expired one — the caller has
+   * no account yet, and a distinguishable answer is an oracle for which codes
+   * were ever issued.
+   */
+  staffInviteByCode: `
+    SELECT i.id, i.role, i.school_id, s.name AS school_name
+    FROM lenterra_staff_invite i
+    LEFT JOIN lenterra_school s ON s.id = i.school_id
+    WHERE i.code = $1
+      AND i.redeemed_at IS NULL
+      AND i.revoked_at IS NULL
+      AND i.expires_at > now()`,
+
+  /**
+   * Redeem, atomically.
+   *
+   * Single-use is enforced by the `redeemed_at IS NULL` predicate rather than by
+   * reading first and writing after: two devices racing on one code leave
+   * exactly one winner, and the loser sees zero rows instead of both being
+   * granted a role over the same school.
+   */
+  staffInviteRedeem: `
+    UPDATE lenterra_staff_invite
+    SET redeemed_by = $2, redeemed_at = now()
+    WHERE code = $1
+      AND redeemed_at IS NULL
+      AND revoked_at IS NULL
+      AND expires_at > now()
+    RETURNING id, role, school_id, transfers_from`,
+
+  staffInviteRevoke: `
+    UPDATE lenterra_staff_invite
+    SET revoked_at = now()
+    WHERE id = $1 AND redeemed_at IS NULL AND revoked_at IS NULL
+    RETURNING id`,
+
+  /**
+   * The administrator's list. Codes of unredeemed invites are returned because
+   * an administrator who has lost the code they just issued has no other way to
+   * recover it; spent ones are shown by status only.
+   */
+  staffInviteList: `
+    SELECT i.id, i.role, i.school_id, i.transfers_from, i.created_at, i.expires_at,
+           i.redeemed_at, i.revoked_at,
+           CASE WHEN i.redeemed_at IS NULL AND i.revoked_at IS NULL AND i.expires_at > now()
+                THEN i.code ELSE NULL END AS code,
+           p.display_name AS redeemed_by_name
+    FROM lenterra_staff_invite i
+    LEFT JOIN lenterra_account_profile p ON p.user_id = i.redeemed_by
+    WHERE ($1::uuid IS NULL OR i.school_id = $1)
+    ORDER BY i.created_at DESC
+    LIMIT 100`,
+
+  /** Attach role and school in one statement, so neither can land without the other. */
+  profileGrantStaff: `
+    UPDATE lenterra_account_profile
+    SET role = $2,
+        school_id = COALESCE($3, school_id),
+        auth_strategy = 'staff_code',
+        onboarded_at = COALESCE(onboarded_at, now()),
+        updated_at = now()
+    WHERE user_id = $1
+    RETURNING role, school_id`,
+
+  /**
+   * Move every class a teacher owns to another account.
+   *
+   * The classes are the reason transfer exists at all: a teacher locked out of
+   * their account keeps their students, their history, and their join codes.
+   */
+  classTransferOwner: `
+    UPDATE lenterra_class SET teacher_user_id = $2
+    WHERE teacher_user_id = $1 AND archived_at IS NULL
+    RETURNING id`,
+
   // --- auth ----------------------------------------------------------------
 
   burnJti: `

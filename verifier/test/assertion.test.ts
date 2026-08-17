@@ -7,7 +7,7 @@ import {
   buildClaims,
   signAssertion,
   verifyAssertion,
-  verifyJoinGrant,
+  verifyGrant,
 } from '../dist/assertion.js';
 
 const SECRET = 'a'.repeat(48);
@@ -110,7 +110,7 @@ test('a valid join grant verifies and carries its class', () => {
     { classId: 'class-1', seed: 'server-generated', iat: NOW, exp: NOW + 300, jti: 'j1' },
     SECRET,
   );
-  const result = verifyJoinGrant(grant, SECRET, NOW);
+  const result = verifyGrant(grant, SECRET, NOW);
 
   assert.equal(result.valid, true);
   if (result.valid) assert.equal(result.grant.classId, 'class-1');
@@ -121,7 +121,7 @@ test('a join grant for another class cannot be forged', () => {
     { classId: 'class-1', seed: 's', iat: NOW, exp: NOW + 300, jti: 'j1' },
     OTHER,
   );
-  assert.equal(verifyJoinGrant(grant, SECRET, NOW).valid, false);
+  assert.equal(verifyGrant(grant, SECRET, NOW).valid, false);
 });
 
 test('an expired join grant is rejected', () => {
@@ -129,7 +129,51 @@ test('an expired join grant is rejected', () => {
     { classId: 'class-1', seed: 's', iat: NOW - 600, exp: NOW - 300, jti: 'j1' },
     SECRET,
   );
-  const result = verifyJoinGrant(grant, SECRET, NOW);
+  const result = verifyGrant(grant, SECRET, NOW);
   assert.equal(result.valid, false);
   if (!result.valid) assert.equal(result.reason, 'expired');
+});
+
+test('a staff grant verifies and carries its invite', () => {
+  const grant = mintGrant(
+    { kind: 'staff', inviteId: 'invite-1', seed: 's', iat: NOW, exp: NOW + 300, jti: 'j1' },
+    SECRET,
+  );
+  const result = verifyGrant(grant, SECRET, NOW, 'staff');
+
+  assert.equal(result.valid, true);
+  if (result.valid) assert.equal(result.grant.inviteId, 'invite-1');
+});
+
+// The two endpoints mint identically-signed grants, so the only thing keeping a
+// class code from being redeemed for a staff role is this check. Both
+// directions, because a staff grant presented as a class code would create an
+// account with no class and no explanation for it.
+test('a grant of the wrong kind is refused in both directions', () => {
+  const staff = mintGrant(
+    { kind: 'staff', inviteId: 'invite-1', seed: 's', iat: NOW, exp: NOW + 300, jti: 'j1' },
+    SECRET,
+  );
+  const asClass = verifyGrant(staff, SECRET, NOW, 'class');
+  assert.equal(asClass.valid, false);
+  if (!asClass.valid) assert.equal(asClass.reason, 'wrong_kind');
+
+  const klass = mintGrant(
+    { kind: 'class', classId: 'class-1', seed: 's', iat: NOW, exp: NOW + 300, jti: 'j1' },
+    SECRET,
+  );
+  const asStaff = verifyGrant(klass, SECRET, NOW, 'staff');
+  assert.equal(asStaff.valid, false);
+  if (!asStaff.valid) assert.equal(asStaff.reason, 'wrong_kind');
+});
+
+// Grants minted before staff codes existed carry no `kind` at all. They were
+// all class grants, and one in flight during a deploy has to keep working.
+test('a grant with no kind is treated as a class grant', () => {
+  const grant = mintGrant(
+    { classId: 'class-1', seed: 's', iat: NOW, exp: NOW + 300, jti: 'j1' },
+    SECRET,
+  );
+  assert.equal(verifyGrant(grant, SECRET, NOW, 'class').valid, true);
+  assert.equal(verifyGrant(grant, SECRET, NOW, 'staff').valid, false);
 });
