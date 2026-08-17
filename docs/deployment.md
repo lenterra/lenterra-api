@@ -99,9 +99,10 @@ npm run smoke                                  # the deploy target
 npm run smoke -- https://staging.example.com   # somewhere else
 ```
 
-Seven checks a stranger could make: the server is healthy, TLS and HSTS are in
-front of it, the verifier can mint grants, the Nakama console is refused, two
-RPCs refuse an anonymous caller, and the runtime is loaded. If the first fails
+Eight checks a stranger could make: the server is healthy, TLS and HSTS are in
+front of it, the verifier can mint grants, the Nakama console is refused, three
+RPCs refuse an anonymous caller — including the retention sweep, which deletes
+accounts and takes no session — and the runtime is loaded. If the first fails
 the rest are reported as **not checked** rather than passed — a parked domain
 answers 403 to everything, which is indistinguishable from correctly refusing,
 and a row of green ticks against a host with nothing on it is worse than no
@@ -186,14 +187,34 @@ before you need to do it under pressure.
 
 ## Retention
 
-`v1.admin.purge` deletes accounts whose deletion request has passed its thirty
-days, and clears expired sign-in and rate-limit records. It runs when somebody
-presses the button on the dashboard's administration page.
+Accounts whose deletion request has passed its thirty days are deleted, and
+expired sign-in and rate-limit records are cleared, by the `purge` container.
+It wakes every five minutes and runs once a day at `PURGE_HOUR_UTC` — 19:00
+UTC by default, which is the small hours in WITA and no classroom's lesson.
 
-That is a person remembering, which is not good enough for a promise in a
-privacy notice. Until it is scheduled, put it in a cron on the host — the RPC
-needs a staff session, so the honest interim is a calendar reminder rather than
-a script with credentials in it.
+It used to run when somebody pressed a button on the dashboard, and that was
+the gap: a privacy notice promising deletion cannot be kept by a person
+remembering, and the failure is silent. Nothing breaks. It just looks like
+nothing, and it is data that should be gone.
+
+The button still exists, for running it now rather than waiting. Both routes do
+identical work and the audit row records which one asked, because a deletion
+carried out by a timer and one carried out by a person are the same deletion.
+
+The scheduled route is reachable with no session, gated by the runtime HTTP
+key, exactly as `v1.class.grant` is. That is deliberate and it is not a new
+exposure: the key is a server secret the compose stack holds and a client never
+does, and the container talks to `nakama:7350` directly, so the request never
+leaves the internal network. The alternative was a scheduler holding a staff
+session — a long-lived credential, on disk, for an account that can read every
+child in every school.
+
+```bash
+docker compose -f docker/docker-compose.prod.yml logs purge
+```
+
+A run prints what it removed. A failure prints `retention: FAILED`, which is
+the line to alert on: it means accounts past their window are still here.
 
 ## What this does not do
 

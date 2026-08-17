@@ -35,10 +35,21 @@ export interface FakeOptions {
   userId?: string;
   now?: number;
   env?: Record<string, string>;
+  /**
+   * Make `nk.accountDeleteId` throw, as it does for an id Nakama does not know.
+   *
+   * The deletion sweep catches per-account failures on purpose — one bad row
+   * must not stop the rest of a retention run — which means a fake that could
+   * not fail would make that catch untestable, and a swallowed error look like
+   * a success.
+   */
+  deleteFails?: boolean;
 }
 
 export interface Fake {
   ctx: Ctx;
+  /** Nakama user ids passed to `accountDeleteId`, in order. */
+  deleted: string[];
   /** Every statement that reached the fake, in order. */
   calls: { sql: string; params: readonly unknown[]; kind: 'query' | 'exec' }[];
   /** How many times one statement was issued. */
@@ -71,6 +82,7 @@ export function fakeCtx(Q: Record<string, string>, options: FakeOptions = {}): F
   }
 
   const calls: Fake['calls'] = [];
+  const deleted: string[] = [];
 
   const run = (kind: 'query' | 'exec') => (sql: string, params: readonly unknown[] = []) => {
     calls.push({ sql, params, kind });
@@ -106,6 +118,15 @@ export function fakeCtx(Q: Record<string, string>, options: FakeOptions = {}): F
       (typeof value === 'string' ? Buffer.from(value, 'utf8') : Buffer.from(value)).toString(
         'base64url',
       ),
+    /**
+     * Deleting an account. Records rather than performs, so a test can assert
+     * on *which* accounts a retention sweep removed — the number alone would
+     * pass just as well if it deleted the wrong ones.
+     */
+    accountDeleteId: (userId: string) => {
+      if (options.deleteFails) throw new Error('no such account');
+      deleted.push(userId);
+    },
     hmacSha256Hash: (input: string, key: string) => {
       // Only `mintGrant` reaches this, and only to prove a grant was produced.
       // `test/grant.test.mts` is where the wire format is actually checked,
@@ -132,6 +153,7 @@ export function fakeCtx(Q: Record<string, string>, options: FakeOptions = {}): F
   return {
     ctx,
     calls,
+    deleted,
     countOf: (sql) => calls.filter((call) => call.sql === sql).length,
     paramsOf: (sql) => calls.find((call) => call.sql === sql)?.params,
   };

@@ -91,19 +91,47 @@ export function adminRoleGrant(c: Ctx, req: RoleGrantReq) {
  */
 export function adminPurge(c: Ctx) {
   requireStaff(c);
+  return purge(c, 'dashboard');
+}
 
+/**
+ * The same work, through a door a timer can reach.
+ *
+ * Retention was a promise kept by somebody remembering to press a button. A
+ * privacy notice says accounts are deleted thirty days after a request; a
+ * person who is on holiday, or who has left, is not a mechanism. The gap
+ * between the promise and the implementation was the whole defect, and it does
+ * not show up as an error — it shows up as data that should be gone.
+ *
+ * Reachable with no session, gated by the runtime HTTP key, exactly as
+ * `v1.class.grant` is. The key is a server secret held by the compose stack and
+ * never by a client, so this is not a new class of exposure — it is the
+ * existing one, reused rather than invented. The alternative was a scheduler
+ * holding a staff session, which means a long-lived credential for an account
+ * that can read every child in every school, stored on the host.
+ *
+ * The distinction from the dashboard route is recorded in the audit row rather
+ * than in what it does, because a deletion carried out by a timer and one
+ * carried out by a person are the same deletion and should not diverge.
+ */
+export function adminPurgeScheduled(c: Ctx) {
+  return purge(c, 'scheduled');
+}
+
+function purge(c: Ctx, trigger: 'dashboard' | 'scheduled') {
   const jti = c.nk.sqlExec(Q.purgeJti, []);
   const idempotency = c.nk.sqlExec(Q.idempotencyPurge, []);
   const rateLimits = c.nk.sqlExec(Q.rateLimitPurge, []);
   const deleted = executeDueDeletions(c);
 
-  audit(c, 'maintenance.purge', 'system', 'retention', { accountsDeleted: deleted });
+  audit(c, 'maintenance.purge', 'system', 'retention', { accountsDeleted: deleted, trigger });
 
   return {
     authJti: jti.rowsAffected,
     idempotency: idempotency.rowsAffected,
     rateLimits: rateLimits.rowsAffected,
     accountsDeleted: deleted,
+    trigger,
   };
 }
 

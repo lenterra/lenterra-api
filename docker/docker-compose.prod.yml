@@ -98,6 +98,52 @@ services:
       VERIFIER_PORT: '8787'
     # No ports either. Caddy routes /verifier/* here.
 
+  # Retention, on a timer rather than on somebody remembering.
+  #
+  # `v1.admin.purge` deletes accounts whose thirty-day window has passed and
+  # clears expired sign-in and rate-limit records. It ran when a person pressed
+  # a button on the dashboard, which is not a mechanism — a privacy notice that
+  # promises deletion cannot be kept by a calendar reminder, and the failure is
+  # silent: it looks like nothing, and it is data that should be gone.
+  #
+  # A container rather than a host cron, so the schedule ships with the stack
+  # and a rebuilt server does not quietly lose it. It publishes no ports, joins
+  # the internal network, and reaches Nakama directly — the request never leaves
+  # the compose network, so it does not pass through Caddy or the internet.
+  purge:
+    image: alpine:3.20
+    restart: unless-stopped
+    depends_on:
+      - nakama
+    environment:
+      NAKAMA_HTTP_KEY: ${NAKAMA_HTTP_KEY:?set NAKAMA_HTTP_KEY}
+      # Daily, in the small hours of WITA. Deleting an account is irreversible
+      # and the query walks every due row, so it runs when no classroom does.
+      PURGE_HOUR_UTC: ${PURGE_HOUR_UTC:-19}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        apk add --no-cache curl >/dev/null 2>&1
+        echo "retention: waking hourly, purging at ${PURGE_HOUR_UTC:-19}:00 UTC"
+        while true; do
+          if [ "$$(date -u +%H)" = "$$(printf '%02d' "$${PURGE_HOUR_UTC:-19}")" ]; then
+            echo "retention: $$(date -u +%FT%TZ) running"
+            # `--fail` so an HTTP error is a non-zero exit and a visible log
+            # line, rather than a body nobody reads. The response is small and
+            # names what it removed.
+            curl --fail --silent --show-error --max-time 300 \
+              -X POST \
+              -H 'Content-Type: application/json' \
+              "http://nakama:7350/v2/rpc/v1.admin.purge.scheduled?http_key=$${NAKAMA_HTTP_KEY}" \
+              -d '"{}"' \
+              || echo "retention: FAILED — accounts past their window are still here"
+            # Past the hour before looping, so a run cannot fire twice.
+            sleep 3600
+          fi
+          sleep 300
+        done
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped

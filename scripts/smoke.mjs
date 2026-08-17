@@ -118,6 +118,28 @@ await check('the class-grant rpc refuses a caller with no http key', async () =>
 });
 
 /**
+ * The scheduled purge must not be reachable from outside.
+ *
+ * It deletes accounts and takes no session, because a timer has none — the
+ * runtime HTTP key is the only thing standing in front of it. That key is
+ * supposed to stay inside the compose network, so a caller from the internet
+ * without it must be refused. If this ever answers 200, anybody on the internet
+ * can trigger deletions.
+ */
+await check('the scheduled purge refuses a caller with no http key', async () => {
+  const res = await get('/v2/rpc/v1.admin.purge.scheduled', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(JSON.stringify({})),
+  });
+  expect(
+    res.status === 401 || res.status === 403,
+    `answered ${res.status} — an unauthenticated caller reached the account-deletion sweep`,
+  );
+  return `${res.status}`;
+});
+
+/**
  * Is there content?
  *
  * Not a failure: a stack can be correctly deployed and not yet published to.

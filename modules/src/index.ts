@@ -62,7 +62,12 @@ import {
   moderationReport,
   moderationResolve,
 } from './rpc/account';
-import { adminCatalogPublish, adminPurge, adminRoleGrant } from './rpc/admin';
+import {
+  adminCatalogPublish,
+  adminPurge,
+  adminPurgeScheduled,
+  adminRoleGrant,
+} from './rpc/admin';
 
 function InitModule(
   ctx: nkruntime.Context,
@@ -216,6 +221,14 @@ function InitModule(
   initializer.registerRpc('v1.admin.catalog.publish', rpc('v1.admin.catalog.publish', adminCatalogPublish));
   initializer.registerRpc('v1.admin.role.grant', rpc('v1.admin.role.grant', adminRoleGrant));
   initializer.registerRpc('v1.admin.purge', rpc('v1.admin.purge', adminPurge));
+  // Same work, reachable by a timer instead of a person. Unauthenticated in the
+  // same sense `v1.class.grant` is: no session, but the runtime HTTP key, which
+  // a client never holds. Retention that depends on somebody remembering is not
+  // a mechanism, and a privacy notice promising deletion needs one.
+  initializer.registerRpc(
+    'v1.admin.purge.scheduled',
+    rpc('v1.admin.purge.scheduled', adminPurgeScheduled, { allowUnauthenticated: true }),
+  );
   initializer.registerRpc('v1.admin.staff.invite', rpc('v1.admin.staff.invite', adminStaffInvite));
   initializer.registerRpc(
     'v1.admin.staff.invite.list',
