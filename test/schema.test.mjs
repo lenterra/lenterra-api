@@ -15,6 +15,7 @@
 import { test, before, after, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -93,7 +94,13 @@ describe('migrations', () => {
     if (!available) return t.skip('no database');
 
     const output = migrate();
-    assert.match(output, /applied 5 migration/);
+
+    // Counted from the directory rather than written here. A literal was stale
+    // from the first migration added after it, and a stale count fails the
+    // build for the one reason that is never the problem.
+    const files = readdirSync(join(root, 'migrations')).filter((f) => f.endsWith('.sql'));
+    assert.match(output, new RegExp(`applied ${files.length} migration`));
+    for (const file of files) assert.match(output, new RegExp(`\\+ ${file} … ok`));
 
     const { rows } = await client.query(
       `SELECT table_name FROM information_schema.tables
@@ -148,6 +155,36 @@ describe('migrations', () => {
 });
 
 describe('constraints', () => {
+  test('an account may wait for a wallet, but two may not share one', async (t) => {
+    if (!available) return t.skip('no database');
+
+    // A class-code student has no address until they add an email. That is the
+    // point rather than a limitation: an address that is never issued is one
+    // that can never change underneath a certificate.
+    const profile = (userId, wallet) =>
+      client.query(
+        `INSERT INTO lenterra_account_profile
+           (user_id, role, display_name, friend_code, wallet_address, auth_strategy)
+         VALUES ($1,'student','Siswa',$2,$3,'class_code')`,
+        [userId, `FC${userId.slice(0, 6)}`, wallet],
+      );
+
+    // Any number of accounts may be waiting: Postgres does not consider two
+    // NULLs equal, which is what makes the existing UNIQUE still correct.
+    await profile(await newUser(), null);
+    await profile(await newUser(), null);
+
+    // And no two may ever hold the same one.
+    const shared = `0x${randomUUID().replace(/-/g, '')}`;
+    await profile(await newUser(), shared);
+
+    const claimant = await newUser();
+    await assert.rejects(
+      () => profile(claimant, shared),
+      'two accounts shared a wallet address',
+    );
+  });
+
   test('points balance is derived, never stored', async (t) => {
     if (!available) return t.skip('no database');
 

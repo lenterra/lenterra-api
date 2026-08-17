@@ -18,7 +18,7 @@
     "test:schema": "node --test test/schema.test.mjs",
     "content:validate": "node scripts/content-validate.mjs",
     "content:publish": "node scripts/content-publish.mjs",
-    "test:integration": "node --test \"test/integration/*.test.mjs\"",
+    "test:integration": "node --test --test-concurrency=1 \"test/integration/*.test.mjs\"",
     "build": "npm run build -w @lenterra/core && npm run build -w @lenterra/modules",
     "build:core": "npm run build -w @lenterra/core",
     "build:modules": "npm run build -w @lenterra/modules",
