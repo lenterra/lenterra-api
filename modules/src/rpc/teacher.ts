@@ -11,9 +11,10 @@ import type { SkillNodeId } from '@lenterra/core';
 import { bandOf } from '@lenterra/core';
 
 import { invalidArgument, notFound } from '../lib/errors';
-import { optionalString, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
+import { optionalString, requireBool, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
 import { Q } from '../db/queries';
 import { audit, maskName, requireMemberOf, requireRole, requireTeacherOf } from '../domain/profile';
+import { emit } from '../domain/telemetry';
 
 // ---------------------------------------------------------------------------
 // Class creation and roster
@@ -548,4 +549,78 @@ export function teacherReclaimApprove(c: Ctx, req: ReclaimApproveReq) {
     status: req.approve ? 'approved' : 'rejected',
     transferredUserId: req.approve ? request.requester_user_id : undefined,
   };
+}
+
+/**
+ * Every class this teacher owns.
+ *
+ * The dashboard's landing view. Ownership is the filter — a teacher sees their
+ * own classes and nothing else, and this is enforced by the query rather than
+ * by the caller passing a school id it could have made up.
+ */
+export function teacherClassList(c: Ctx) {
+  requireRole(c, ['teacher', 'school_admin', 'staff']);
+
+  const rows = c.nk.sqlQuery(Q.classesOwnedBy, [c.userId]) as {
+    id: string;
+    name: string;
+    level: string;
+    join_code: string;
+    leaderboard_enabled: boolean;
+    students: number;
+  }[];
+
+  const classes = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i] as (typeof rows)[number];
+    classes.push({
+      id: row.id,
+      name: row.name,
+      level: row.level,
+      joinCode: row.join_code,
+      leaderboardEnabled: row.leaderboard_enabled,
+      students: Number(row.students),
+    });
+  }
+
+  return { classes };
+}
+
+/**
+ * Remove a student from a class (PRD-TCH-003).
+ *
+ * Ends the membership; it never deletes the student's work. A teacher tidying
+ * a roster must not be able to destroy a term of a child's learning history,
+ * and the two operations should not share a button. Deletion is a separate,
+ * deliberate path with a thirty-day window (`v1.account.delete.request`).
+ */
+export function teacherClassRemove(c: Ctx, req: { classId: string; userId: string }) {
+  const klass = requireTeacherOf(c, requireString(req.classId, 'classId', 64));
+  const userId = requireString(req.userId, 'userId', 64);
+  requireMemberOf(c, klass.id, userId);
+
+  c.nk.sqlExec(Q.classMemberRemove, [klass.id, userId]);
+  // An adult action on a child's account, so it is audited (TRD-SEC-014).
+  audit(c, 'class.member.remove', 'user', userId, { classId: klass.id });
+
+  return { removed: true };
+}
+
+/**
+ * Turn the class leaderboard off (PRD-SOC-008).
+ *
+ * A teacher who knows their class knows when ranking helps and when it makes
+ * the bottom three stop trying. The setting is theirs, and it is per class
+ * rather than global because the answer differs between two classes in the
+ * same school.
+ */
+export function teacherLeaderboardSet(c: Ctx, req: { classId: string; enabled: boolean }) {
+  const klass = requireTeacherOf(c, requireString(req.classId, 'classId', 64));
+  const enabled = requireBool(req.enabled, 'enabled');
+
+  c.nk.sqlExec(Q.classSetLeaderboard, [klass.id, c.userId, enabled]);
+  audit(c, enabled ? 'class.leaderboard.enable' : 'class.leaderboard.disable', 'class', klass.id, {});
+  emit(c, 'leaderboard.disabled', { classId: klass.id, enabled });
+
+  return { enabled };
 }

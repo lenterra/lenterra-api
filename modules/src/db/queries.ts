@@ -92,6 +92,20 @@ export const Q = {
       AND c.archived_at IS NULL
       AND (c.join_code_expires_at IS NULL OR c.join_code_expires_at > now())`,
 
+  /** Every class this teacher owns, for the dashboard's landing view. */
+  classesOwnedBy: `
+    SELECT c.id, c.name, c.level, c.join_code, c.leaderboard_enabled,
+           (SELECT count(*) FROM lenterra_class_member m
+             WHERE m.class_id = c.id AND m.removed_at IS NULL) AS students
+    FROM lenterra_class c
+    WHERE c.teacher_user_id = $1 AND c.archived_at IS NULL
+    ORDER BY c.created_at DESC`,
+
+  classSetLeaderboard: `
+    UPDATE lenterra_class SET leaderboard_enabled = $3
+    WHERE id = $1 AND teacher_user_id = $2 AND archived_at IS NULL
+    RETURNING id`,
+
   classOwnedBy: `
     SELECT c.id, c.name, c.school_id, c.leaderboard_enabled, c.join_code, c.join_code_expires_at
     FROM lenterra_class c

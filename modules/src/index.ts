@@ -33,7 +33,10 @@ import {
   teacherAssignmentCreate,
   teacherAttentionList,
   teacherClassCreate,
+  teacherClassList,
+  teacherClassRemove,
   teacherClassRoster,
+  teacherLeaderboardSet,
   teacherClassSummary,
   teacherReclaimApprove,
   teacherStudentDetail,
@@ -108,7 +111,13 @@ function InitModule(
 
   // --- rpc: teacher -------------------------------------------------------
   initializer.registerRpc('v1.teacher.class.create', rpc('v1.teacher.class.create', teacherClassCreate));
+  initializer.registerRpc('v1.teacher.class.list', rpc('v1.teacher.class.list', teacherClassList));
   initializer.registerRpc('v1.teacher.class.roster', rpc('v1.teacher.class.roster', teacherClassRoster));
+  initializer.registerRpc('v1.teacher.class.remove', rpc('v1.teacher.class.remove', teacherClassRemove));
+  initializer.registerRpc(
+    'v1.teacher.leaderboard.set',
+    rpc('v1.teacher.leaderboard.set', teacherLeaderboardSet),
+  );
   initializer.registerRpc(
     'v1.teacher.class.summary',
     rpc('v1.teacher.class.summary', teacherClassSummary, {
