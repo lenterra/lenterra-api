@@ -7,7 +7,7 @@
 // mechanic behind it, a ladder with a gap, a mission nobody can win, and a
 // greedy-trap quota that has quietly eroded as content was added.
 
-import { checkAll, report } from './content-lib.mjs';
+import { checkAll, checkTeachingNotes, report } from './content-lib.mjs';
 import { checkGreedyTrapQuota } from '../packages/core/dist/index.js';
 
 const games = process.argv.slice(2).filter((a) => !a.startsWith('-'));
@@ -16,6 +16,7 @@ const targets = games.length > 0 ? games : ['congklak', 'benteng'];
 
 let totalErrors = 0;
 let totalWarnings = 0;
+const allMissionIds = [];
 
 for (const game of targets) {
   const { missions, issues, solved, traps } = checkAll(game, { skipSolver });
@@ -51,6 +52,20 @@ for (const game of targets) {
   }
 
   if (counts.errors === 0) console.log(`  ✓ ${game} content is valid`);
+  for (const mission of missions) allMissionIds.push(mission.id);
+}
+
+// Teaching notes are checked against every game's missions at once, because a
+// note for a security node points at Benteng while a computation note points
+// at Congklak.
+const teaching = checkTeachingNotes(allMissionIds);
+if (teaching.length > 0) {
+  console.log('\nteaching notes');
+  const counts = report(teaching);
+  totalErrors += counts.errors;
+  totalWarnings += counts.warnings;
+} else {
+  console.log('\nteaching notes: ✓');
 }
 
 console.log(`\n${totalErrors} error(s), ${totalWarnings} warning(s)`);

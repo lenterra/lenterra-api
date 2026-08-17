@@ -199,6 +199,10 @@ export const Q = {
 
   catalogVersionExists: `SELECT status FROM lenterra_catalog_version WHERE version = $1`,
 
+  /** One part by name — used for the teaching notes the dashboard reads. */
+  catalogPartBody: `
+    SELECT body FROM lenterra_catalog_part WHERE version = $1 AND part = $2`,
+
   catalogPublish: `
     UPDATE lenterra_catalog_version
     SET status = 'published', published_at = now(), published_by = $2

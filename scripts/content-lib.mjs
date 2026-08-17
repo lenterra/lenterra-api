@@ -41,6 +41,64 @@ export function loadMissions(game) {
     });
 }
 
+/**
+ * Teaching notes, one per skill node (PRD-TCH-012).
+ *
+ * Authored alongside the missions rather than written into the dashboard,
+ * because a note about what students typically get wrong is content that has
+ * to be reviewed by someone who has taught the age group — and a wrong note
+ * sends a lesson in the wrong direction with more confidence than no note.
+ */
+export function loadTeachingNotes() {
+  const path = join(contentDir, 'teaching', 'notes.yaml');
+  if (!existsSync(path)) return {};
+  return yaml.load(readFileSync(path, 'utf8')) ?? {};
+}
+
+/**
+ * Check the notes against the missions that actually exist.
+ *
+ * A note pointing at an unauthored mission is a warning, not an error: content
+ * ships incrementally, and a Benteng note written before the Benteng ladder is
+ * correct in advance rather than broken.
+ */
+export function checkTeachingNotes(allMissionIds) {
+  const notes = loadTeachingNotes();
+  const issues = [];
+  const known = new Set(allMissionIds);
+
+  for (const [node, note] of Object.entries(notes)) {
+    if (!note || typeof note !== 'object') {
+      issues.push({ severity: 'error', check: 'teaching', missionId: node, message: 'note is not an object' });
+      continue;
+    }
+    for (const field of ['misconception', 'howToTeach']) {
+      const value = note[field];
+      if (typeof value !== 'string' || value.trim().length < 40) {
+        // A one-line note is worse than none: it reads as guidance and is not.
+        issues.push({
+          severity: 'error',
+          check: 'teaching',
+          missionId: node,
+          message: `${field} is missing or too short to be useful`,
+        });
+      }
+    }
+    for (const missionId of note.missions ?? []) {
+      if (!known.has(missionId)) {
+        issues.push({
+          severity: 'warning',
+          check: 'teaching',
+          missionId: node,
+          message: `suggests "${missionId}", which is not authored yet`,
+        });
+      }
+    }
+  }
+
+  return issues;
+}
+
 export function loadStrings(locale) {
   const path = join(contentDir, 'strings', `${locale}.yaml`);
   if (!existsSync(path)) return {};

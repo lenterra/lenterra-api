@@ -1,0 +1,192 @@
+# Teaching notes, one per skill node (PRD-TCH-012).
+#
+# These exist because of a specific person. Pak Yosef teaches this class and is
+# not certified in the subject. A dashboard that tells him "your class is weak
+# at iteration" without telling him what iteration is, what students typically
+# get wrong about it, or what to do on Monday leaves him worse off than before
+# it said anything — he now has a problem and no way to act on it.
+#
+# So each node carries three things: what the skill actually is in one
+# sentence, the misconception students reliably arrive with, and a concrete
+# first move. The misconceptions are the part worth reviewing with a teacher
+# who has taught the age group, because a wrong one sends a lesson in the wrong
+# direction with more confidence than no note at all.
+#
+# `missions` lists the missions that evidence the node, so "what do I set them"
+# has an answer. `lesson` is the course lesson covering it, null until the
+# course exists — an honest null rather than a link to nothing.
+
+comp.counting:
+  lesson: null
+  missions: [congklak.m01, congklak.m02]
+  misconception: >-
+    Anak menghitung lubang, bukan biji. Saat menyebar, mereka menghitung
+    "satu lubang, dua lubang" dan lupa bahwa yang dibagikan adalah biji.
+  howToTeach: >-
+    Minta mereka menyebar dengan tangan di papan sungguhan sambil menyebut
+    angka setiap kali satu biji jatuh. Suara dan gerakan menyatukan hitungan
+    dengan bendanya.
+
+comp.arithmetic:
+  lesson: null
+  missions: [congklak.m02, congklak.m09]
+  misconception: >-
+    Menjumlah isi lubang satu per satu setiap kali ditanya, bukan mengingat
+    hasilnya. Ini bukan salah, tapi lambat, dan membuat mereka kehabisan waktu
+    sebelum sempat berpikir strategi.
+  howToTeach: >-
+    Tanyakan "berapa isi lumbungmu?" sebelum dan sesudah satu langkah, lalu
+    "berubah berapa?". Selisihnya jauh lebih mudah diingat daripada totalnya.
+
+comp.estimation:
+  lesson: null
+  missions: [congklak.m04, congklak.m12]
+  misconception: >-
+    Menganggap lubang paling penuh pasti paling menguntungkan. Perkiraan yang
+    dipakai adalah "banyak = bagus", bukan "sejauh mana bijinya sampai".
+  howToTeach: >-
+    Sebelum menyebar, minta mereka menunjuk di mana biji terakhir akan jatuh.
+    Menebak lalu memeriksa jauh lebih kuat daripada dikoreksi.
+
+comp.modular:
+  lesson: null
+  missions: [congklak.m04, congklak.m05]
+  misconception: >-
+    Mengira papan berhenti di ujung. Saat sebaran melewati ujung dan berputar
+    kembali, hitungan mereka meleset persis satu putaran.
+  howToTeach: >-
+    Gambar papan sebagai lingkaran, bukan dua baris. Sekali melihatnya sebagai
+    lingkaran, "melewati ujung" berhenti menjadi kejutan.
+
+algo.sequencing:
+  lesson: null
+  missions: [congklak.m01, congklak.m03]
+  misconception: >-
+    Menganggap urutan langkah tidak penting selama tujuannya sama. Padahal dua
+    langkah yang sama dengan urutan berbeda memberi hasil berbeda.
+  howToTeach: >-
+    Mainkan dua langkah yang sama dalam urutan terbalik di papan yang sama, dan
+    biarkan mereka melihat sendiri papannya berbeda.
+
+algo.iteration:
+  lesson: null
+  missions: [congklak.m06, congklak.m07]
+  misconception: >-
+    Mengira rantai sebaran adalah keberuntungan. Mereka belum melihat bahwa
+    rantai terjadi karena biji terakhir jatuh di lubang berisi — sebuah aturan,
+    bukan kebetulan.
+  howToTeach: >-
+    Minta mereka menyebut "lanjut" atau "berhenti" sebelum biji terakhir
+    mendarat. Setelah beberapa kali, aturannya muncul sendiri.
+
+algo.branching:
+  lesson: null
+  missions: [congklak.m14, congklak.m17]
+  misconception: >-
+    Memilih langkah pertama yang terlihat masuk akal tanpa membandingkannya
+    dengan pilihan lain.
+  howToTeach: >-
+    Larang bergerak sampai mereka menyebutkan dua pilihan dan satu alasan.
+    Alasannya boleh salah; membandingkannya yang dilatih.
+
+algo.state-eval:
+  lesson: null
+  missions: [congklak.m13, benteng.m03]
+  misconception: >-
+    Menilai posisi hanya dari isi lumbung sendiri, tanpa melihat apa yang
+    terbuka untuk lawan.
+  howToTeach: >-
+    Setelah setiap langkah, tanyakan satu pertanyaan: "apa yang bisa dilakukan
+    lawan sekarang?" Cukup satu, tapi setiap kali.
+
+algo.lookahead:
+  lesson: null
+  missions: [congklak.m11, congklak.m17]
+  misconception: >-
+    Berpikir satu langkah ke depan dan menyebutnya berpikir ke depan.
+  howToTeach: >-
+    Minta mereka mengucapkan dua langkah sebelum bergerak: "saya begini, dia
+    begitu, lalu saya begini." Mengucapkannya membuat langkah kedua terasa
+    nyata.
+
+algo.greedy:
+  lesson: null
+  missions: [congklak.m15, congklak.m16, congklak.m18]
+  misconception: >-
+    Ini kesalahpahaman paling kuat di seluruh permainan: lubang paling penuh
+    terasa seperti langkah terbaik, dan sering memang benar — sampai tidak.
+    Karena sering benar, anak berhenti memeriksa.
+  howToTeach: >-
+    Jangan katakan langkah serakah itu salah. Minta mereka memainkannya sampai
+    kalah, lalu ulangi posisi yang sama dan cari langkah lain. Kalah sekali di
+    posisi yang bisa diulang mengajarkan lebih banyak daripada peringatan.
+
+algo.optimization:
+  lesson: null
+  missions: [congklak.m18, congklak.m20]
+  misconception: >-
+    Mengira "langkah bagus" dan "langkah terbaik" adalah hal yang sama.
+  howToTeach: >-
+    Setelah mereka menemukan langkah yang berhasil, tanyakan apakah ada yang
+    lebih baik. Sering tidak ada — dan mencarinya tetap latihan yang benar.
+
+sec.assets:
+  lesson: null
+  missions: [benteng.m01, benteng.m02]
+  misconception: >-
+    Mengira semua bidak sama berharganya. Belum melihat bahwa benteng adalah
+    satu-satunya yang kalau hilang, permainan berakhir.
+  howToTeach: >-
+    Tanyakan "kalau kamu hanya boleh menjaga satu, yang mana?" sebelum
+    permainan dimulai.
+
+sec.threats:
+  lesson: null
+  missions: [benteng.m03, benteng.m05]
+  misconception: >-
+    Menganggap ancaman baru nyata setelah terjadi. Bidak yang bisa ditangkap
+    giliran depan belum terasa sebagai masalah sekarang.
+  howToTeach: >-
+    Sebelum lawan bergerak, minta mereka menunjuk bidak mereka yang paling
+    berisiko. Menunjuk lebih mudah daripada menjelaskan.
+
+sec.access:
+  lesson: null
+  missions: [benteng.m04, benteng.m06]
+  misconception: >-
+    Mengira menangkap adalah soal posisi saja, padahal aturannya soal
+    kesegaran: siapa yang lebih baru menyentuh benteng. Ini persis konsep
+    "izin yang masih berlaku".
+  howToTeach: >-
+    Sebutkan dua angka kesegaran dengan lantang sebelum setiap penangkapan.
+    Perbandingan angkanya adalah aturannya, bukan gambaran tentangnya.
+
+sec.defense:
+  lesson: null
+  missions: [benteng.m08, benteng.m09]
+  misconception: >-
+    Mengira bertahan berarti tidak bergerak. Padahal bidak yang diam justru
+    kehilangan kesegaran dan menjadi sasaran.
+  howToTeach: >-
+    Tunjukkan satu bidak yang diam selama lima giliran, lalu tanyakan mengapa
+    sekarang bisa ditangkap.
+
+sec.risk:
+  lesson: null
+  missions: [benteng.m07, benteng.m10]
+  misconception: >-
+    Menilai risiko sebagai "aman" atau "bahaya" tanpa tingkatan, sehingga
+    langkah yang sedikit berisiko dan yang sangat berisiko diperlakukan sama.
+  howToTeach: >-
+    Minta mereka memberi nilai 1 sampai 3 untuk risiko sebuah langkah sebelum
+    mengambilnya, lalu bandingkan dengan hasilnya.
+
+sec.response:
+  lesson: null
+  missions: [benteng.m11, benteng.m12]
+  misconception: >-
+    Setelah kehilangan satu bidak, bermain seolah tidak terjadi apa-apa, atau
+    sebaliknya panik dan mengubah seluruh rencana.
+  howToTeach: >-
+    Setelah kehilangan bidak, satu pertanyaan: "apa yang berubah, dan apa yang
+    tidak?" Keduanya penting.

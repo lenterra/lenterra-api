@@ -131,3 +131,15 @@ export function catalogParts(c: Ctx, version: string): ManifestPart[] {
   }
   return out;
 }
+
+/**
+ * Read one catalog part on the server.
+ *
+ * Used for content the *server* needs rather than the device — teaching notes
+ * are read by the dashboard through an RPC, because the dashboard has no
+ * catalog cache and no reason to grow one for seventeen paragraphs.
+ */
+export function catalogPart<T>(c: Ctx, version: string, part: string): T | null {
+  const rows = c.nk.sqlQuery(Q.catalogPartBody, [version, part]) as { body: T }[];
+  return rows.length > 0 ? (rows[0] as { body: T }).body : null;
+}

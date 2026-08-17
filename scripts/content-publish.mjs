@@ -12,7 +12,7 @@
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 
-import { checkAll, loadStrings, report } from './content-lib.mjs';
+import { checkAll, loadStrings, loadTeachingNotes, report } from './content-lib.mjs';
 import { checkGreedyTrapQuota, hasErrors } from '../packages/core/dist/index.js';
 
 const GAMES = ['congklak', 'benteng'];
@@ -88,6 +88,19 @@ async function main() {
       sha256: sha256(body),
       bytes: Buffer.byteLength(body),
       body: strings,
+    });
+  }
+
+  // Teaching notes ride the catalog like everything else, so a corrected
+  // misconception reaches a teacher without an app release (PRD-CNT-007).
+  const notes = loadTeachingNotes();
+  if (Object.keys(notes).length > 0) {
+    const body = JSON.stringify(notes);
+    parts.push({
+      part: 'teaching',
+      sha256: sha256(body),
+      bytes: Buffer.byteLength(body),
+      body: notes,
     });
   }
 

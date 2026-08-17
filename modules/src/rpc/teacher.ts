@@ -14,6 +14,7 @@ import { invalidArgument, notFound } from '../lib/errors';
 import { optionalString, requireBool, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
 import { Q } from '../db/queries';
 import { audit, maskName, requireMemberOf, requireRole, requireTeacherOf } from '../domain/profile';
+import { catalogPart, currentCatalog } from '../domain/catalog';
 import { emit } from '../domain/telemetry';
 
 // ---------------------------------------------------------------------------
@@ -165,6 +166,13 @@ export interface ClassSummaryReq {
 
 const PERIOD_DAYS: Record<string, number> = { week: 7, month: 30, term: 120 };
 
+interface TeachingNote {
+  lesson: string | null;
+  missions: string[];
+  misconception: string;
+  howToTeach: string;
+}
+
 export function teacherClassSummary(c: Ctx, req: ClassSummaryReq) {
   const klass = requireTeacherOf(c, requireString(req.classId, 'classId', 64));
   const period = req.period === 'month' || req.period === 'term' ? req.period : 'week';
@@ -231,15 +239,31 @@ export function teacherClassSummary(c: Ctx, req: ClassSummaryReq) {
     below_proficient: number;
     total: number;
   }[];
+  // Teaching notes for the nodes that came back as gaps (PRD-TCH-012).
+  //
+  // Naming a weakness without saying what to do about it leaves a teacher who
+  // is not certified in this subject worse off than before the dashboard spoke:
+  // they now have a problem and no way to act on it.
+  const catalog = currentCatalog(c);
+  const notes = catalogPart<Record<string, TeachingNote>>(c, catalog.version, 'teaching') ?? {};
+
   const gaps = [];
   for (let i = 0; i < gapRows.length; i++) {
     const row = gapRows[i] as (typeof gapRows)[number];
+    const note = notes[row.skill_node_id];
     gaps.push({
       skillNodeId: row.skill_node_id,
       studentsBelowProficient: Number(row.below_proficient),
       totalStudents: Number(row.total),
-      suggestedLessonId: null,
-      suggestedMissionIds: [],
+      suggestedLessonId: note && note.lesson ? note.lesson : null,
+      suggestedMissionIds: note && note.missions ? note.missions : [],
+      // Prose rather than a key, because it *is* content: authored in the
+      // catalog, reviewed with the course material, and updatable without an
+      // app release. The dashboard has no catalog cache and no reason to grow
+      // one for seventeen paragraphs.
+      teaching: note
+        ? { misconception: note.misconception, howToTeach: note.howToTeach }
+        : null,
     });
   }
 
