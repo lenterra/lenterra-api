@@ -11,7 +11,14 @@ id: benteng.m03
 game: benteng
 rank: 3
 contentVersion: 1
-eloDifficulty: 1000
+# The declared difficulty is what play measures, not what the ladder position
+# suggests. A mission's ELO is what the adaptive selector matches against a
+# student's rating, so declaring this one easier than it plays would keep
+# offering it to exactly the students who cannot yet win it.
+#
+# Its rank is unchanged: rank is the teaching order, and this mission has to be
+# met where it is for the ladder's explanation to hold together.
+eloDifficulty: 1375
 seed: 2003
 
 skillWeights:
