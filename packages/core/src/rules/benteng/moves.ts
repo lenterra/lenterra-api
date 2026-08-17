@@ -98,11 +98,19 @@ export function legalityOf(
     const moverFreshness = freshnessOf(state, unit);
     const targetFreshness = freshnessOf(state, occupant);
 
-    // Strictly fresher. Equal freshness does not permit a capture — a tie
-    // between two equally-aged credentials should not resolve in the
-    // aggressor's favour, and making it strict keeps the rule stateable in
-    // one sentence.
-    if (moverFreshness >= targetFreshness) {
+    // Strictly fresher, by more than the mission's grace window. Equal
+    // freshness does not permit a capture — a tie between two equally-aged
+    // credentials should not resolve in the aggressor's favour, and making it
+    // strict keeps the rule stateable in one sentence.
+    //
+    // The window is the same one `isCapturable` applies, and it has to be:
+    // that function decides what the board marks as takeable and what the
+    // exposure metric counts, so a legality rule that ignored it would mark a
+    // unit safe and then let it be taken anyway. An early rank relaxes the
+    // window so a student reads freshness numbers before they are punished for
+    // misreading them, and a relaxation that did not actually protect anything
+    // would be a brief making a promise the rules break.
+    if (moverFreshness + state.freshnessWindow >= targetFreshness) {
       return { legal: false, reason: 'stale', rejection: { moverFreshness, targetFreshness } };
     }
   }

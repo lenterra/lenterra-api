@@ -164,11 +164,3 @@ export function rankMove(state: CongklakState, move: CongklakMove): number | nul
   }
   return null;
 }
-
-/**
- * Number of legal moves — the denominator in "the 2nd best of 7 possible
- * moves" the result panel shows.
- */
-export function legalMoveCount(state: CongklakState): number {
-  return legalMoves(state).length;
-}
