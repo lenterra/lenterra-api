@@ -72,7 +72,7 @@ if (!numbers || numbers.length < 3) {
 
 const [line, branch, funcs] = numbers.map(Number);
 
-console.log(`core coverage — line ${line}%, branch ${branch}%, functions ${funcs}%`);
+console.log(`packages/core only — line ${line}%, branch ${branch}%, functions ${funcs}%`);
 console.log(
   `floor: line ${MIN_LINE}%, branch ${MIN_BRANCH}%, functions ${MIN_FUNCTIONS}%` +
     `    target: branch ${TARGET_BRANCH}%`,
@@ -104,3 +104,11 @@ if (branch < TARGET_BRANCH) {
 } else {
   console.log('✓ TRD-TEST-001 satisfied');
 }
+
+// Said every run, because this number has already been quoted as though it
+// described the project. It describes `packages/core`: the shared rules engine.
+// The Nakama handlers — where every authorisation decision lives — are measured
+// by `npm run test:coverage:modules`, and most of them are not measured at all.
+console.log('');
+console.log('This figure covers packages/core and nothing else.');
+console.log('For the handlers, run: npm run test:coverage:modules');

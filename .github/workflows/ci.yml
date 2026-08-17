@@ -91,6 +91,14 @@ jobs:
       - name: core coverage gate
         run: npm run test:coverage
 
+      # A separate gate on purpose. The one above measures `packages/core` and
+      # says nothing about the handlers, which is where authorisation lives —
+      # and its number has already been read as though it covered both. This
+      # one guards the handler files that have contract tests and prints, every
+      # run, the ones that have none.
+      - name: handler coverage gate
+        run: npm run test:coverage:modules
+
       - name: schema tests
         run: npm run test:schema
         env:
