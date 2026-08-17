@@ -29,7 +29,8 @@
     "dev:down": "docker compose -f docker/docker-compose.yml down",
     "dev:logs": "docker compose -f docker/docker-compose.yml logs -f nakama",
     "dev:reload": "npm run build:modules && npm run guard:bundle && docker compose -f docker/docker-compose.yml restart nakama",
-    "test:coverage": "node scripts/coverage-gate.mjs"
+    "test:coverage": "node scripts/coverage-gate.mjs",
+    "test:contract": "node --test \"test/*.test.mts\""
   },
   "devDependencies": {
     "@types/node": "^26.2.0",

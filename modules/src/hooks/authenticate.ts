@@ -12,57 +12,7 @@
 
 import { LenterraError } from '../lib/errors';
 import { Q } from '../db/queries';
-
-const ISSUER = 'lenterra-verifier';
-const AUDIENCE = 'lenterra-nakama';
-const CLOCK_SKEW_SECONDS = 30;
-
-interface AssertionClaims {
-  sub: string;
-  iss: string;
-  aud: string;
-  iat: number;
-  exp: number;
-  jti: string;
-  strategy?: string;
-}
-
-function secrets(ctx: nkruntime.Context): string[] {
-  const env = ctx.env ?? {};
-  const out: string[] = [];
-  if (env['ASSERTION_HMAC_SECRET']) out.push(env['ASSERTION_HMAC_SECRET'] as string);
-  // Rotation accepts both keys during the window, so replacing the secret does
-  // not create a period in which every sign-in fails.
-  if (env['ASSERTION_HMAC_SECRET_PREVIOUS']) {
-    out.push(env['ASSERTION_HMAC_SECRET_PREVIOUS'] as string);
-  }
-  return out;
-}
-
-/**
- * Constant-time comparison.
- *
- * Length and content are both compared without an early exit, so the timing
- * leaks neither.
- */
-function constantTimeEquals(a: string, b: string): boolean {
-  let diff = a.length ^ b.length;
-  const len = a.length > b.length ? a.length : b.length;
-  for (let i = 0; i < len; i++) {
-    diff |= (a.charCodeAt(i) | 0) ^ (b.charCodeAt(i) | 0);
-  }
-  return diff === 0;
-}
-
-/**
- * `nk.hmacSha256Hash` returns an ArrayBuffer and `base64UrlEncode` may or may
- * not pad depending on the runtime build. Padding is stripped here so the
- * comparison is against exactly what Node's `digest('base64url')` produced on
- * the verifier side — a padding mismatch would reject every valid sign-in.
- */
-function unpadded(value: string): string {
-  return value.replace(/=+$/, '');
-}
+import { assertionSecrets, verifyAssertion } from '../lib/assertion';
 
 export const beforeAuthenticateCustom: nkruntime.BeforeHookFunction<
   nkruntime.AuthenticateCustomRequest
@@ -81,60 +31,36 @@ export const beforeAuthenticateCustom: nkruntime.BeforeHookFunction<
   };
 
   if (!requestedId) reject('missing_custom_id');
-  if (!assertion) reject('missing_assertion');
 
-  const parts = assertion.split('.');
-  if (parts.length !== 3) reject('malformed_assertion');
-
-  const keys = secrets(ctx);
+  const keys = assertionSecrets(ctx);
   if (keys.length === 0) {
     logger.error('ASSERTION_HMAC_SECRET is not configured; refusing all sign-ins');
     throw new LenterraError('UNAVAILABLE', 'Sign-in is temporarily unavailable');
   }
 
-  // 1. signature
-  const signingInput = parts[0] + '.' + parts[1];
-  const presented = unpadded(parts[2] as string);
-  let signatureOk = false;
-  for (let i = 0; i < keys.length; i++) {
-    const mac = nk.hmacSha256Hash(signingInput, keys[i] as string);
-    if (constantTimeEquals(unpadded(nk.base64UrlEncode(mac)), presented)) signatureOk = true;
-  }
-  if (!signatureOk) reject('bad_signature');
+  // Signature, claims, and — the check the whole chain exists for — that the
+  // assertion's subject is the account being requested. Without that last one
+  // the caller could present a valid assertion for one identity while asking
+  // to become another.
+  const verified = verifyAssertion(
+    nk,
+    keys,
+    assertion ?? '',
+    requestedId,
+    Math.floor(Date.now() / 1000),
+  );
+  if (!verified.ok) reject(verified.reason);
 
-  // 2. claims
-  let claims: AssertionClaims;
-  try {
-    claims = JSON.parse(
-      nk.binaryToString(nk.base64UrlDecode(parts[1] as string)),
-    ) as AssertionClaims;
-  } catch (_e) {
-    return reject('malformed_claims');
-  }
-
-  const now = Math.floor(Date.now() / 1000);
-  if (claims.aud !== AUDIENCE) reject('bad_audience');
-  if (claims.iss !== ISSUER) reject('bad_issuer');
-  if (claims.exp < now - CLOCK_SKEW_SECONDS) reject('expired');
-  if (claims.iat > now + CLOCK_SKEW_SECONDS) reject('from_the_future');
-
-  // 3. The claim that closes the hole: the assertion's subject must be the
-  // account being requested. Without this, every other check is decoration
-  // around the same impersonation.
-  if (!claims.sub || claims.sub.toLowerCase() !== requestedId) reject('subject_mismatch');
-
-  // 4. replay protection — the jti is burned on first use
-  if (!claims.jti) reject('missing_jti');
-  const inserted = nk.sqlExec(Q.burnJti, [claims.jti, claims.exp]);
+  // Replay protection — the jti is burned on first use. For a class-code
+  // sign-in this jti came from the join grant, which is what makes that grant
+  // single-use without the verifier needing a database.
+  const inserted = nk.sqlExec(Q.burnJti, [verified.claims.jti, verified.claims.exp]);
   if (inserted.rowsAffected === 0) reject('replayed');
 
   // The assertion must never be persisted in account vars, where it would be
   // readable for as long as the account exists.
   delete (account as { vars?: Record<string, string> }).vars!['assertion'];
-  (account as { vars: Record<string, string> }).vars['authStrategy'] =
-    claims.strategy === 'google' || claims.strategy === 'class_code'
-      ? claims.strategy
-      : 'email';
+  (account as { vars: Record<string, string> }).vars['authStrategy'] = verified.strategy;
 
   return data;
 };
@@ -153,7 +79,7 @@ export const afterAuthenticateCustom: nkruntime.AfterHookFunction<
   if (!out.created) return;
 
   const account = data.account;
-  const address = ((account && account.id) || '').toLowerCase();
+  const customId = ((account && account.id) || '').toLowerCase();
   const vars = (account && account.vars) || {};
 
   const strategy = vars['authStrategy'] === 'google'
@@ -166,12 +92,28 @@ export const afterAuthenticateCustom: nkruntime.AfterHookFunction<
     ctx.userId,
     generateDisplayName(nk),
     generateFriendCode(nk),
-    address,
+    walletAddressOf(customId),
     strategy,
   ]);
 
   logger.info('profile created user=%s strategy=%s', ctx.userId, strategy);
 };
+
+/**
+ * The wallet address, if this identity has one.
+ *
+ * An email or Google account is keyed by its address, so the custom id *is* the
+ * address. A class-code account provisioned in `deferred` mode is keyed by an
+ * opaque server-generated id and has no wallet at all until the student adds an
+ * email — see `v1.account.upgrade`.
+ *
+ * Storing the opaque id in `wallet_address` would be worse than storing
+ * nothing: every later reader would take it for an address, and the first one
+ * to try minting a certificate to it would find out at the worst moment.
+ */
+function walletAddressOf(customId: string): string | null {
+  return customId.indexOf('0x') === 0 ? customId : null;
+}
 
 /**
  * A neutral placeholder name.

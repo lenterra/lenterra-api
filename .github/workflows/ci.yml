@@ -64,6 +64,12 @@ jobs:
       - name: unit tests
         run: npm test
 
+      # The wire formats Nakama and the verifier each implement separately, in
+      # two runtimes that cannot import each other. A disagreement between them
+      # is not a type error — it is a class of students who cannot sign in.
+      - name: cross-runtime contract tests
+        run: npm run test:contract
+
       # The core is the one package where a bug is wrong twice — on the phone
       # and in the validator, identically — so the two agree on a wrong answer
       # and nothing looks broken (TRD-TEST-001).
