@@ -146,6 +146,26 @@ export const Q = {
     ORDER BY p.display_name
     LIMIT 40`,
 
+  /**
+   * Every (student, node) mastery row in a class (PRD-SOC-009).
+   *
+   * Bands are computed from these in the core rather than in SQL, so the class
+   * goal counts a node as Proficient by exactly the rule the student's own
+   * screen uses. A threshold written twice is a threshold that eventually
+   * disagrees with itself, and here the two halves would be a teacher's
+   * dashboard and a child's progress bar.
+   */
+  classMastery: `
+    SELECT m.user_id, s.skill_node_id, s.mastery, s.evidence_count
+    FROM lenterra_class_member m
+    JOIN lenterra_skill_mastery s ON s.user_id = m.user_id
+    WHERE m.class_id = $1 AND m.removed_at IS NULL`,
+
+  classMemberCount: `
+    SELECT count(*)::int AS n
+    FROM lenterra_class_member
+    WHERE class_id = $1 AND removed_at IS NULL`,
+
   classRoster: `
     SELECT p.user_id, p.display_name, m.joined_at,
            (SELECT min(a.submitted_at) FROM lenterra_attempt a WHERE a.user_id = p.user_id) AS first_attempt_at,

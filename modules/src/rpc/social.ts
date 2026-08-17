@@ -6,7 +6,15 @@
  * harmful product (10-03).
  */
 
-import { checkCertificate, type NodeEvidence, type SkillNodeId } from '@lenterra/core';
+import {
+  bandOf,
+  checkCertificate,
+  classGoal,
+  isCounted,
+  type MasteryBand,
+  type NodeEvidence,
+  type SkillNodeId,
+} from '@lenterra/core';
 
 import { conflict, forbidden, invalidArgument, notFound } from '../lib/errors';
 import { optionalString, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
@@ -330,4 +338,105 @@ export function friendSearchByCode(c: Ctx, req: FriendSearchReq) {
 
   const row = rows[0] as { user_id: string; display_name: string };
   return { userId: row.user_id, displayName: row.display_name, sameSchool: true };
+}
+
+// ---------------------------------------------------------------------------
+// v1.class.goal
+// ---------------------------------------------------------------------------
+
+export interface ClassGoalRes {
+  /** Null when the student is in no class — most of the tab is still useful. */
+  classId: string | null;
+  className: string | null;
+  reached: number;
+  target: number;
+  progress: number;
+  achieved: boolean;
+  contributors: number;
+  memberCount: number;
+  /**
+   * What the student themselves has contributed.
+   *
+   * Present so the bar can answer "and what did I add", which is the question
+   * that turns a class total into something a student can act on. It is a count
+   * of their own nodes, never a ranking against classmates.
+   */
+  mine: number;
+}
+
+/**
+ * Progress toward the class goal (PRD-SOC-009).
+ *
+ * Deliberately not gated on `leaderboard_enabled`. A teacher who switches the
+ * ranking off is switching off competition, and this is the mechanic that is
+ * meant to survive that — it is the one place where a stronger student gains
+ * from a weaker one improving.
+ */
+export function classGoalGet(c: Ctx): ClassGoalRes {
+  const empty: ClassGoalRes = {
+    classId: null,
+    className: null,
+    reached: 0,
+    target: 0,
+    progress: 0,
+    achieved: false,
+    contributors: 0,
+    memberCount: 0,
+    mine: 0,
+  };
+
+  const classRows = c.nk.sqlQuery(Q.classOfUser, [c.userId]);
+  if (classRows.length === 0) return empty;
+
+  const klass = classRows[0] as { id: string; name: string };
+
+  const countRows = c.nk.sqlQuery(Q.classMemberCount, [klass.id]);
+  const memberCount = countRows.length > 0 ? Number((countRows[0] as { n: number }).n) : 0;
+
+  const rows = c.nk.sqlQuery(Q.classMastery, [klass.id]) as {
+    user_id: string;
+    skill_node_id: string;
+    mastery: number;
+    evidence_count: number;
+  }[];
+
+  // Grouped per student so contributors can be counted without a second query,
+  // and so the arithmetic stays checkable against a roster.
+  const byStudent: Record<string, MasteryBand[]> = {};
+  let mine = 0;
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i] as {
+      user_id: string;
+      skill_node_id: string;
+      mastery: number;
+      evidence_count: number;
+    };
+    const band = bandOf(Number(row.mastery), Number(row.evidence_count));
+    const bands = byStudent[row.user_id] ?? [];
+    bands.push(band);
+    byStudent[row.user_id] = bands;
+    if (row.user_id === c.userId && isCounted(band)) mine++;
+  }
+
+  const contributions: { userId: string; bands: MasteryBand[] }[] = [];
+  const userIds = Object.keys(byStudent).sort();
+  for (let i = 0; i < userIds.length; i++) {
+    const userId = userIds[i] as string;
+    contributions.push({ userId, bands: byStudent[userId] as MasteryBand[] });
+  }
+
+  const goal = classGoal(memberCount, contributions);
+
+  return {
+    classId: klass.id,
+    className: klass.name,
+    reached: goal.reached,
+    target: goal.target,
+    progress: goal.progress,
+    achieved: goal.achieved,
+    contributors: goal.contributors,
+    memberCount,
+    mine,
+  };
 }

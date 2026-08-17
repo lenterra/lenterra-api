@@ -26,6 +26,7 @@ import {
   certificateVisibility,
   friendSearchByCode,
   leaderboardList,
+  classGoalGet,
   pointsHistory,
   rewardRedeem,
 } from './rpc/social';
@@ -102,6 +103,7 @@ function InitModule(
     rpc('v1.certificate.visibility', certificateVisibility),
   );
   initializer.registerRpc('v1.leaderboard.list', rpc('v1.leaderboard.list', leaderboardList));
+  initializer.registerRpc('v1.class.goal', rpc('v1.class.goal', classGoalGet));
   initializer.registerRpc(
     'v1.friend.searchByCode',
     rpc('v1.friend.searchByCode', friendSearchByCode, {

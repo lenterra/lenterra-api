@@ -26,6 +26,7 @@ export * from './adaptive/elo';
 export * from './adaptive/select';
 export * from './adaptive/struggle';
 export * from './adaptive/mastery';
+export * from './adaptive/classgoal';
 
 // --- rules -----------------------------------------------------------------
 export * from './rules/types';
