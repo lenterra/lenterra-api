@@ -36,7 +36,7 @@
     "prod:logs": "docker compose -f docker/docker-compose.prod.yml logs -f",
     "prod:down": "docker compose -f docker/docker-compose.prod.yml down",
     "test:coverage": "node scripts/coverage-gate.mjs",
-    "test:contract": "node --test \"test/*.test.mts\"",
+    "test:contract": "node --import ./test/ts-resolve.mjs --test \"test/*.test.mts\"",
     "test:content": "node --test test/rewards.test.mjs",
     "fixtures:generate": "node scripts/fixtures-generate.mjs",
     "test:conformance": "node --test test/conformance.test.mjs"
