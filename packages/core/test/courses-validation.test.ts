@@ -503,3 +503,37 @@ test('a course that overruns a single session is flagged', () => {
 
   assert.ok(warns(input, 'reading_time'));
 });
+
+test('a course with no single dominant node is flagged', () => {
+  // Two nodes at half weight each means the mission cannot be filed under one
+  // skill, and the recommendation engine has to pick one anyway. A warning
+  // rather than an error: the content is usable, it is just less informative
+  // than it looks.
+  const input = fixture();
+  (input.courses[0] as CourseSummary).skillNodes = ['algo.iteration', 'algo.sequencing'];
+  (input.answers[CHECK_ID] as CheckAnswerKey).skillWeights = {
+    'algo.iteration': 0.5,
+    'algo.sequencing': 0.5,
+  };
+  input.lessonNodes[CHECK_ID] = ['algo.iteration', 'algo.sequencing'];
+  (input.lessons[0] as Lesson).skillNodes = ['algo.iteration', 'algo.sequencing'];
+
+  assert.ok(warns(input, 'weights'));
+});
+
+test('every way an ordering answer can fail to be a permutation is caught', () => {
+  // Each of these grades some student's correct answer as wrong, and none of
+  // them looks wrong in a diff.
+  for (const correct of [
+    [0, 1],        // too short
+    [0, 1, 1],     // a repeat
+    [0, 1, 3],     // out of range
+    [-1, 0, 1],    // negative
+    [0, 1, 1.5],   // not an integer
+    ['a', 'b', 'c'], // not numbers at all
+  ]) {
+    const input = fixture();
+    (input.answers[CHECK_ID] as CheckAnswerKey).items[1]!.correct = correct as never;
+    assert.ok(has(input, 'answers'), `${JSON.stringify(correct)} was accepted as a permutation`);
+  }
+});

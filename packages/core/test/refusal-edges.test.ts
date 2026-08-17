@@ -19,7 +19,9 @@ import assert from 'node:assert/strict';
 import {
   bentengEngine,
   checkGreedyTrap,
+  classGoal,
   congklakEngine,
+  greedyLine,
   solve,
   verifyLine,
 } from '../dist/index.js';
@@ -379,4 +381,72 @@ test('positions already seen are not expanded twice', () => {
 
   const result = solve(engine, STUB_MISSION, { maxDepth: 6, maxNodes: 100_000 });
   assert.ok(result.nodesVisited <= 4, `expanded ${result.nodesVisited} identical positions`);
+});
+
+test('a line continues when the opponent has no move to make', () => {
+  // Distinct from the runaway case: here the opponent is simply out of options,
+  // which is a legitimate mid-game state and must not be read as the line
+  // failing. Breaking out and carrying on is what lets a mission end with one
+  // side stuck rather than with a rejected replay.
+  const engine = stubEngine({ sideToMove: () => 2 as const, aiMove: () => null });
+  const result = verifyLine(engine, STUB_MISSION, [{ kind: 'sow', pit: 7 }]);
+
+  assert.equal(result.achieved, false);
+  assert.equal(/never yielded/.test(result.reason ?? ''), false);
+});
+
+test('the greedy line stops when the opponent is stuck rather than looping', () => {
+  const engine = stubEngine({ sideToMove: () => 2 as const, aiMove: () => null });
+  const result = greedyLine(engine, STUB_MISSION, 5);
+
+  assert.equal(result.achieved, false);
+  assert.ok(result.line.length <= 5);
+});
+
+test('the greedy line ends the moment the goal is met', () => {
+  const engine = stubEngine({
+    evaluateGoal: () => ({ achieved: true, terminal: true, progress: 1 }),
+  });
+
+  const result = greedyLine(engine, STUB_MISSION, 10);
+  assert.equal(result.achieved, true);
+  assert.equal(result.line.length, 0, 'a mission already won needs no moves');
+});
+
+test('the greedy line ranks by the engine, and falls back when nothing ranks', () => {
+  // `rankMove` returning null for every option is the normal case on a grid
+  // game. The line must still be produced, and still be the same line twice.
+  const unranked = stubEngine({
+    rankMove: () => null,
+    legalMoves: () => [
+      { kind: 'sow', pit: 7 },
+      { kind: 'sow', pit: 8 },
+    ],
+  });
+
+  const first = greedyLine(unranked, STUB_MISSION, 3);
+  const second = greedyLine(unranked, STUB_MISSION, 3);
+  assert.deepEqual(first.line, second.line);
+
+  // And when it does rank, the best-ranked move is the one taken.
+  const ranked = stubEngine({
+    legalMoves: () => [
+      { kind: 'sow', pit: 7 },
+      { kind: 'sow', pit: 8 },
+    ],
+    rankMove: (_state: unknown, move: { pit: number }) => (move.pit === 8 ? 0 : 5),
+  });
+
+  const chosen = greedyLine(ranked, STUB_MISSION, 1);
+  assert.deepEqual(chosen.line[0], { kind: 'sow', pit: 8 });
+});
+
+test('a class goal with an impossible target reports no progress rather than dividing by it', () => {
+  // Not reachable from `classGoalTarget`, which has a floor — but `classGoal`
+  // is called with a target from the database, and a zero there would otherwise
+  // render as NaN% on a teacher's dashboard.
+  const goal = classGoal(0, []);
+  assert.ok(goal.target > 0);
+  assert.equal(goal.progress, 0);
+  assert.equal(goal.achieved, false);
 });

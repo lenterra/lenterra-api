@@ -78,7 +78,7 @@ test('an abandoned attempt produces no evidence at all', () => {
     {
       outcome: 'abandoned',
       skillWeights: { 'comp.counting': 1 },
-      source: 'mission',
+      source: 'game',
       sourceKey: 'a1',
       hintShown: false,
       hintUsed: false,
@@ -99,7 +99,7 @@ test('a skill with no weight in an attempt is untouched by it', () => {
     {
       outcome: 'success',
       skillWeights: { 'comp.counting': 1, 'algo.greedy': 0 },
-      source: 'mission',
+      source: 'game',
       sourceKey: 'a2',
       hintShown: false,
       hintUsed: false,
