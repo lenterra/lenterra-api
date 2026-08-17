@@ -26,15 +26,32 @@ const SERVER_KEY = process.env.NAKAMA_SERVER_KEY ?? 'lenterra-localdev-key';
 const HTTP_KEY = process.env.NAKAMA_HTTP_KEY ?? 'lenterra-localdev-http';
 const SECRET = process.env.ASSERTION_HMAC_SECRET ?? '';
 
-export const BASE = `http://${HOST}:${PORT}`;
+/**
+ * Where the server is.
+ *
+ * `TEST_NAKAMA_URL` points the whole suite at a deployed server — the only way
+ * to run any of this on a machine where Nakama's amd64-only image will not
+ * start, which is the machine this was written on.
+ *
+ * **Running this against production writes to production.** These tests create
+ * accounts, classes, and attempts, and seed roles directly in the database.
+ * Point it at a staging deployment, or at one you are willing to have a test
+ * class in.
+ */
+export const BASE = process.env.TEST_NAKAMA_URL ?? `http://${HOST}:${PORT}`;
 
-const PG = {
-  host: process.env.POSTGRES_HOST ?? 'localhost',
-  port: Number(process.env.POSTGRES_PORT ?? 5432),
-  database: process.env.POSTGRES_DB ?? 'nakama',
-  user: process.env.POSTGRES_USER ?? 'postgres',
-  password: process.env.POSTGRES_PASSWORD ?? 'localdev',
-};
+/** A remote run needs a database URL too, since roles are seeded through SQL. */
+const REMOTE = Boolean(process.env.TEST_NAKAMA_URL);
+
+const PG = process.env.DATABASE_URL
+  ? { connectionString: process.env.DATABASE_URL }
+  : {
+      host: process.env.POSTGRES_HOST ?? 'localhost',
+      port: Number(process.env.POSTGRES_PORT ?? 5432),
+      database: process.env.POSTGRES_DB ?? 'nakama',
+      user: process.env.POSTGRES_USER ?? 'postgres',
+      password: process.env.POSTGRES_PASSWORD ?? 'localdev',
+    };
 
 let db = null;
 
@@ -49,9 +66,29 @@ export async function connect() {
     console.log('skipping integration: ASSERTION_HMAC_SECRET not set');
     return false;
   }
+  if (REMOTE && !process.env.DATABASE_URL) {
+    // Named rather than skipped quietly. Somebody who has set TEST_NAKAMA_URL
+    // is trying to run these against a deployment, and a silent skip would let
+    // them believe the suite passed there.
+    console.log(
+      'skipping integration: TEST_NAKAMA_URL is set but DATABASE_URL is not — ' +
+        'roles and schools are seeded through SQL, so the suite needs both',
+    );
+    return false;
+  }
   try {
-    const res = await fetch(`${BASE}/healthcheck`, { signal: AbortSignal.timeout(4000) });
-    if (!res.ok) return false;
+    // A remote server is behind TLS and a proxy, so it gets longer than a
+    // container on the same machine.
+    const res = await fetch(`${BASE}/healthcheck`, {
+      signal: AbortSignal.timeout(REMOTE ? 15_000 : 4000),
+    });
+    if (!res.ok) {
+      // Something answered and it was not a healthy Nakama — a proxy, a parked
+      // domain, the wrong host. Skipping silently here would look identical to
+      // "no server configured", so it says which.
+      console.log(`skipping integration: ${BASE}/healthcheck answered ${res.status}`);
+      return false;
+    }
   } catch {
     console.log(`skipping integration: no Nakama at ${BASE}`);
     return false;
@@ -64,6 +101,7 @@ export async function connect() {
     db = null;
     return false;
   }
+  if (REMOTE) console.log(`running integration against ${BASE} — this writes data there`);
   return true;
 }
 

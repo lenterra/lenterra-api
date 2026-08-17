@@ -95,9 +95,49 @@ the same version hash and no new rows.
 ## Checking it
 
 ```bash
+npm run smoke                                  # the deploy target
+npm run smoke -- https://staging.example.com   # somewhere else
+```
+
+Seven checks a stranger could make: the server is healthy, TLS and HSTS are in
+front of it, the verifier can mint grants, the Nakama console is refused, two
+RPCs refuse an anonymous caller, and the runtime is loaded. If the first fails
+the rest are reported as **not checked** rather than passed — a parked domain
+answers 403 to everything, which is indistinguishable from correctly refusing,
+and a row of green ticks against a host with nothing on it is worse than no
+check at all.
+
+It says nothing about signing in. That needs a class code that exists.
+
+```bash
 curl -s https://lenterra-api.faizath.com/verifier/health
 docker compose -f docker/docker-compose.prod.yml logs -f nakama
 ```
+
+### The integration suite, against a deployment
+
+The 104 integration tests need a real Nakama, which this project's development
+machine cannot run — the image is amd64-only. Pointing them at a deployment is
+the only way to run them outside CI:
+
+```bash
+TEST_NAKAMA_URL=https://staging.example.com \
+DATABASE_URL=postgres://user:pass@host:5432/nakama \
+ASSERTION_HMAC_SECRET=<that deployment's secret> \
+NAKAMA_SERVER_KEY=<its server key> \
+NAKAMA_HTTP_KEY=<its http key> \
+npm run test:integration
+```
+
+Both URLs are needed: roles and schools are seeded through SQL rather than over
+the wire, deliberately — there is no RPC that promotes a caller to teacher, and
+adding a test-only one would create the privilege-escalation route its absence
+prevents.
+
+**This writes to whatever you point it at.** It creates accounts, classes, and
+attempts. Use staging, or a deployment you are willing to have a test class in.
+Setting `TEST_NAKAMA_URL` without `DATABASE_URL` skips the whole suite with a
+message saying so, rather than half-running.
 
 `/verifier/health` reports whether code sign-in is configured and whether
 thirdweb is set up. `codeSignIn: false` means `JOIN_GRANT_HMAC_SECRET` or

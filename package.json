@@ -32,6 +32,7 @@
     "dev:logs": "docker compose -f docker/docker-compose.yml logs -f nakama",
     "dev:reload": "npm run build:modules && npm run guard:bundle && docker compose -f docker/docker-compose.yml restart nakama",
     "deploy": "node scripts/deploy.mjs",
+    "smoke": "node scripts/smoke.mjs",
     "prod:logs": "docker compose -f docker/docker-compose.prod.yml logs -f",
     "prod:down": "docker compose -f docker/docker-compose.prod.yml down",
     "test:coverage": "node scripts/coverage-gate.mjs",

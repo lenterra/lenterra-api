@@ -19,7 +19,11 @@ const PORT = process.env.NAKAMA_PORT ?? '7350';
 const SERVER_KEY = process.env.NAKAMA_SERVER_KEY ?? 'lenterra-localdev-key';
 const SECRET = process.env.ASSERTION_HMAC_SECRET ?? '';
 
-const BASE = `http://${HOST}:${PORT}`;
+// Written before the shared harness existed, so it reads the same environment
+// itself. `TEST_NAKAMA_URL` has to be honoured here too — otherwise a remote
+// run silently skips the one suite that covers the sign-in hook, which is the
+// suite most worth running against a real deployment.
+const BASE = process.env.TEST_NAKAMA_URL ?? `http://${HOST}:${PORT}`;
 let available = false;
 
 before(async () => {
@@ -28,8 +32,17 @@ before(async () => {
     return;
   }
   try {
-    const res = await fetch(`${BASE}/healthcheck`, { signal: AbortSignal.timeout(4000) });
+    const res = await fetch(`${BASE}/healthcheck`, {
+      // A remote server is behind TLS and a proxy, so it gets longer.
+      signal: AbortSignal.timeout(process.env.TEST_NAKAMA_URL ? 15_000 : 4000),
+    });
     available = res.ok;
+    if (!res.ok) {
+      // Something answered and it was not a healthy Nakama — a proxy, a parked
+      // domain, the wrong host. Skipping silently here would look identical to
+      // "no server configured", so it says which.
+      console.log(`skipping auth integration: ${BASE}/healthcheck answered ${res.status}`);
+    }
   } catch {
     console.log(`skipping auth integration: no Nakama at ${BASE}`);
   }
