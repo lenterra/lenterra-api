@@ -40,7 +40,9 @@ for (const game of targets) {
     const lines = missions
       .map((m) => {
         const s = solved.get(m.id);
-        const line = s?.solvable ? `${s.line.length} move(s)` : 'UNSOLVED';
+        const line = s?.solvable
+          ? `${s.line.length} move(s)${s.fromReferenceLine ? ' (authored)' : ''}`
+          : 'UNSOLVED';
         const trap = traps.has(m.id) ? ' · greedy trap' : '';
         return `  rank ${String(m.rank).padStart(2)}  ${m.id.padEnd(16)} elo ${String(m.eloDifficulty).padStart(4)}  ${line}${trap}`;
       })

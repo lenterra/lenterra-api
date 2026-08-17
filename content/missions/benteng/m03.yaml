@@ -1,0 +1,55 @@
+# Benteng mission m03 — Pulang Dulu
+#
+# Grid coordinates: x rightwards, y downwards. The student's base is at the
+# bottom, the opponent's at the top.
+#
+# Freshness is `turn - lastTouchedBaseOnTurn`; lower is stronger, and a unit may
+# only capture one whose freshness is strictly higher than its own. `freshness`
+# below is how stale a unit already is at turn zero.
+
+id: benteng.m03
+game: benteng
+rank: 3
+contentVersion: 1
+eloDifficulty: 1000
+seed: 2003
+
+skillWeights:
+  sec.access: 0.6
+  algo.sequencing: 0.2
+  algo.lookahead: 0.2
+
+rationale: >-
+  The student starts stale and can capture nobody. Going home first is the only move that changes that — the credential has to be renewed before it authorises anything.
+
+goal:
+  kind: capture_units
+  count: 1
+
+setup:
+  game: benteng
+  width: 5
+  height: 5
+  toMove: 1
+  bases:
+    - { side: 1, x: 2, y: 4 }
+    - { side: 2, x: 2, y: 0 }
+  units:
+    - { id: p1, side: 1, x: 2, y: 3, freshness: 4 }
+    - { id: e1, side: 2, x: 2, y: 1, freshness: 2 }
+    - { id: e2, side: 2, x: 4, y: 0 }
+
+constraints:
+  maxMoves: 12
+  parMoves: 5
+  aiTier: mudah
+
+config:
+  freshnessWindow: 0
+
+titleKey: mission.benteng.m03.title
+briefKey: mission.benteng.m03.brief
+hintKeys:
+  - mission.benteng.m03.hint1
+failureKeys:
+  tooStale: mission.benteng.m03.fail.tooStale

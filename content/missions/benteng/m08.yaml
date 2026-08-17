@@ -1,0 +1,74 @@
+# Benteng mission m08 — Pertahanan Berlapis
+#
+# Grid coordinates: x rightwards, y downwards. The student's base is at the
+# bottom, the opponent's at the top.
+#
+# Freshness is `turn - lastTouchedBaseOnTurn`; lower is stronger, and a unit may
+# only capture one whose freshness is strictly higher than its own. `freshness`
+# below is how stale a unit already is at turn zero.
+
+id: benteng.m08
+game: benteng
+rank: 8
+contentVersion: 1
+eloDifficulty: 1450
+seed: 2008
+
+skillWeights:
+  sec.defense: 0.7
+  algo.lookahead: 0.3
+
+rationale: >-
+  Ten turns against three attackers. Defenders at staggered freshness cover each other; defenders that all refresh together leave a window.
+
+goal:
+  kind: defend_base
+  turns: 10
+
+setup:
+  game: benteng
+  width: 7
+  height: 7
+  toMove: 1
+  bases:
+    - { side: 1, x: 3, y: 6 }
+    - { side: 2, x: 3, y: 0 }
+  units:
+    - { id: p1, side: 1, x: 3, y: 6 }
+    - { id: p2, side: 1, x: 2, y: 5 }
+    - { id: p3, side: 1, x: 4, y: 5 }
+    - { id: e1, side: 2, x: 1, y: 2, freshness: 1 }
+    - { id: e2, side: 2, x: 3, y: 2, freshness: 1 }
+    - { id: e3, side: 2, x: 5, y: 2, freshness: 1 }
+
+constraints:
+  maxMoves: 20
+  parMoves: 10
+  aiTier: sedang
+
+config:
+  freshnessWindow: 0
+
+# The intended solution, replayed by content validation.
+# Search is not tractable here: several units with four directions each, and a
+# goal that is only satisfied at full depth, so there is nothing to prune on.
+# Writing the line down proves the mission is winnable, documents the intent
+# for review, and fails the build the day a rules change breaks it.
+referenceLine:
+  - { kind: move, unitId: p1, x: 3, y: 5 }
+  - { kind: move, unitId: p1, x: 3, y: 4 }
+  - { kind: move, unitId: p1, x: 3, y: 3 }
+  - { kind: move, unitId: p1, x: 3, y: 2 }
+  - { kind: move, unitId: p1, x: 3, y: 1 }
+  - { kind: move, unitId: p2, x: 2, y: 4 }
+  - { kind: move, unitId: p2, x: 2, y: 3 }
+  - { kind: move, unitId: p2, x: 2, y: 2 }
+  - { kind: move, unitId: p2, x: 2, y: 1 }
+  - { kind: move, unitId: p3, x: 4, y: 4 }
+
+titleKey: mission.benteng.m08.title
+briefKey: mission.benteng.m08.brief
+hintKeys:
+  - mission.benteng.m08.hint1
+failureKeys:
+  baseTaken: mission.benteng.m08.fail.baseTaken

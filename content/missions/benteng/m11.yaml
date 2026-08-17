@@ -1,0 +1,78 @@
+# Benteng mission m11 — Pertandingan Penuh
+#
+# Grid coordinates: x rightwards, y downwards. The student's base is at the
+# bottom, the opponent's at the top.
+#
+# Freshness is `turn - lastTouchedBaseOnTurn`; lower is stronger, and a unit may
+# only capture one whose freshness is strictly higher than its own. `freshness`
+# below is how stale a unit already is at turn zero.
+
+id: benteng.m11
+game: benteng
+rank: 11
+contentVersion: 1
+eloDifficulty: 1650
+seed: 2011
+
+skillWeights:
+  sec.threats: 0.4
+  sec.defense: 0.25
+  sec.risk: 0.2
+  algo.state-eval: 0.15
+
+rationale: >-
+  A full game on the grid, three units a side. Freshness, exposure and the moment to refresh all matter at once, and nothing prompts any of them.
+
+goal:
+  kind: reach_base
+
+setup:
+  game: benteng
+  width: 5
+  height: 5
+  toMove: 1
+  bases:
+    - { side: 1, x: 2, y: 4 }
+    - { side: 2, x: 2, y: 0 }
+  units:
+    - { id: p1, side: 1, x: 1, y: 4 }
+    - { id: p2, side: 1, x: 2, y: 4 }
+    - { id: p3, side: 1, x: 3, y: 4 }
+    - { id: e1, side: 2, x: 1, y: 0 }
+    - { id: e2, side: 2, x: 2, y: 0 }
+    - { id: e3, side: 2, x: 3, y: 0 }
+
+constraints:
+  maxMoves: 20
+  parMoves: 13
+  aiTier: sedang
+
+config:
+  freshnessWindow: 0
+
+# The intended solution, replayed by content validation.
+# Search is not tractable here: several units with four directions each, and a
+# goal that is only satisfied at full depth, so there is nothing to prune on.
+# Writing the line down proves the mission is winnable, documents the intent
+# for review, and fails the build the day a rules change breaks it.
+referenceLine:
+  - { kind: move, unitId: p1, x: 1, y: 3 }
+  - { kind: move, unitId: p1, x: 1, y: 2 }
+  - { kind: move, unitId: p1, x: 1, y: 1 }
+  - { kind: move, unitId: p1, x: 0, y: 1 }
+  - { kind: move, unitId: p1, x: 0, y: 0 }
+  - { kind: move, unitId: p1, x: 0, y: 1 }
+  - { kind: move, unitId: p1, x: 0, y: 0 }
+  - { kind: move, unitId: p2, x: 2, y: 3 }
+  - { kind: move, unitId: p2, x: 2, y: 4 }
+  - { kind: move, unitId: p2, x: 2, y: 3 }
+  - { kind: move, unitId: p2, x: 2, y: 2 }
+  - { kind: move, unitId: p2, x: 2, y: 1 }
+  - { kind: move, unitId: p2, x: 2, y: 0 }
+
+titleKey: mission.benteng.m11.title
+briefKey: mission.benteng.m11.brief
+hintKeys:
+  - mission.benteng.m11.hint1
+failureKeys:
+  lost: mission.benteng.m11.fail.lost

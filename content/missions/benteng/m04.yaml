@@ -1,0 +1,56 @@
+# Benteng mission m04 — Jangan Terlalu Jauh
+#
+# Grid coordinates: x rightwards, y downwards. The student's base is at the
+# bottom, the opponent's at the top.
+#
+# Freshness is `turn - lastTouchedBaseOnTurn`; lower is stronger, and a unit may
+# only capture one whose freshness is strictly higher than its own. `freshness`
+# below is how stale a unit already is at turn zero.
+
+id: benteng.m04
+game: benteng
+rank: 4
+contentVersion: 1
+eloDifficulty: 1100
+seed: 2004
+
+skillWeights:
+  sec.risk: 0.65
+  algo.lookahead: 0.35
+
+rationale: >-
+  Reaching the base is easy; reaching it without ever standing capturable is the lesson. Distance from home is exposure.
+
+goal:
+  kind: all
+  goals:
+      - kind: reach_base
+      - kind: no_exposure
+
+setup:
+  game: benteng
+  width: 5
+  height: 5
+  toMove: 1
+  bases:
+    - { side: 1, x: 2, y: 4 }
+    - { side: 2, x: 2, y: 0 }
+  units:
+    - { id: p1, side: 1, x: 2, y: 4 }
+    - { id: e1, side: 2, x: 1, y: 1, freshness: 1 }
+    - { id: e2, side: 2, x: 3, y: 1, freshness: 1 }
+
+constraints:
+  maxMoves: 10
+  parMoves: 4
+  aiTier: mudah
+
+config:
+  freshnessWindow: 0
+
+titleKey: mission.benteng.m04.title
+briefKey: mission.benteng.m04.brief
+hintKeys:
+  - mission.benteng.m04.hint1
+failureKeys:
+  exposed: mission.benteng.m04.fail.exposed

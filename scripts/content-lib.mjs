@@ -18,6 +18,7 @@ import {
   hasErrors,
   solve,
   validateMissionSet,
+  verifyLine,
 } from '../packages/core/dist/index.js';
 
 export const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -173,6 +174,41 @@ export function checkAll(game, { skipSolver = false } = {}) {
   const traps = new Set();
 
   for (const mission of missions) {
+    // An authored line is checked first and is authoritative for "is this
+    // winnable". Search still runs where it is tractable, because the two
+    // answer different questions: the line proves a win exists, the search
+    // proves the obvious move is not always it.
+    if (mission.referenceLine) {
+      const verified = verifyLine(engine, mission, mission.referenceLine);
+      if (!verified.achieved) {
+        issues.push({
+          severity: 'error',
+          check: 'solvability',
+          missionId: mission.id,
+          message:
+            `the authored solution does not win: ${verified.reason}` +
+            (verified.failedAtMove === null ? '' : ` (move ${verified.failedAtMove})`),
+        });
+      }
+      const cap = mission.constraints?.maxMoves;
+      if (cap !== undefined && verified.playerMoves > cap) {
+        issues.push({
+          severity: 'error',
+          check: 'solvability',
+          missionId: mission.id,
+          message: `the authored solution needs ${verified.playerMoves} moves but maxMoves is ${cap}`,
+        });
+      }
+      solved.set(mission.id, {
+        solvable: verified.achieved,
+        line: mission.referenceLine,
+        nodesVisited: 0,
+        exhausted: false,
+        fromReferenceLine: true,
+      });
+      continue;
+    }
+
     let result;
     try {
       result = solve(engine, mission, { maxDepth: 10, maxNodes: 120_000 });

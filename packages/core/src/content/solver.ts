@@ -141,11 +141,20 @@ export interface DifficultyEstimate {
   /**
    * Whether the estimate says anything.
    *
+   * Two ways it does not.
+   *
    * Random play is a usable proxy for missions won by choosing well. It is a
    * terrible proxy for missions won by computing correctly: a mission with one
    * legal move is beaten by a random player every time and by a confused
    * student every time, which tells us nothing about its difficulty. Below two
-   * average choices the number is noise and callers should ignore it.
+   * average choices the number is noise.
+   *
+   * And a success rate of exactly 0 or 1 cannot be inverted into a rating. The
+   * ELO curve is asymptotic there, so the number that comes back is whatever
+   * the clamp happens to be — a property of the clamp, not of the mission. On a
+   * grid game where a random walk essentially never traces a coherent path,
+   * that is the common case, and reporting it as "play suggests ~1676" would
+   * be inventing a measurement.
    */
   informative: boolean;
 }
@@ -208,7 +217,7 @@ export function estimateDifficulty<S, M>(
     impliedElo: eloFromSuccessRate(successRate),
     playouts,
     meanBranching,
-    informative: meanBranching >= 2,
+    informative: meanBranching >= 2 && successRate > 0 && successRate < 1,
   };
 }
 

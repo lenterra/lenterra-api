@@ -1,0 +1,56 @@
+# Benteng mission m10 — Pulihkan Keadaan
+#
+# Grid coordinates: x rightwards, y downwards. The student's base is at the
+# bottom, the opponent's at the top.
+#
+# Freshness is `turn - lastTouchedBaseOnTurn`; lower is stronger, and a unit may
+# only capture one whose freshness is strictly higher than its own. `freshness`
+# below is how stale a unit already is at turn zero.
+
+id: benteng.m10
+game: benteng
+rank: 10
+contentVersion: 1
+eloDifficulty: 1550
+seed: 2010
+
+skillWeights:
+  sec.response: 0.5
+  algo.state-eval: 0.3
+  algo.optimization: 0.2
+
+rationale: >-
+  Two units already lost. The position is bad and still winnable, which is the point: a breach is not the end of the game.
+
+goal:
+  kind: reach_base
+
+setup:
+  game: benteng
+  width: 7
+  height: 7
+  toMove: 1
+  bases:
+    - { side: 1, x: 3, y: 6 }
+    - { side: 2, x: 3, y: 0 }
+  units:
+    - { id: p1, side: 1, x: 3, y: 6 }
+    - { id: p2, side: 1, x: 2, y: 6, captured: true }
+    - { id: p3, side: 1, x: 4, y: 6, captured: true }
+    - { id: e1, side: 2, x: 3, y: 2, freshness: 3 }
+    - { id: e2, side: 2, x: 1, y: 3, freshness: 3 }
+
+constraints:
+  maxMoves: 22
+  parMoves: 9
+  aiTier: sedang
+
+config:
+  freshnessWindow: 0
+
+titleKey: mission.benteng.m10.title
+briefKey: mission.benteng.m10.brief
+hintKeys:
+  - mission.benteng.m10.hint1
+failureKeys:
+  lost: mission.benteng.m10.fail.lost

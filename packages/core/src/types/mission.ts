@@ -106,7 +106,30 @@ export interface BentengSetup {
   height: number;
   /** Base coordinates, one per side. */
   bases: { side: 1 | 2; x: number; y: number }[];
-  units: { id: string; side: 1 | 2; x: number; y: number }[];
+  units: {
+    id: string;
+    side: 1 | 2;
+    x: number;
+    y: number;
+    /**
+     * Turns since this unit last touched its base, at turn 0.
+     *
+     * Without this every unit starts equally fresh, and since capture requires
+     * *strictly* lower freshness, no capture is possible until somebody goes
+     * home — which makes the whole first tier unteachable. A mission that wants
+     * to open on "one of these is stale, which one can you take?" says so here.
+     *
+     * Defaults to 0: on its base, fully fresh.
+     */
+    freshness?: number;
+    /**
+     * Start already captured, held at the enemy base.
+     *
+     * For missions that open from a position the student has to recover from,
+     * rather than making them lose two units first to get there.
+     */
+    captured?: boolean;
+  }[];
   toMove: 1 | 2;
 }
 
@@ -175,6 +198,17 @@ export interface Mission {
   setup: MissionSetup;
   constraints: MissionConstraints;
   config: GameConfig;
+  /**
+   * An authored winning line, player moves only.
+   *
+   * Optional, and required in practice only where exhaustive search is not
+   * tractable — a Benteng defence mission is sixteen branches per turn with no
+   * early exit to prune on. Validation replays it against the deterministic
+   * opponent, so a mission cannot be published claiming to be winnable when it
+   * is not, and a rules change that breaks the intended solution fails the
+   * build rather than reaching a student.
+   */
+  referenceLine?: unknown[];
 
   /** Seed for deterministic AI. Part of the definition so play is reproducible. */
   seed: number;

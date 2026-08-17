@@ -34,16 +34,46 @@ function initState(setup: MissionSetup, config: GameConfig): BentengState {
 
   const units: BentengUnit[] = [];
   for (let i = 0; i < setup.units.length; i++) {
-    const unit = setup.units[i] as { id: string; side: 1 | 2; x: number; y: number };
+    const unit = setup.units[i] as {
+      id: string;
+      side: 1 | 2;
+      x: number;
+      y: number;
+      freshness?: number;
+      captured?: boolean;
+    };
+    // Freshness is `turn - lastTouchedBaseOnTurn`, so a unit that should start
+    // three turns stale last touched its base three turns *before* turn zero.
+    const staleness = unit.freshness ?? 0;
     units.push({
       id: unit.id,
       team: unit.side,
       x: unit.x,
       y: unit.y,
-      // Every unit starts at its base, so every unit starts fresh.
-      lastTouchedBaseOnTurn: 0,
-      captured: false,
+      lastTouchedBaseOnTurn: -staleness,
+      captured: unit.captured === true,
     });
+  }
+
+  // A unit that starts captured is a prisoner from turn zero: held at the
+  // capturing team's base, counted as lost, and rescuable. Modelling it as
+  // "just a flag" would leave the rescue goal with nothing to rescue.
+  const prisoners: { unitId: string; heldBy: 1 | 2 }[] = [];
+  const unitsLostBy: [number, number] = [0, 0];
+
+  for (let i = 0; i < units.length; i++) {
+    const unit = units[i] as BentengUnit;
+    if (!unit.captured) continue;
+
+    const captor = unit.team === 1 ? 2 : 1;
+    prisoners.push({ unitId: unit.id, heldBy: captor });
+    unitsLostBy[unit.team === 1 ? 0 : 1] += 1;
+
+    const captorBase = bases.filter((base) => base.team === captor)[0];
+    if (captorBase) {
+      unit.x = captorBase.x;
+      unit.y = captorBase.y;
+    }
   }
 
   return {
@@ -54,14 +84,14 @@ function initState(setup: MissionSetup, config: GameConfig): BentengState {
     playerSide: 1,
     bases,
     units,
-    prisoners: [],
+    prisoners,
     turnLimit: DEFAULT_TURN_LIMIT,
     freshnessWindow: config.freshnessWindow ?? 0,
     illegalCaptureAttempts: 0,
     maxExposureTurns: 0,
     exposureRun: {},
     refreshCount: 0,
-    unitsLostBy: [0, 0],
+    unitsLostBy,
     rescuesPerformed: 0,
     baseUndefendedTurns: 0,
     turnsWithoutLoss: 0,

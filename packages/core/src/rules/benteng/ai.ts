@@ -76,8 +76,26 @@ export function evaluate(state: BentengState, team: Team): number {
 
   for (let i = 0; i < theirs.length; i++) {
     const unit = theirs[i] as BentengUnit;
-    if (ownBase) score += manhattan(unit, ownBase) * 6;
     if (isCapturable(state, unit)) score += 40;
+    if (!ownBase) continue;
+
+    const distance = manhattan(unit, ownBase);
+    score += distance * 6;
+
+    // Urgency near the base.
+    //
+    // Linear distance alone made the opponent indifferent between an enemy two
+    // steps from its base and one adjacent to it — a difference of six points
+    // against the eight it scores for advancing one step of its own. So it
+    // raced, never defended, and every "full game" mission was won by walking
+    // straight up a column while the opponent walked straight down another.
+    //
+    // The penalty has to be steep enough that stopping a unit one step out
+    // outweighs any amount of progress, because at one step out there is no
+    // next turn to make progress in.
+    if (distance <= 1) score -= 900;
+    else if (distance === 2) score -= 250;
+    else if (distance === 3) score -= 60;
   }
 
   score -= state.unitsLostBy[teamIndex(team)] * 150;
@@ -150,7 +168,15 @@ export function aiMove(state: BentengState, tier: AiTier, seed: number): Benteng
     return best ?? (moves[0] as BentengMove);
   }
 
-  const depth = tier === 'sulit' ? 3 : 1;
+  // *sedang* searches two ply, not one.
+  //
+  // At one ply the opponent evaluates only the position its own move produces,
+  // so it cannot see an interception before the interception is needed — by
+  // which point there is no turn left to make it. That made every full-game
+  // mission winnable by walking straight up a column. Two ply is enough to see
+  // "if I do not move across now, they arrive next turn", and on a 7×7 board
+  // with four units it costs about 256 evaluations per move.
+  const depth = tier === 'sulit' ? 3 : 2;
 
   let best: BentengMove | null = null;
   let bestValue = -Infinity;
