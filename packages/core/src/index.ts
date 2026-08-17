@@ -66,3 +66,4 @@ export * from './content/validate';
 export * from './content/solver';
 export * from './content/certificates';
 export * from './content/achievements';
+export * from './notify-window';

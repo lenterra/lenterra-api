@@ -34,3 +34,18 @@ CREATE INDEX IF NOT EXISTS lenterra_deletion_due_idx
 CREATE UNIQUE INDEX IF NOT EXISTS lenterra_moderation_open_pair_idx
   ON lenterra_moderation_report (reporter_user_id, subject_user_id)
   WHERE status = 'open';
+
+-- Notifications sent, for the daily cap.
+--
+-- Nakama stores the notifications themselves; this is only the counter. Reading
+-- the cap off Nakama's own table would couple us to its schema, and the cap is
+-- a product rule rather than a delivery detail.
+CREATE TABLE IF NOT EXISTS lenterra_notification_log (
+  id      UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code    INT NOT NULL,
+  sent_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS lenterra_notification_user_day_idx
+  ON lenterra_notification_log (user_id, sent_at DESC);

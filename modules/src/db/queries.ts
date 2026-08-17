@@ -672,6 +672,21 @@ export const Q = {
     SELECT count(*) AS n FROM lenterra_moderation_report
     WHERE status = 'open' AND created_at < now() - interval '72 hours'`,
 
+  // --- notifications -------------------------------------------------------
+
+  // Counted over a rolling 24 hours rather than a calendar day: a calendar cap
+  // resets at midnight, which is inside the quiet window and would let three
+  // more arrive the moment it lifts.
+  notificationCountToday: `
+    SELECT count(*) AS n FROM lenterra_notification_log
+    WHERE user_id = $1 AND sent_at > now() - interval '24 hours'`,
+
+  notificationRecord: `
+    INSERT INTO lenterra_notification_log (id, user_id, code) VALUES ($1,$2,$3)`,
+
+  notificationPurge: `
+    DELETE FROM lenterra_notification_log WHERE sent_at < now() - interval '30 days'`,
+
   // --- audit and telemetry -------------------------------------------------
 
   auditInsert: `

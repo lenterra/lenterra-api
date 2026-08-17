@@ -31,6 +31,7 @@ import { parseReplay, validate } from '../domain/validation';
 import { evaluateForAttempt } from '../domain/achievements';
 import { issueEarned } from '../domain/certificates';
 import { emit } from '../domain/telemetry';
+import { notify, NOTIFICATION_CODE } from '../domain/notify';
 import { recommend, ratingFor, studentRatings } from '../domain/selection';
 
 export interface AttemptPayload {
@@ -329,10 +330,34 @@ export function submitAttempt(
   }
 
   for (let i = 0; i < achievements.length; i++) {
-    emit(c, 'achievement.earned', { achievementId: achievements[i] as string });
+    const id = achievements[i] as string;
+    emit(c, 'achievement.earned', { achievementId: id });
+    // In-app only in R1. Push needs store presence and a consent conversation
+    // about minors the pilot does not need to have (PRD-APP-060, OQ-05).
+    notify(c, c.userId, {
+      code: NOTIFICATION_CODE.achievement,
+      subjectKey: 'notification.achievement',
+      params: { achievementId: id },
+    });
   }
   for (let i = 0; i < certificatesIssued.length; i++) {
-    emit(c, 'certificate.issued', { definitionId: certificatesIssued[i] as string });
+    const id = certificatesIssued[i] as string;
+    emit(c, 'certificate.issued', { definitionId: id });
+    notify(c, c.userId, {
+      code: NOTIFICATION_CODE.certificate,
+      subjectKey: 'notification.certificate',
+      params: { definitionId: id },
+    });
+  }
+
+  // A streak is only worth announcing at a milestone. Telling a student
+  // "2 days!" every second day is how a notification becomes noise.
+  if (streak.currentDays > 0 && streak.currentDays % 7 === 0) {
+    notify(c, c.userId, {
+      code: NOTIFICATION_CODE.streakKept,
+      subjectKey: 'notification.streakMilestone',
+      params: { days: streak.currentDays },
+    });
   }
   if (struggle) {
     emit(c, 'struggle.detected', {
