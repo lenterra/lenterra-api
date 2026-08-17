@@ -7,11 +7,109 @@
  * rather than a user because this path is reachable before an account exists.
  */
 
-import { conflict, invalidArgument, notFound } from '../lib/errors';
+import { LenterraError, conflict, invalidArgument, notFound } from '../lib/errors';
 import { optionalString, requireString, type Ctx } from '../lib/ctx';
-import { assertFailureBudget, recordFailure } from '../lib/ratelimit';
+import {
+  LIMITS,
+  assertFailureBudget,
+  checkRateLimit,
+  recordFailure,
+  type RateLimit,
+} from '../lib/ratelimit';
+import { JOIN_GRANT_TTL_SECONDS, mintJoinGrant } from '../lib/assertion';
 import { Q } from '../db/queries';
 import { audit, maskName, validateDisplayName } from '../domain/profile';
+
+interface ClassRow {
+  id: string;
+  name: string;
+  school_id: string;
+  max_members: number;
+  school_name: string;
+  member_count: number;
+}
+
+/**
+ * Resolve a join code, or fail the way an attacker learns nothing from.
+ *
+ * Unknown and expired codes are deliberately indistinguishable: telling them
+ * apart would let someone enumerate which codes ever existed, and what is
+ * behind a code is a list of children.
+ */
+function resolveClass(c: Ctx, code: string, subject: string): ClassRow {
+  const rows = c.nk.sqlQuery(Q.classByCode, [code]);
+  if (rows.length === 0) {
+    recordFailure(c, 'v1.class.join', subject);
+    throw notFound('That class code is not valid');
+  }
+
+  const row = rows[0] as ClassRow;
+  if (Number(row.member_count) >= Number(row.max_members)) {
+    throw conflict('class_full', 'That class is full');
+  }
+  return row;
+}
+
+// ---------------------------------------------------------------------------
+// v1.class.grant
+// ---------------------------------------------------------------------------
+
+export interface ClassGrantReq {
+  code: string;
+  deviceId?: string;
+}
+
+export interface ClassGrantRes {
+  grant: string;
+  /** Shown before the student commits, so a mistyped code is caught by a human. */
+  className: string;
+  schoolName: string;
+  expiresIn: number;
+}
+
+/**
+ * Mint a join grant for a valid class code (TRD-AUTH-004).
+ *
+ * The only handler in the system reachable with no account, because it is the
+ * one that exists so an account can be created. It therefore writes nothing:
+ * a caller with a stolen code can learn a class name and burn rate-limit
+ * budget, and that is the whole of it.
+ *
+ * The rate limit keys on a device identifier rather than a user for the same
+ * reason — there is no user yet — and shares its budget with `v1.class.join`,
+ * so guessing codes here does not simply reset the counter that guards there.
+ */
+export function classGrant(c: Ctx, req: ClassGrantReq): ClassGrantRes {
+  const code = requireString(req.code, 'code', 16).toUpperCase();
+  const deviceId = optionalString(req.deviceId, 'deviceId', 128) ?? c.userId;
+
+  if (!deviceId) {
+    // Without one there is nothing to rate-limit against, and an unlimited
+    // guessing channel against a six-character code is the one failure this
+    // handler must not have.
+    throw invalidArgument('deviceId is required');
+  }
+
+  const secret = (c.ctx.env ?? {})['JOIN_GRANT_HMAC_SECRET'] as string | undefined;
+  if (!secret) {
+    c.logger.error('JOIN_GRANT_HMAC_SECRET is not set; class-code sign-in is unavailable');
+    throw new LenterraError('UNAVAILABLE', 'Joining with a class code is temporarily unavailable');
+  }
+
+  // Keyed on the device because there is no user yet. Both budgets apply: the
+  // failure budget shared with `v1.class.join` catches guessing, and the call
+  // budget catches a caller who holds one valid code and hammers the handler.
+  checkRateLimit(c, 'v1.class.grant', LIMITS['v1.class.grant'] as RateLimit, deviceId);
+  assertFailureBudget(c, 'v1.class.join', deviceId);
+  const row = resolveClass(c, code, deviceId);
+
+  return {
+    grant: mintJoinGrant(c.nk, secret, row.id, Math.floor(c.now / 1000)),
+    className: row.name,
+    schoolName: row.school_name,
+    expiresIn: JOIN_GRANT_TTL_SECONDS,
+  };
+}
 
 export interface ClassJoinReq {
   code: string;
@@ -31,27 +129,7 @@ export function classJoin(c: Ctx, req: ClassJoinReq): ClassJoinRes {
   const deviceId = optionalString(req.deviceId, 'deviceId', 128) ?? c.userId;
 
   assertFailureBudget(c, 'v1.class.join', deviceId);
-
-  const rows = c.nk.sqlQuery(Q.classByCode, [code]);
-  if (rows.length === 0) {
-    recordFailure(c, 'v1.class.join', deviceId);
-    // Deliberately identical for an unknown and an expired code: telling them
-    // apart would let someone enumerate which codes ever existed.
-    throw notFound('That class code is not valid');
-  }
-
-  const row = rows[0] as {
-    id: string;
-    name: string;
-    school_id: string;
-    max_members: number;
-    school_name: string;
-    member_count: number;
-  };
-
-  if (Number(row.member_count) >= Number(row.max_members)) {
-    throw conflict('class_full', 'That class is full');
-  }
+  const row = resolveClass(c, code, deviceId);
 
   if (displayName !== null) {
     const rejection = validateDisplayName(displayName);

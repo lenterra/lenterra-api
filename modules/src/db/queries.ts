@@ -42,6 +42,37 @@ export const Q = {
     SET onboarded_at = COALESCE(onboarded_at, now()), updated_at = now()
     WHERE user_id = $1`,
 
+  /** The strategy and address of the caller, for the upgrade path. */
+  profileIdentity: `
+    SELECT auth_strategy, wallet_address
+    FROM lenterra_account_profile
+    WHERE user_id = $1`,
+
+  /** Whoever already holds this address, if anyone. */
+  profileByWallet: `
+    SELECT user_id FROM lenterra_account_profile WHERE wallet_address = $1`,
+
+  /**
+   * Claim an address for an account that has none.
+   *
+   * The `wallet_address IS NULL` predicate is the concurrency guard: two
+   * upgrades racing on the same account leave exactly one winner, and the loser
+   * sees zero rows rather than silently overwriting an address a certificate
+   * may already have been minted to.
+   */
+  profileClaimWallet: `
+    UPDATE lenterra_account_profile
+    SET wallet_address = $2, auth_strategy = $3, updated_at = now()
+    WHERE user_id = $1 AND wallet_address IS NULL
+    RETURNING user_id`,
+
+  /** Record the new strategy where the address was already correct. */
+  profileSetStrategy: `
+    UPDATE lenterra_account_profile
+    SET auth_strategy = $2, updated_at = now()
+    WHERE user_id = $1 AND wallet_address = $3
+    RETURNING user_id`,
+
   friendCodeExists: `SELECT 1 FROM lenterra_account_profile WHERE friend_code = $1`,
 
   // Only ever a same-school match. A code from another school returns nothing

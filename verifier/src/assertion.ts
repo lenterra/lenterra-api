@@ -43,20 +43,27 @@ export function signAssertion(claims: AssertionClaims, secret: string): string {
   return `${body}.${mac}`;
 }
 
+/**
+ * @param jti Supply the join grant's own `jti` on the class-code path. Nakama
+ *   burns it when the assertion is presented, which is what makes the grant
+ *   single-use without this service needing a database to remember grants it
+ *   has already honoured. Everywhere else a fresh one is correct.
+ */
 export function buildClaims(
-  address: string,
+  subject: string,
   strategy: AuthStrategy,
   nowSeconds: number,
+  jti?: string,
 ): AssertionClaims {
   return {
-    // Lower-cased here and compared lower-cased in the hook. An address that
+    // Lower-cased here and compared lower-cased in the hook. A subject that
     // differs only in case must not be able to masquerade as a second account.
-    sub: address.toLowerCase(),
+    sub: subject.toLowerCase(),
     iss: ISSUER,
     aud: AUDIENCE,
     iat: nowSeconds,
     exp: nowSeconds + ASSERTION_TTL_SECONDS,
-    jti: randomUUID(),
+    jti: jti ?? randomUUID(),
     strategy,
   };
 }

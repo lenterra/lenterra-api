@@ -22,6 +22,7 @@ import {
   verifyJoinGrant,
   type AuthStrategy,
 } from './assertion.js';
+import { provisionerFromEnv } from './provision.js';
 
 function required(name: string): string {
   const value = process.env[name];
@@ -49,6 +50,11 @@ const auth = THIRDWEB_SECRET_KEY
       client: createThirdwebClient({ secretKey: THIRDWEB_SECRET_KEY }),
     })
   : null;
+
+// Throws at start if the selected mode cannot work, for the same reason
+// `required()` above does: a service that starts happily and then fails every
+// student is a service whose configuration error is found by a classroom.
+const provisioner = provisionerFromEnv(process.env);
 
 const app = express();
 app.use(express.json({ limit: '16kb' }));
@@ -155,6 +161,10 @@ app.post('/session', async (req: Request, res: Response) => {
  * service never decides who may join a class — it only attests an identity for
  * a grant that Nakama already signed. Reversing that would put class
  * membership behind a service with no database and no audit log.
+ *
+ * The identity itself comes from whichever provisioner is configured. See
+ * `provision.ts` for why there are two and what each costs; nothing below this
+ * line branches on the answer.
  */
 app.post('/session/class-code', async (req: Request, res: Response) => {
   const grant = (req.body as { grant?: unknown })?.grant;
@@ -174,16 +184,29 @@ app.post('/session/class-code', async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'invalid_grant' });
   }
 
-  // Whether thirdweb can provision a wallet headlessly from a server-generated
-  // identifier — and later link it to an email keeping the same address — is
-  // unverified against a live integration (OQ-04). Until that spike lands,
-  // this path reports itself unimplemented rather than silently minting an
-  // address that cannot be upgraded, which would strand every class-code
-  // student's certificates at R3.
-  logAttempt('unimplemented', 'headless_provisioning_pending_oq04');
-  return res.status(501).json({
-    error: 'not_implemented',
-    detail: 'headless wallet provisioning is pending the thirdweb spike (OQ-04)',
+  let identity;
+  try {
+    identity = await provisioner.provision(verified.grant.seed);
+  } catch (err) {
+    // Never a fallback to the other mode. Silently dropping to `deferred`
+    // because thirdweb was slow would give some students in the same class an
+    // address and others none, with nothing in the logs saying which.
+    logAttempt('error', err instanceof Error ? err.message : 'provision_failed');
+    return res.status(503).json({ error: 'provisioning_failed' });
+  }
+
+  // The grant's jti becomes the assertion's, which is what makes the grant
+  // single-use: Nakama burns it on first presentation and the second one is
+  // rejected as a replay. The verifier holds no state and must not have to.
+  const claims = buildClaims(identity.customId, 'class_code', nowSeconds(), verified.grant.jti);
+
+  logAttempt('issued', `class_code_${provisioner.mode}`);
+  return res.json({
+    assertion: signAssertion(claims, HMAC_SECRET),
+    customId: identity.customId,
+    walletAddress: identity.walletAddress,
+    classId: verified.grant.classId,
+    expiresIn: ASSERTION_TTL_SECONDS,
   });
 });
 
@@ -192,6 +215,10 @@ app.get('/health', (_req: Request, res: Response) => {
     ok: true,
     thirdweb: auth !== null,
     classCode: JOIN_GRANT_SECRET.length > 0,
+    // Named rather than merely on/off: which mode is running decides whether a
+    // class-code student has a wallet, and that is not something to discover by
+    // reading a profile row.
+    provisioner: provisioner.mode,
   });
 });
 
@@ -202,6 +229,7 @@ app.listen(PORT, () => {
       msg: 'verifier listening',
       port: PORT,
       thirdweb: auth !== null,
+      provisioner: provisioner.mode,
     }),
   );
 });

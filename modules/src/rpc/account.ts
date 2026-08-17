@@ -9,11 +9,123 @@
  * because it is read as one.
  */
 
-import { forbidden, invalidArgument, notFound } from '../lib/errors';
+import { conflict, forbidden, invalidArgument, notFound, unauthenticated } from '../lib/errors';
 import { optionalString, requireString, type Ctx } from '../lib/ctx';
+import { assertionSecrets, verifyAssertion } from '../lib/assertion';
 import { Q } from '../db/queries';
 import { audit, requireStaff } from '../domain/profile';
 import { emit } from '../domain/telemetry';
+
+// ---------------------------------------------------------------------------
+// v1.account.upgrade
+// ---------------------------------------------------------------------------
+
+export interface UpgradeReq {
+  /** Minted by the verifier for the address the student just proved control of. */
+  assertion: string;
+  idempotencyKey?: string;
+}
+
+export interface UpgradeRes {
+  walletAddress: string;
+  strategy: string;
+  /** True when the account's Nakama custom id was re-keyed to the address. */
+  rekeyed: boolean;
+}
+
+/**
+ * Add an email or Google login to a class-code account (TRD-AUTH-005).
+ *
+ * A class-code student has no email and no password, which is what makes the
+ * path reachable at all and also what makes it fragile: lose the device and the
+ * only recovery is a teacher approving a reclaim. This is how they stop being
+ * in that position, and how they become able to hold a certificate.
+ *
+ * **The account is never forked.** The student is already signed in when they
+ * do this, so there is nothing to merge — the same Nakama user id keeps its
+ * progress, points, and mastery by construction, and the only thing that
+ * changes is what they sign in with next time. Creating a second account and
+ * copying rows between them would be the outcome PRD-ONB-004 exists to prevent.
+ *
+ * What differs between the two provisioning modes is one line. In `deferred`
+ * the account has no address yet, so the custom id is re-keyed to the new one.
+ * In `thirdweb` the address was already the custom id and only the strategy
+ * changes. Both refuse rather than fork when the address is already spoken for.
+ */
+export function accountUpgrade(c: Ctx, req: UpgradeReq): UpgradeRes {
+  const assertion = requireString(req.assertion, 'assertion', 4096);
+
+  const secrets = assertionSecrets(c.ctx);
+  if (secrets.length === 0) {
+    c.logger.error('ASSERTION_HMAC_SECRET is not configured; refusing upgrades');
+    throw unauthenticated('Sign-in could not be verified');
+  }
+
+  // No expected subject: the whole point is that the caller is proving control
+  // of an address the account does not have yet. The assertion still has to be
+  // signed, current, and un-replayed, and the subject it names is the address
+  // that gets claimed — never one the client passed alongside it.
+  const verified = verifyAssertion(c.nk, secrets, assertion, null, Math.floor(c.now / 1000));
+  if (!verified.ok) {
+    c.logger.warn('upgrade rejected reason=%s user=%s', verified.reason, c.userId);
+    throw unauthenticated('Sign-in could not be verified');
+  }
+
+  const address = verified.claims.sub.toLowerCase();
+  if (address.indexOf('0x') !== 0) {
+    // A class-code assertion names an opaque id, not an address. Accepting one
+    // here would let a student "upgrade" to the identity they already have and
+    // record it as though a wallet existed.
+    throw invalidArgument('That sign-in does not carry a wallet address');
+  }
+  if (verified.strategy !== 'email' && verified.strategy !== 'google') {
+    throw invalidArgument('An upgrade needs an email or Google sign-in');
+  }
+
+  const burned = c.nk.sqlExec(Q.burnJti, [verified.claims.jti, verified.claims.exp]);
+  if (burned.rowsAffected === 0) throw unauthenticated('Sign-in could not be verified');
+
+  const rows = c.nk.sqlQuery(Q.profileIdentity, [c.userId]) as {
+    auth_strategy: string;
+    wallet_address: string | null;
+  }[];
+  if (rows.length === 0) throw notFound('No profile for this account');
+  const current = rows[0] as { auth_strategy: string; wallet_address: string | null };
+
+  if (current.wallet_address !== null && current.wallet_address !== address) {
+    // Two addresses on one account has no meaning: the certificates are already
+    // at the first one. Refusing is the outcome TRD-AUTH-005 asks for.
+    throw conflict('already_upgraded', 'This account already has a wallet');
+  }
+
+  const held = c.nk.sqlQuery(Q.profileByWallet, [address]) as { user_id: string }[];
+  if (held.length > 0 && (held[0] as { user_id: string }).user_id !== c.userId) {
+    throw conflict(
+      'address_in_use',
+      'That sign-in already belongs to another account. Sign in with it instead.',
+    );
+  }
+
+  let rekeyed = false;
+  if (current.wallet_address === null) {
+    const claimed = c.nk.sqlQuery(Q.profileClaimWallet, [c.userId, address, verified.strategy]);
+    if (claimed.length === 0) throw conflict('already_upgraded', 'This account already has a wallet');
+
+    // Re-key rather than link: Nakama allows one custom id per user, and the
+    // opaque class-code id is not something a student can reproduce from an
+    // email login. Unlink first — linking to an occupied slot fails.
+    c.nk.unlinkCustom(c.userId);
+    c.nk.linkCustom(c.userId, address);
+    rekeyed = true;
+  } else {
+    c.nk.sqlQuery(Q.profileSetStrategy, [c.userId, verified.strategy, address]);
+  }
+
+  audit(c, 'account.upgrade', 'user', c.userId, { strategy: verified.strategy, rekeyed });
+  emit(c, 'account.upgraded', { from: current.auth_strategy, to: verified.strategy });
+
+  return { walletAddress: address, strategy: verified.strategy, rekeyed };
+}
 
 // ---------------------------------------------------------------------------
 // v1.account.delete.request

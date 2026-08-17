@@ -27,6 +27,13 @@ export interface RateLimit {
 
 export const LIMITS: Record<string, RateLimit> = {
   'v1.class.join': { limit: 5, windowSeconds: 600, failuresOnly: true },
+  // Reachable with no account at all, so this one is counted rather than
+  // failures-only: an unauthenticated handler that only counts its failures
+  // can be called without limit as long as the caller holds one valid code.
+  'v1.class.grant': { limit: 20, windowSeconds: 600 },
+  // Adding an email happens once per account. Anything beyond a handful of
+  // attempts is somebody working through a list of addresses.
+  'v1.account.upgrade': { limit: 5, windowSeconds: 3600 },
   'v1.attempt.submit': { limit: 60, windowSeconds: 60 },
   'v1.sync.push': { limit: 20, windowSeconds: 60 },
   'v1.catalog.pull': { limit: 30, windowSeconds: 3600 },

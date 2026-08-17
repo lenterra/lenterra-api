@@ -20,7 +20,7 @@ import { catalogManifest, catalogPull } from './rpc/catalog';
 import { checkSubmit, missionRecommend, progressGet } from './rpc/learning';
 import { attemptSubmit } from './rpc/attempt';
 import { syncPull, syncPush } from './rpc/sync';
-import { classJoin, classReclaimRequest } from './rpc/classes';
+import { classGrant, classJoin, classReclaimRequest } from './rpc/classes';
 import {
   certificateList,
   certificateVisibility,
@@ -48,6 +48,7 @@ import {
 import {
   accountDeleteCancel,
   accountDeleteRequest,
+  accountUpgrade,
   moderationQueue,
   moderationReport,
   moderationResolve,
@@ -70,6 +71,16 @@ function InitModule(
   // --- rpc: session and identity -----------------------------------------
   initializer.registerRpc('v1.session.bootstrap', rpc('v1.session.bootstrap', sessionBootstrap));
   initializer.registerRpc('v1.profile.update', rpc('v1.profile.update', profileUpdate));
+  // The one handler reachable before an account exists, because it is the one
+  // that exists so an account can be created. It writes nothing.
+  initializer.registerRpc(
+    'v1.class.grant',
+    // The limit is applied inside the handler rather than here: the wrapper
+    // keys on the caller's user id, and this caller has none yet, so every
+    // student in a class would share one bucket and the fifth one to join
+    // would be told to come back later.
+    rpc('v1.class.grant', classGrant, { allowUnauthenticated: true }),
+  );
   initializer.registerRpc(
     'v1.class.join',
     rpc('v1.class.join', classJoin, { rateLimit: LIMITS['v1.class.join'] }),
@@ -168,6 +179,10 @@ function InitModule(
   initializer.registerRpc(
     'v1.account.delete.cancel',
     rpc('v1.account.delete.cancel', accountDeleteCancel),
+  );
+  initializer.registerRpc(
+    'v1.account.upgrade',
+    rpc('v1.account.upgrade', accountUpgrade, { rateLimit: LIMITS['v1.account.upgrade'] }),
   );
   initializer.registerRpc(
     'v1.moderation.report',

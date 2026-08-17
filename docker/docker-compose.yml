@@ -68,6 +68,13 @@ services:
     environment:
       THIRDWEB_SECRET_KEY: ${THIRDWEB_SECRET_KEY:-}
       ASSERTION_HMAC_SECRET: ${ASSERTION_HMAC_SECRET:-change-me-32-bytes-minimum-localdev-only}
+      # Must match Nakama's, or every grant it mints is rejected here.
+      JOIN_GRANT_HMAC_SECRET: ${JOIN_GRANT_HMAC_SECRET:-change-me-join-grant-localdev-only}
+      # `deferred` issues no wallet and needs no third party, which is why it is
+      # the default everywhere including local development. See
+      # verifier/src/provision.ts for what the other mode costs.
+      CLASS_CODE_PROVISIONER: ${CLASS_CODE_PROVISIONER:-deferred}
+      THIRDWEB_AUTH_JWT_SECRET: ${THIRDWEB_AUTH_JWT_SECRET:-}
       AUTH_DOMAIN: ${AUTH_DOMAIN:-localhost:8787}
       VERIFIER_PORT: '8787'
     ports:
