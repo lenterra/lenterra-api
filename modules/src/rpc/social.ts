@@ -66,7 +66,16 @@ export function pointsHistory(c: Ctx, req: PointsHistoryReq) {
       ? toIso(Number((rows[take - 1] as { at_ms: number }).at_ms))
       : null;
 
-  return { balance: balance(c, c.userId), entries, cursor: nextCursor };
+  // What they already own, alongside the balance rather than behind a second
+  // RPC. The shop needs both to render a single row, and a student on a slow
+  // connection should not wait twice for one screen.
+  const ownedRows = c.nk.sqlQuery(Q.redemptionsForUser, [c.userId]) as { item_id: string }[];
+  const owned: string[] = [];
+  for (let i = 0; i < ownedRows.length; i++) {
+    owned.push((ownedRows[i] as { item_id: string }).item_id);
+  }
+
+  return { balance: balance(c, c.userId), entries, owned, cursor: nextCursor };
 }
 
 export interface RedeemReq {

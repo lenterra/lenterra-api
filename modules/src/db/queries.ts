@@ -674,6 +674,10 @@ export const Q = {
 
   redemptionExists: `SELECT 1 FROM lenterra_redemption WHERE user_id = $1 AND item_id = $2`,
 
+  /** What this student already owns, so the shop does not offer it twice. */
+  redemptionsForUser: `
+    SELECT item_id FROM lenterra_redemption WHERE user_id = $1 ORDER BY created_at`,
+
   // --- certificates --------------------------------------------------------
 
   certificateInsert: `

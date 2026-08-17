@@ -48,6 +48,16 @@ export interface BootstrapRes {
      * until there is one there is nowhere to issue it.
      */
     hasWallet: boolean;
+    /**
+     * When this account is due to be deleted, if a request is outstanding.
+     *
+     * Reported because the *cancellation* has to be reachable, and it cannot be
+     * offered by a client that does not know a request exists. A student who
+     * asks for deletion on a borrowed phone and changes their mind an hour
+     * later on another one had, until this was here, no way to take it back —
+     * the thirty-day window was a promise the product could not keep.
+     */
+    deletionScheduledFor: string | null;
   };
   class: { id: string; name: string; leaderboardEnabled: boolean } | null;
   entitlements: string[];
@@ -81,6 +91,12 @@ export function sessionBootstrap(c: Ctx, req: BootstrapReq): BootstrapRes {
   const streakDays =
     streakRows.length === 0 ? 0 : Number((streakRows[0] as { current_days: number }).current_days);
 
+  const deletionRows = c.nk.sqlQuery(Q.deletionPending, [c.userId]) as { scheduled_ms: number }[];
+  const deletionScheduledFor =
+    deletionRows.length === 0
+      ? null
+      : toIso(Number((deletionRows[0] as { scheduled_ms: number }).scheduled_ms));
+
   return {
     profile: {
       userId: profile.userId,
@@ -92,6 +108,7 @@ export function sessionBootstrap(c: Ctx, req: BootstrapReq): BootstrapRes {
       onboarded: profile.onboarded,
       authStrategy: profile.authStrategy,
       hasWallet: profile.hasWallet,
+      deletionScheduledFor,
     },
     class: klass,
     entitlements,
