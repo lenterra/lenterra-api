@@ -33,11 +33,12 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
  * handler graduates from "untested" to "guarded" — the list is the commitment,
  * not the percentage.
  *
- * **A floor below 100% is not a claim that the rest is fine.** Where a file is
- * only partly tested, the floor exists so that deleting the tests that do exist
- * fails the build — a different job from asserting the file is covered. Where
- * the number would be a *side effect* of a test aimed elsewhere, there is no
- * entry here; see the partial list this prints, and why.
+ * **A floor below 100% is not a claim that the rest is fine.** `learning.ts`
+ * sits at 56% because one of its three handlers is tested thoroughly and the
+ * other two not at all; the floor exists so that deleting the tests for the one
+ * fails the build, which is a different job from asserting the file is covered.
+ * Where the number would be a *side effect* of a test aimed elsewhere, there is
+ * no entry here — see the partial list this prints, and why.
  */
 const GUARDED = {
   'rpc/staff.ts': { line: 95, branch: 88 },
@@ -45,6 +46,13 @@ const GUARDED = {
   // The retention sweep: which accounts a purge deletes, and that one failure
   // does not stop the rest.
   'rpc/admin.ts': { line: 75, branch: 95 },
+  // `checkSubmit` only. The floor is low because `missionRecommend` and
+  // `progressGet` are untested, not because the grading path is half-checked.
+  'rpc/learning.ts': { line: 54, branch: 95 },
+  // All four sync item kinds, ordering, and per-item isolation. The shortfall
+  // to 100 is `syncPull` and the attempt-validation path, which need a replay
+  // validator and belong to the integration suite.
+  'rpc/sync.ts': { line: 78, branch: 94 },
 };
 
 /**
