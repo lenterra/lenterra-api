@@ -21,6 +21,7 @@ import { checkSubmit, missionRecommend, progressGet } from './rpc/learning';
 import { attemptSubmit } from './rpc/attempt';
 import { syncPull, syncPush } from './rpc/sync';
 import { classGrant, classJoin, classReclaimRequest } from './rpc/classes';
+import { devConformance } from './rpc/dev';
 import {
   certificateList,
   certificateVisibility,
@@ -201,6 +202,17 @@ function InitModule(
   const env = ctx.env ?? {};
   if (!env['ASSERTION_HMAC_SECRET']) {
     logger.error('ASSERTION_HMAC_SECRET is not set — authentication will refuse every request');
+  }
+
+  // --- rpc: conformance harness -------------------------------------------
+  //
+  // Not registered at all unless explicitly enabled, so a production server
+  // does not have this RPC behind a check — it does not have it. And when it is
+  // on, the server says so in its first ten lines of log rather than leaving it
+  // to be discovered.
+  if (env['CONFORMANCE_ENABLED'] === '1') {
+    logger.warn('CONFORMANCE_ENABLED=1 — the v1.dev.conformance test seam is registered');
+    initializer.registerRpc('v1.dev.conformance', rpc('v1.dev.conformance', devConformance));
   }
 
   logger.info('Lenterra modules initialised');

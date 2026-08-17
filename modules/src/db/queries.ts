@@ -24,7 +24,8 @@ export const Q = {
 
   profileByUser: `
     SELECT p.user_id, p.role, p.display_name, p.friend_code, p.school_id, p.locale,
-           p.auth_strategy, p.onboarded_at IS NOT NULL AS onboarded
+           p.auth_strategy, p.onboarded_at IS NOT NULL AS onboarded,
+           p.wallet_address IS NOT NULL AS has_wallet
     FROM lenterra_account_profile p
     WHERE p.user_id = $1`,
 

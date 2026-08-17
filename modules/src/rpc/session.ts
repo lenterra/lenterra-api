@@ -39,6 +39,15 @@ export interface BootstrapRes {
     locale: string;
     schoolId: string | null;
     onboarded: boolean;
+    authStrategy: string;
+    /**
+     * False for a class-code account that has not added an email yet.
+     *
+     * The app needs it to know whether to offer the upgrade, and the student
+     * needs to be told why: a certificate has to be issued to an address, and
+     * until there is one there is nowhere to issue it.
+     */
+    hasWallet: boolean;
   };
   class: { id: string; name: string; leaderboardEnabled: boolean } | null;
   entitlements: string[];
@@ -81,6 +90,8 @@ export function sessionBootstrap(c: Ctx, req: BootstrapReq): BootstrapRes {
       locale: req.locale ? requireString(req.locale, 'locale', 8) : profile.locale,
       schoolId: profile.schoolId,
       onboarded: profile.onboarded,
+      authStrategy: profile.authStrategy,
+      hasWallet: profile.hasWallet,
     },
     class: klass,
     entitlements,

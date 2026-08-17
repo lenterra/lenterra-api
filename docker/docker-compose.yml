@@ -45,7 +45,8 @@ services:
           --runtime.env ASSERTION_HMAC_SECRET=${ASSERTION_HMAC_SECRET:-change-me-32-bytes-minimum-localdev-only} \
           --runtime.env ASSERTION_HMAC_SECRET_PREVIOUS=${ASSERTION_HMAC_SECRET_PREVIOUS:-} \
           --runtime.env JOIN_GRANT_HMAC_SECRET=${JOIN_GRANT_HMAC_SECRET:-change-me-join-grant-localdev-only} \
-          --runtime.env VERIFIER_URL=${VERIFIER_URL:-http://verifier:8787}
+          --runtime.env VERIFIER_URL=${VERIFIER_URL:-http://verifier:8787} \
+          --runtime.env CONFORMANCE_ENABLED=${CONFORMANCE_ENABLED:-0}
     volumes:
       - ../modules/build:/nakama/data/modules:ro
       - ./config.yml:/nakama/data/config.yml:ro
@@ -75,6 +76,10 @@ services:
       # verifier/src/provision.ts for what the other mode costs.
       CLASS_CODE_PROVISIONER: ${CLASS_CODE_PROVISIONER:-deferred}
       THIRDWEB_AUTH_JWT_SECRET: ${THIRDWEB_AUTH_JWT_SECRET:-}
+      # The class-code hop reaches Nakama with no session, which needs the
+      # runtime HTTP key. It stays server-side; the phone never sees it.
+      NAKAMA_URL: ${NAKAMA_URL:-http://nakama:7350}
+      NAKAMA_HTTP_KEY: ${NAKAMA_HTTP_KEY:-lenterra-localdev-http}
       AUTH_DOMAIN: ${AUTH_DOMAIN:-localhost:8787}
       VERIFIER_PORT: '8787'
     ports:

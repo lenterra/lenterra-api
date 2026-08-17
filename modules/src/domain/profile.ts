@@ -22,6 +22,8 @@ export interface Profile {
   locale: string;
   authStrategy: string;
   onboarded: boolean;
+  /** False for a class-code account that has not yet added an email. */
+  hasWallet: boolean;
 }
 
 export function loadProfile(c: Ctx, userId?: string): Profile {
@@ -37,6 +39,7 @@ export function loadProfile(c: Ctx, userId?: string): Profile {
     locale: string;
     auth_strategy: string;
     onboarded: boolean;
+    has_wallet: boolean;
   };
 
   return {
@@ -48,6 +51,7 @@ export function loadProfile(c: Ctx, userId?: string): Profile {
     locale: row.locale,
     authStrategy: row.auth_strategy,
     onboarded: row.onboarded,
+    hasWallet: row.has_wallet === true,
   };
 }
 
