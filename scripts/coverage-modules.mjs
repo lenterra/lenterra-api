@@ -32,22 +32,48 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
  * build for rounding while a real regression does. Adding a file here is how a
  * handler graduates from "untested" to "guarded" — the list is the commitment,
  * not the percentage.
+ *
+ * **A floor below 100% is not a claim that the rest is fine.** Where a file is
+ * only partly tested, the floor exists so that deleting the tests that do exist
+ * fails the build — a different job from asserting the file is covered. Where
+ * the number would be a *side effect* of a test aimed elsewhere, there is no
+ * entry here; see the partial list this prints, and why.
  */
 const GUARDED = {
   'rpc/staff.ts': { line: 95, branch: 88 },
   'db/queries.ts': { line: 95, branch: 95 },
+  // The retention sweep: which accounts a purge deletes, and that one failure
+  // does not stop the rest.
+  'rpc/admin.ts': { line: 75, branch: 95 },
 };
+
+/**
+ * Every contract test on disk, discovered rather than listed.
+ *
+ * This was a hardcoded pair, and it went wrong in exactly the way a hardcoded
+ * list does: `test/admin.test.mts` was written, and the gate — which had never
+ * been told about it — went on printing `admin.ts` among the modules with no
+ * contract test. Nine tests existed, none of them counted, and the one output
+ * this script exists to produce was wrong in the direction that hides work
+ * rather than inventing it.
+ *
+ * A gate that has to be updated by hand when a test is added will eventually
+ * not be, and the failure is silent. Reading the directory means writing a test
+ * is the only step.
+ */
+const suites = readdirSync(join(root, 'test'))
+  .filter((f) => f.endsWith('.test.mts'))
+  .sort()
+  .map((f) => `test/${f}`);
+
+if (suites.length === 0) {
+  console.error('no contract tests found in test/ — this gate has nothing to measure');
+  process.exit(1);
+}
 
 const result = spawnSync(
   process.execPath,
-  [
-    '--import',
-    './test/ts-resolve.mjs',
-    '--experimental-test-coverage',
-    '--test',
-    'test/staff.test.mts',
-    'test/reward.test.mts',
-  ],
+  ['--import', './test/ts-resolve.mjs', '--experimental-test-coverage', '--test', ...suites],
   { cwd: root, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
 );
 
@@ -75,7 +101,7 @@ for (const line of output.split('\n')) {
 
 let failed = 0;
 
-console.log('\nhandler coverage (contract tests only)\n');
+console.log(`\nhandler coverage (${suites.length} contract suites)\n`);
 
 for (const [file, floor] of Object.entries(GUARDED)) {
   const basename = file.split('/').pop();
