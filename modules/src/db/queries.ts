@@ -403,6 +403,33 @@ export const Q = {
 
   achievementsForUser: `SELECT achievement_id FROM lenterra_achievement WHERE user_id = $1`,
 
+  /** Distinct games with at least one validated attempt — "Penjelajah". */
+  gamesPlayed: `
+    SELECT DISTINCT game_id FROM lenterra_attempt
+    WHERE user_id = $1 AND validation_status = 'validated'`,
+
+  validatedAttemptTotal: `
+    SELECT count(*) AS n FROM lenterra_attempt
+    WHERE user_id = $1 AND validation_status = 'validated'`,
+
+  /**
+   * Evidence behind one node: how many distinct missions, and over how many
+   * distinct days. Both matter for a certificate — a node evidenced twice by
+   * the same mission in one evening is not the same as two missions across a
+   * fortnight, and only the second is worth certifying (PRD-RWD-012).
+   */
+  masteryEvidenceSpread: `
+    SELECT e.skill_node_id,
+           count(DISTINCT a.mission_id) AS sources,
+           count(DISTINCT date_trunc('day', e.created_at)) AS days,
+           count(*) AS events,
+           extract(epoch FROM min(e.created_at)) * 1000 AS first_ms,
+           extract(epoch FROM max(e.created_at)) * 1000 AS last_ms
+    FROM lenterra_mastery_event e
+    LEFT JOIN lenterra_attempt a ON a.id = e.source_id
+    WHERE e.user_id = $1 AND e.correct AND e.skill_node_id = ANY($2)
+    GROUP BY e.skill_node_id`,
+
   redemptionInsert: `
     INSERT INTO lenterra_redemption (id, user_id, item_id, cost, ledger_id)
     VALUES ($1,$2,$3,$4,$5)`,

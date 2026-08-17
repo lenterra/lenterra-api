@@ -28,6 +28,9 @@ import { currentCatalog, loadMission } from '../domain/catalog';
 import { applyAndPersist, readMastery, ENGINE_VERSION } from '../domain/mastery';
 import { award, creditStreak, pointsForAttempt, type PointsAward } from '../domain/ledger';
 import { parseReplay, validate } from '../domain/validation';
+import { evaluateForAttempt } from '../domain/achievements';
+import { issueEarned } from '../domain/certificates';
+import { emit } from '../domain/telemetry';
 import { recommend, ratingFor, studentRatings } from '../domain/selection';
 
 export interface AttemptPayload {
@@ -260,6 +263,84 @@ export function submitAttempt(
   // --- struggle -----------------------------------------------------------
   const struggle = evaluateStruggle(c, mission);
 
+  // --- achievements and certificates --------------------------------------
+  // Both run after mastery is persisted, so neither can be granted on evidence
+  // the server has not already accepted and written.
+  // Re-read rather than reuse the pre-attempt snapshot: both checks below ask
+  // about the state this attempt produced, and `evidenceCount` is what
+  // separates "0.9 from one lucky mission" from a band worth certifying.
+  const after = readMastery(c, c.userId);
+
+  const masteryAfter: { skillNodeId: string; mastery: number; evidenceCount: number }[] = [];
+  for (let i = 0; i < masteryChanges.length; i++) {
+    const change = masteryChanges[i] as { skillNodeId: SkillNodeId; after: number };
+    const state = after.state[change.skillNodeId];
+    masteryAfter.push({
+      skillNodeId: change.skillNodeId,
+      mastery: change.after,
+      evidenceCount: state ? state.evidenceCount : 0,
+    });
+  }
+
+  const achievements = evaluateForAttempt(c, {
+    mission,
+    success: actualOutcome === 'success',
+    priorSuccesses,
+    chainMaxLength: metrics.chainMaxLength,
+    unitsLost: metrics.unitsLost,
+    streakDays: streak.currentDays,
+    masteryAfter,
+  });
+
+  const certificatesIssued = issueEarned(c, after, ENGINE_VERSION);
+
+  // --- telemetry ----------------------------------------------------------
+  emit(c, 'attempt.validated', {
+    missionId: payload.missionId,
+    rank: mission.rank,
+    gameId: payload.gameId,
+    outcome: actualOutcome,
+    durationMs: payload.durationMs,
+    hintUsed: payload.hintUsed,
+    playedOffline: payload.playedOffline,
+    twoPlayer: payload.twoPlayer,
+    optimalMoveRank: metrics.optimalMoveRank,
+    greedyMoveTaken: metrics.greedyMoveTaken,
+    coreVersion: payload.coreVersion,
+  });
+
+  for (let i = 0; i < masteryChanges.length; i++) {
+    const change = masteryChanges[i] as {
+      skillNodeId: string;
+      before: number;
+      after: number;
+      band: string;
+      bandChanged: boolean;
+      weight: number;
+    };
+    emit(c, 'mastery.updated', {
+      skillNodeId: change.skillNodeId,
+      before: change.before,
+      after: change.after,
+      band: change.band,
+      bandChanged: change.bandChanged,
+      weight: change.weight,
+    });
+  }
+
+  for (let i = 0; i < achievements.length; i++) {
+    emit(c, 'achievement.earned', { achievementId: achievements[i] as string });
+  }
+  for (let i = 0; i < certificatesIssued.length; i++) {
+    emit(c, 'certificate.issued', { definitionId: certificatesIssued[i] as string });
+  }
+  if (struggle) {
+    emit(c, 'struggle.detected', {
+      skillNodeId: struggle.skillNodeId,
+      supportOffered: struggle.supportOptions.length,
+    });
+  }
+
   // --- next step ----------------------------------------------------------
   const next = recommend(c, c.userId, payload.catalogVersion, 1);
 
@@ -270,8 +351,8 @@ export function submitAttempt(
     masteryChanges,
     pointsAwarded,
     streak,
-    achievements: [],
-    certificatesIssued: [],
+    achievements,
+    certificatesIssued,
     nextRecommendation: next.recommendations.length > 0 ? next.recommendations[0] : null,
     struggleDetected: struggle,
   };
