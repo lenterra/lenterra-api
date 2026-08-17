@@ -31,7 +31,21 @@ export interface ManifestReq {
 
 export interface ManifestRes {
   version: string;
-  parts: { part: string; sha256: string; bytes: number; changed: boolean }[];
+  parts: {
+    part: string;
+    sha256: string;
+    bytes: number;
+    changed: boolean;
+    /**
+     * Whether a client may pull this part.
+     *
+     * The flag is on the wire rather than a constant the client also keeps,
+     * because a duplicated list of what must stay server-side is a list that
+     * eventually disagrees with itself — and the half that is wrong is the
+     * client's, which is the one an attacker reads.
+     */
+    available: boolean;
+  }[];
   totalBytes: number;
   changedBytes: number;
 }
@@ -61,7 +75,13 @@ export function catalogManifest(c: Ctx, req: ManifestReq): ManifestRes {
     const changed = !have || previous[part.part] !== part.sha256;
     totalBytes += part.bytes;
     if (changed) changedBytes += part.bytes;
-    out.push({ part: part.part, sha256: part.sha256, bytes: part.bytes, changed });
+    out.push({
+      part: part.part,
+      sha256: part.sha256,
+      bytes: part.bytes,
+      changed,
+      available: SERVER_ONLY_PARTS.indexOf(part.part) < 0,
+    });
   }
 
   return { version: catalog.version, parts: out, totalBytes, changedBytes };
