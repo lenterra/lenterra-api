@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "guard:deps": "node scripts/deps-guard.mjs",
     "test": "npm run test --workspaces --if-present",
     "test:schema": "node --test test/schema.test.mjs",
     "content:validate": "node scripts/content-validate.mjs",
