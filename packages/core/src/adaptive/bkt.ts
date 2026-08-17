@@ -135,14 +135,35 @@ export function hintDiscount(hintShown: boolean, hintUsed: boolean): number {
   return HINT_DISCOUNT.unhinted;
 }
 
-/** effectiveWeight = skillWeight × hintDiscount × sourceFactor */
+/**
+ * How much a hot-seat attempt is discounted (TRD-MP-002).
+ *
+ * 0.8, and the number is a judgement rather than a measurement. In a shared
+ * game a student is coached from across the mat, distracted, and sometimes
+ * handed the phone mid-turn. The decisions attributed to them are genuinely
+ * theirs — only their own moves feed the model at all — but they were made
+ * under conditions that make the signal noisier than solo play.
+ *
+ * Not zero, because two students playing together is the mode this game is
+ * actually played in and refusing to count it would push them towards a worse
+ * experience for a cleaner number.
+ */
+export const TWO_PLAYER_FACTOR = 0.8;
+
+/** effectiveWeight = skillWeight × hintDiscount × sourceFactor × sharedFactor */
 export function effectiveWeight(
   skillWeight: number,
   hintShown: boolean,
   hintUsed: boolean,
   source: EvidenceSource,
+  twoPlayer = false,
 ): number {
-  return clamp01(clamp01(skillWeight) * hintDiscount(hintShown, hintUsed) * SOURCE_FACTOR[source]);
+  return clamp01(
+    clamp01(skillWeight) *
+      hintDiscount(hintShown, hintUsed) *
+      SOURCE_FACTOR[source] *
+      (twoPlayer ? TWO_PLAYER_FACTOR : 1),
+  );
 }
 
 // ---------------------------------------------------------------------------

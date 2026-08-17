@@ -57,6 +57,17 @@ export function validateReplay<S, M>(
   replay: Replay,
   mission: Mission,
   engine: GameEngine<S, M>,
+  /**
+   * Whether the attempt was declared hot-seat (TRD-MP-003).
+   *
+   * This decides who is allowed to have moved the opponent's side. In a solo
+   * attempt the opponent is the deterministic AI and every one of its moves is
+   * recomputed and required to match; a replay that labelled those moves
+   * `opponent` instead would slip past that check entirely and let a client
+   * hand itself an opponent that plays badly on purpose. So the label is only
+   * accepted when the attempt says a second person was there.
+   */
+  twoPlayer = false,
 ): ValidationResult {
   if (!replay || !replay.moves || Object.prototype.toString.call(replay.moves) !== '[object Array]') {
     return reject('malformed_replay', 'moves is not an array');
@@ -98,6 +109,13 @@ export function validateReplay<S, M>(
 
     const sideToMove = engine.sideToMove(state);
 
+    if (entry.actor === 'opponent' && !twoPlayer) {
+      return reject(
+        'ai_divergence',
+        `move ${i} claims a human opponent in a solo attempt`,
+      );
+    }
+
     if (entry.actor === 'ai') {
       // The opponent's side of the game is verified, not trusted: recompute
       // what the AI would have played and require a match.
@@ -112,7 +130,10 @@ export function validateReplay<S, M>(
       }
     }
 
-    if (sideToMove === playerSide && entry.actor !== 'ai') {
+    // Only the account holder's own decisions produce evidence (TRD-MP-002).
+    // `actor === 'player'` rather than "not the AI", so a hot-seat guest's
+    // moves are replayed and validated but never scored as the student's.
+    if (sideToMove === playerSide && entry.actor === 'player') {
       playerMoveCount++;
       if (engine.isGreedyMove(state, move)) greedyMoveTaken++;
       const rank = engine.rankMove(state, move);

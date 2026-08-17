@@ -82,6 +82,8 @@ export interface EvidenceRequest {
   outcome: AttemptOutcome;
   hintShown: boolean;
   hintUsed: boolean;
+  /** Hot-seat, so the evidence carries a reduced weight (TRD-MP-002). */
+  twoPlayer?: boolean;
   source: EvidenceSource;
   sourceKey: string;
   sourceType: 'attempt' | 'check';
@@ -115,6 +117,7 @@ export function applyAndPersist(
     outcome: request.outcome,
     hintShown: request.hintShown,
     hintUsed: request.hintUsed,
+    twoPlayer: request.twoPlayer === true,
     source: request.source,
     sourceKey: request.sourceKey,
     priorSourceKeys: snapshot.sourceKeys,

@@ -139,7 +139,7 @@ export function submitAttempt(
     return recordRejected(c, attemptId, payload, idempotencyKey, clientVersion, 'malformed_replay');
   }
 
-  const outcome = validate(c, mission, replay);
+  const outcome = validate(c, mission, replay, payload.twoPlayer);
 
   if (!outcome.result.valid) {
     // Recorded, not discarded. Rejections are the signal that distinguishes a
@@ -208,6 +208,11 @@ export function submitAttempt(
     // A repeat of an already-passed mission is weaker evidence than the first
     // success on it.
     source: priorSuccesses > 0 ? 'repeat' : 'game',
+    // Hot-seat evidence counts, at four fifths (TRD-MP-002). Only the account
+    // holder's own moves reached the model in the first place — the guest is
+    // never identified, recorded, or given an account — but a game played with
+    // somebody leaning over your shoulder is noisier than one played alone.
+    twoPlayer: payload.twoPlayer,
     sourceKey: payload.missionId,
     sourceType: 'attempt',
     sourceId: attemptId,

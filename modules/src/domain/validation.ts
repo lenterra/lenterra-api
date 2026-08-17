@@ -24,7 +24,12 @@ export interface ValidationOutcome {
   rejectionReason: string | null;
 }
 
-export function validate(c: Ctx, mission: Mission, replay: Replay): ValidationOutcome {
+export function validate(
+  c: Ctx,
+  mission: Mission,
+  replay: Replay,
+  twoPlayer = false,
+): ValidationOutcome {
   // Validate under the engine version the replay declares, not the current one.
   // A phone that played offline for six days under 1.2 must not be judged by
   // 1.3's rules — that would reject exactly the students the offline design
@@ -44,7 +49,7 @@ export function validate(c: Ctx, mission: Mission, replay: Replay): ValidationOu
     };
   }
 
-  const result = validateReplay(replay, mission, engine as never);
+  const result = validateReplay(replay, mission, engine as never, twoPlayer);
 
   if (!result.valid) {
     return { result, status: 'rejected', rejectionReason: result.reason };

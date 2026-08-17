@@ -38,6 +38,15 @@ export interface EvidenceInput {
   hintShown: boolean;
   hintUsed: boolean;
   source: EvidenceSource;
+  /**
+   * Whether this was a hot-seat game (TRD-MP-002).
+   *
+   * Only the account holder's own moves ever reach this function, so the
+   * evidence is theirs either way. The discount reflects that a shared game is
+   * played under conditions that make the signal noisier, not that the
+   * decisions belong to somebody else.
+   */
+  twoPlayer?: boolean;
   /** Source identifier — mission ID or check ID — for the distinct-source count. */
   sourceKey: string;
   /** Source keys that have already contributed to each node. */
@@ -115,6 +124,7 @@ export function applyEvidence(
       evidence.hintShown,
       evidence.hintUsed,
       evidence.source,
+      evidence.twoPlayer === true,
     );
 
     const priorKeys = evidence.priorSourceKeys[node] ?? [];
