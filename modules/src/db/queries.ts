@@ -166,6 +166,32 @@ export const Q = {
     FROM lenterra_class_member
     WHERE class_id = $1 AND removed_at IS NULL`,
 
+  // --- consent (PRD-ONB-018) ------------------------------------------------
+
+  /**
+   * Is school-level consent on file, and not withdrawn?
+   *
+   * Read before a class can be created rather than reported afterwards, because
+   * a class that exists is a class students can join, and a student joining is
+   * the moment a minor's data starts being collected.
+   */
+  consentForSchool: `
+    SELECT id, confirmed_by, confirmed_at, process_note
+    FROM lenterra_consent
+    WHERE school_id = $1 AND kind = 'school_participation' AND withdrawn_at IS NULL
+    ORDER BY confirmed_at DESC
+    LIMIT 1`,
+
+  consentRecord: `
+    INSERT INTO lenterra_consent (id, school_id, class_id, confirmed_by, kind, process_note)
+    VALUES ($1, $2, NULL, $3, 'school_participation', $4)
+    RETURNING id, confirmed_at`,
+
+  consentWithdraw: `
+    UPDATE lenterra_consent SET withdrawn_at = now()
+    WHERE school_id = $1 AND kind = 'school_participation' AND withdrawn_at IS NULL
+    RETURNING id`,
+
   classRoster: `
     SELECT p.user_id, p.display_name, m.joined_at,
            (SELECT min(a.submitted_at) FROM lenterra_attempt a WHERE a.user_id = p.user_id) AS first_attempt_at,

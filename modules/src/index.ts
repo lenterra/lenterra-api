@@ -34,6 +34,9 @@ import {
   teacherAssignmentCreate,
   teacherAttentionList,
   teacherClassCreate,
+  teacherConsentRecord,
+  teacherConsentStatus,
+  teacherConsentWithdraw,
   teacherClassList,
   teacherClassRemove,
   teacherClassRoster,
@@ -112,6 +115,18 @@ function InitModule(
   );
 
   // --- rpc: teacher -------------------------------------------------------
+  initializer.registerRpc(
+    'v1.teacher.consent.status',
+    rpc('v1.teacher.consent.status', teacherConsentStatus),
+  );
+  initializer.registerRpc(
+    'v1.teacher.consent.record',
+    rpc('v1.teacher.consent.record', teacherConsentRecord),
+  );
+  initializer.registerRpc(
+    'v1.teacher.consent.withdraw',
+    rpc('v1.teacher.consent.withdraw', teacherConsentWithdraw),
+  );
   initializer.registerRpc('v1.teacher.class.create', rpc('v1.teacher.class.create', teacherClassCreate));
   initializer.registerRpc('v1.teacher.class.list', rpc('v1.teacher.class.list', teacherClassList));
   initializer.registerRpc('v1.teacher.class.roster', rpc('v1.teacher.class.roster', teacherClassRoster));

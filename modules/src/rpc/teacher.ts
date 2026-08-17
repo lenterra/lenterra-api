@@ -10,7 +10,7 @@
 import type { SkillNodeId } from '@lenterra/core';
 import { bandOf } from '@lenterra/core';
 
-import { invalidArgument, notFound } from '../lib/errors';
+import { conflict, invalidArgument, notFound } from '../lib/errors';
 import { optionalString, requireBool, requireInt, requireString, toIso, type Ctx } from '../lib/ctx';
 import { Q } from '../db/queries';
 import { audit, maskName, requireMemberOf, requireRole, requireTeacherOf } from '../domain/profile';
@@ -38,6 +38,24 @@ export interface ClassCreateReq {
 export function teacherClassCreate(c: Ctx, req: ClassCreateReq) {
   const profile = requireRole(c, ['teacher', 'school_admin', 'staff']);
   if (!profile.schoolId) throw invalidArgument('Your account is not attached to a school');
+
+  // The consent gate (PRD-ONB-018).
+  //
+  // Refused here rather than warned about later, because a class that exists is
+  // a class students can join, and a student joining is the moment a minor's
+  // data starts being collected. A banner on a dashboard does not stop that; it
+  // only means somebody could have read one.
+  //
+  // The pilot runs through schools, so what is attested is the school's own
+  // process — not a per-parent record, which R1 has no mechanism to collect and
+  // would be pretending to have.
+  const consent = c.nk.sqlQuery(Q.consentForSchool, [profile.schoolId]);
+  if (consent.length === 0) {
+    throw conflict(
+      'consent_required',
+      'Record how this school obtained consent to participate before creating a class',
+    );
+  }
 
   const name = requireString(req.name, 'name', 64);
   const level = requireString(req.level, 'level', 32);
@@ -647,4 +665,109 @@ export function teacherLeaderboardSet(c: Ctx, req: { classId: string; enabled: b
   emit(c, 'leaderboard.disabled', { classId: klass.id, enabled });
 
   return { enabled };
+}
+
+// ---------------------------------------------------------------------------
+// v1.teacher.consent.* (PRD-ONB-018)
+// ---------------------------------------------------------------------------
+
+export interface ConsentRecordReq {
+  /** How the school obtained consent, in the school's own words. */
+  processNote: string;
+  confirmed: boolean;
+  idempotencyKey: string;
+}
+
+/**
+ * Attest that school-level consent is in place.
+ *
+ * Two things this deliberately does not do. It does not accept a bare boolean:
+ * `confirmed: true` with no description records that a box was ticked, and the
+ * question a school will actually be asked later is *how*. And it does not
+ * claim to be parental consent — R1 has no mechanism to collect that, and
+ * naming it so would be a claim the system cannot support (30-03 OQ-02).
+ */
+export function teacherConsentRecord(c: Ctx, req: ConsentRecordReq) {
+  const profile = requireRole(c, ['teacher', 'school_admin', 'staff']);
+  if (!profile.schoolId) throw invalidArgument('Your account is not attached to a school');
+
+  if (req.confirmed !== true) {
+    throw invalidArgument('Consent must be confirmed explicitly');
+  }
+
+  // Long enough to be a description rather than a word. A one-line note reads
+  // as a record and is not one.
+  const processNote = requireString(req.processNote, 'processNote', 500);
+  if (processNote.trim().length < 20) {
+    throw invalidArgument('Describe how consent was obtained, so the record means something');
+  }
+
+  const existing = c.nk.sqlQuery(Q.consentForSchool, [profile.schoolId]);
+  if (existing.length > 0) {
+    const row = existing[0] as { id: string; confirmed_at: string; process_note: string | null };
+    return {
+      consentId: row.id,
+      confirmedAt: row.confirmed_at,
+      processNote: row.process_note,
+      alreadyRecorded: true,
+    };
+  }
+
+  const consentId = c.nk.uuidv4();
+  const rows = c.nk.sqlQuery(Q.consentRecord, [
+    consentId,
+    profile.schoolId,
+    c.userId,
+    processNote.trim(),
+  ]);
+  if (rows.length === 0) throw invalidArgument('Could not record consent');
+
+  const row = rows[0] as { id: string; confirmed_at: string };
+  // Audited under the confirming teacher, because this is the record that says
+  // who attested — an attestation nobody is named on attests to nothing.
+  audit(c, 'consent.record', 'school', profile.schoolId, { consentId: row.id });
+
+  return {
+    consentId: row.id,
+    confirmedAt: row.confirmed_at,
+    processNote: processNote.trim(),
+    alreadyRecorded: false,
+  };
+}
+
+export interface ConsentStatusRes {
+  recorded: boolean;
+  confirmedAt: string | null;
+  processNote: string | null;
+}
+
+export function teacherConsentStatus(c: Ctx): ConsentStatusRes {
+  const profile = requireRole(c, ['teacher', 'school_admin', 'staff']);
+  if (!profile.schoolId) return { recorded: false, confirmedAt: null, processNote: null };
+
+  const rows = c.nk.sqlQuery(Q.consentForSchool, [profile.schoolId]);
+  if (rows.length === 0) return { recorded: false, confirmedAt: null, processNote: null };
+
+  const row = rows[0] as { confirmed_at: string; process_note: string | null };
+  return { recorded: true, confirmedAt: row.confirmed_at, processNote: row.process_note };
+}
+
+/**
+ * Withdraw consent.
+ *
+ * Existing classes are left standing on purpose. Withdrawal stops new classes
+ * being created and is the signal to begin deletion; silently unmaking classes
+ * mid-term would destroy a teacher's work and a student's record as a side
+ * effect of an administrative act, and deletion is a request with its own
+ * thirty-day path (PRD-ONB-018).
+ */
+export function teacherConsentWithdraw(c: Ctx) {
+  const profile = requireRole(c, ['school_admin', 'staff']);
+  if (!profile.schoolId) throw invalidArgument('Your account is not attached to a school');
+
+  const rows = c.nk.sqlQuery(Q.consentWithdraw, [profile.schoolId]);
+  const withdrawn = rows.length > 0;
+  if (withdrawn) audit(c, 'consent.withdraw', 'school', profile.schoolId, {});
+
+  return { withdrawn };
 }
